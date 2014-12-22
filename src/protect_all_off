@@ -1,0 +1,10 @@
+cd bgc*
+chmod a+w *
+cd ../point*
+chmod a+w *
+cd ../include
+chmod a+w *
+cd ../lib
+chmod a+w *
+cd ..
+chmod a+w *
