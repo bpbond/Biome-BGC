@@ -1,15 +1,19 @@
+#ifndef POINTBGC_STRUCT_H
+#define POINTBGC_STRUCT_H
 /* 
 pointbgc_struct.h
-for use with pointbgc front-end to BIOME-BGC library v4.0
+for use with pointbgc front-end to BIOME-BGC library
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGC version 4.1.1
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group (NTSG)
-School of Forestry, University of Montana
-Missoula, MT 59812
+Biome-BGC version 4.2 (final release)
+See copyright.txt for Copyright information
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /* point simulation control parameters */
 typedef struct
@@ -55,5 +59,14 @@ typedef struct
 	file annavgout;        /* annual average output file */
     file annout;           /* annual output file */
 	file anntext;          /* simple annual text output */
+	file dayoutascii;	/* ASCII daily output file */
+	file monoutascii;	/* ASCII monthly output file */
+	file annoutascii;	/* ASCII annual output file */
+	unsigned char bgc_ascii;	
 } output_struct;
 
+#ifdef __cplusplus
+}
+#endif
+
+#endif

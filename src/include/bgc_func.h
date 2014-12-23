@@ -1,15 +1,20 @@
+#ifndef BGC_FUNC_H
+#define BGC_FUNC_H
 /*
 bgc_func.h
 header file for function prototypes
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGC version 4.1.1
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group (NTSG)
-School of Forestry, University of Montana
-Missoula, MT 59812
+Biome-BGC version 4.2 (final release)
+See copyright.txt for Copyright information
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
+#include "bgc.h"
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 int output_map_init(double** output_map, metvar_struct* metv, wstate_struct* ws,
 wflux_struct* wf, cstate_struct* cs, cflux_struct* cf, nstate_struct* ns,
@@ -57,14 +62,14 @@ int canopy_et(const metvar_struct* metv, const epconst_struct* epc,
 epvar_struct* epv, wflux_struct* wf, int verbose);
 int penmon(const pmet_struct* in, int out_flag,	double* et);
 int photosynthesis(psn_struct* psn);
-int outflow(const siteconst_struct* sitec, const wstate_struct* ws,
-wflux_struct* wf);
+int total_photosynthesis(const metvar_struct* metv, const epconst_struct* epc, epvar_struct* epv, cflux_struct* cf, psn_struct *psn_sun, psn_struct *psn_shade);
+int outflow(const siteconst_struct* sitec, const wstate_struct* ws, wflux_struct* wf);
 int decomp(double tsoil, const epconst_struct* epc, epvar_struct* epv, 
 const siteconst_struct* sitec, cstate_struct* cs, cflux_struct* cf,
 nstate_struct* ns, nflux_struct* nf, ntemp_struct* nt);
 int daily_allocation(cflux_struct* cf, cstate_struct* cs,
 nflux_struct* nf, nstate_struct* ns, epconst_struct* epc, epvar_struct* epv,
-ntemp_struct* nt);
+ntemp_struct* nt, double naddfrac, int mode);
 int spinup_daily_allocation(cflux_struct* cf, cstate_struct* cs,
 nflux_struct* nf, nstate_struct* ns, epconst_struct* epc, epvar_struct* epv,
 ntemp_struct* nt, double naddfrac);
@@ -83,6 +88,12 @@ int check_water_balance(wstate_struct* ws, int first_balance);
 int check_carbon_balance(cstate_struct* cs, int first_balance);
 int check_nitrogen_balance(nstate_struct* ns, int first_balance);
 int csummary(cflux_struct* cf, cstate_struct* cs, summary_struct* summary);
+int wsummary(wstate_struct* ws,wflux_struct* wf, summary_struct* summary);
+int output_ascii(float arr[],int nvars, FILE *ptr); 
+double get_co2(co2control_struct * co2,int simyr);		/* Added WMJ 03/16/2005 */
+double get_ndep(ndepcontrol_struct * ndep,int simyr);	/* Added WMJ 03/16/2005 */
+#ifdef __cplusplus
+}
+#endif
 
-
-
+#endif

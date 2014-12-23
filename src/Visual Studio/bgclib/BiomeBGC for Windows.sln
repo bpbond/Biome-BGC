@@ -1,0 +1,38 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bgclib", "bgclib.vcproj", "{A45EE02E-D82A-4241-9D1F-1B71A8FBB82E}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pointbgc", "..\pointbgc\pointbgc.vcproj", "{8EA44542-F76A-48BB-AFF3-A8C6292D9B19}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A45EE02E-D82A-4241-9D1F-1B71A8FBB82E} = {A45EE02E-D82A-4241-9D1F-1B71A8FBB82E}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "restart_diff", "..\restart_diff\restart_diff.vcproj", "{27278D65-8F4B-491E-926D-8E17E6DBDA44}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{A45EE02E-D82A-4241-9D1F-1B71A8FBB82E}.Debug.ActiveCfg = Debug|Win32
+		{A45EE02E-D82A-4241-9D1F-1B71A8FBB82E}.Debug.Build.0 = Debug|Win32
+		{A45EE02E-D82A-4241-9D1F-1B71A8FBB82E}.Release.ActiveCfg = Release|Win32
+		{A45EE02E-D82A-4241-9D1F-1B71A8FBB82E}.Release.Build.0 = Release|Win32
+		{8EA44542-F76A-48BB-AFF3-A8C6292D9B19}.Debug.ActiveCfg = Debug|Win32
+		{8EA44542-F76A-48BB-AFF3-A8C6292D9B19}.Debug.Build.0 = Debug|Win32
+		{8EA44542-F76A-48BB-AFF3-A8C6292D9B19}.Release.ActiveCfg = Release|Win32
+		{8EA44542-F76A-48BB-AFF3-A8C6292D9B19}.Release.Build.0 = Release|Win32
+		{27278D65-8F4B-491E-926D-8E17E6DBDA44}.Debug.ActiveCfg = Debug|Win32
+		{27278D65-8F4B-491E-926D-8E17E6DBDA44}.Debug.Build.0 = Debug|Win32
+		{27278D65-8F4B-491E-926D-8E17E6DBDA44}.Release.ActiveCfg = Release|Win32
+		{27278D65-8F4B-491E-926D-8E17E6DBDA44}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

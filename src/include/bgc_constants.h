@@ -1,15 +1,24 @@
+#ifndef BGC_CONSTANTS_H
+#define BGC_CONSTANTS_H
 /*
 bgc_constants.h
 Holds macro definitions for constants used in bgc()
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGC version 4.1.1
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group (NTSG)
-School of Forestry, University of Montana
-Missoula, MT 59812
+Biome-BGC version 4.2 (final release)
+See copyright.txt for Copyright information
+
+Revisions from version 4.1.1:
+Moved the heterotrophic respiration fractions and base decomposition rates 
+out of the science subroutines and into the constants file so that it is
+easier to make sure modifications are propagated correctly.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /* atmospheric constants */
 /* from the definition of the standard atmosphere, as established
@@ -43,6 +52,41 @@ Iribane, J.V., and W.L. Godson, 1981. Atmospheric Thermodynamics. 2nd
 #define DENITRIF_PROPORTION  0.01  /* fraction of mineralization to volatile */
 #define MOBILEN_PROPORTION   0.1   /* fraction mineral N avail for leaching */
 
+/* use this block of constants to include the dynamics for slowest soil pool (s4) */
+/* respiration fractions for fluxes between compartments (unitless) */ 
+#define	RFL1S1		0.39	/* transfer from litter 1 to soil 1 */
+#define	RFL2S2		0.55	/* transfer from litter 2 to soil 2 */
+#define	RFL4S3		0.29	/* transfer from litter 4 to soil 3 */
+#define	RFS1S2		0.28	/* transfer from soil 1 to soil 2 */
+#define	RFS2S3		0.46    /* transfer from soil 2 to soil 3 */
+#define	RFS3S4		0.55	/* transfer from soil 3 to soil 4 */
+/* base decomposition rate constants (1/day) */ 
+#define KL1_BASE	0.7		/* labile litter pool */
+#define KL2_BASE	0.07	/* cellulose litter pool */
+#define KL4_BASE	0.014	/* lignin litter pool */
+#define KS1_BASE	0.07	/* fast microbial recycling pool */
+#define KS2_BASE	0.014	/* medium microbial recycling pool */
+#define KS3_BASE	0.0014	/* slow microbial recycling pool */
+#define KS4_BASE	0.0001	/* recalcitrant SOM (humus) pool */
+#define KFRAG_BASE	0.001	/* physical fragmentation of coarse woody debris */
+
+/* use this block of constants to exclude the dynamics for slowest soil pool (s4) */
+/* respiration fractions for fluxes between compartments (unitless) */ 
+/*#define	RFL1S1	0.39*/	/* transfer from litter 1 to soil 1 */
+/*#define	RFL2S2	0.55*/	/* transfer from litter 2 to soil 2 */
+/*#define	RFL4S3	0.29*/	/* transfer from litter 4 to soil 3 */
+/*#define	RFS1S2	0.28*/	/* transfer from soil 1 to soil 2 */
+/*#define	RFS2S3	0.46*/  /* transfer from soil 2 to soil 3 */
+/*#define	RFS3S4	1.00*/	/* transfer from soil 3 to soil 4 */
+/* base decomposition rate constants (1/day) */ 
+/*#define KL1_BASE	0.7	*/	/* labile litter pool */
+/*#define KL2_BASE	0.07*/	/* cellulose litter pool */
+/*#define KL4_BASE	0.014*/	/* lignin litter pool */
+/*#define KS1_BASE	0.07*/	/* fast microbial recycling pool */
+/*#define KS2_BASE	0.014*/	/* medium microbial recycling pool */
+/*#define KS3_BASE	0.0005*/	/* slow microbial recycling pool */
+/*#define KS4_BASE	0.0000*/	/* recalcitrant SOM (humus) pool */
+
 /* precision control */
 /* This constant determines the lower limit of state variables before they
 are set to 0.0 to control rounding and overflow errors */
@@ -51,6 +95,20 @@ are set to 0.0 to control rounding and overflow errors */
 /* spinup control */
 /* maximum allowable trend in slow soil carbon at steady-state (kgC/m2/yr) */
 #define SPINUP_TOLERANCE 0.0005
+#define MODE_INI 0
+#define MODE_SPINUP 1
+#define MODE_MODEL 2
+#define MODE_SPINNGO 3
 
 /* output control constants */
 #define NMAP 700
+
+/* For modifying summary output as per pan-arctic bgc */
+#define SANE 1
+#define INSANE 0
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
