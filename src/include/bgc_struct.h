@@ -1,19 +1,20 @@
+#ifndef BGC_STRUCT_H
+#define BGC_STRUCT_H
+
 /*
 bgc_struct.h 
 header file for structure definitions
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGC version 4.1.1
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group (NTSG)
-School of Forestry, University of Montana
-Missoula, MT 59812
+Biome-BGC version 4.2 (final release)
+See copyright.txt for Copyright information
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Modified:
-4/17/2000 (PET): Added new nf structure element (sminn_to_denitrif). This is
-part of a larger modification that increases denitrification in the presence
-of excess soil mineral N.
 */
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /* simulation control variables */
 typedef struct
@@ -50,9 +51,21 @@ typedef struct
 typedef struct
 {
 	int varco2;             /* (flag) 0=const 1=use file 2=const,file for Ndep */
-    double co2ppm;          /* (ppm)     constant CO2 concentration */
-	double* co2ppm_array;   /* (ppm)     annual CO2 concentration array */
+    double co2ppm;          /* (ppm)  constant CO2 concentration */
+	double* co2ppm_array;   /* (ppm)  annual CO2 concentration array */
+	int* co2year_array;		/* (year) year corresponding to the concentration value in co2ppm_arry */
+	int co2vals;			/* (num)  The number of CO2 concentration values in the co2ppm_array */
 } co2control_struct;	
+
+/* a structure to hold annual nitrogen deposition data */
+typedef struct
+{
+	int varndep;            /* (flag) 0=const 1=use file  */
+    double ndep;			/* (kgN m-2 yr-1)  constant ndep value */
+	double* ndep_array;		/* (kgN m-2 yr-1)  annual ndep array */
+	int* ndepyear_array;	/* (year) year corresponding to the ndep value in ndep_array */
+	int ndepvals;			/* (num)  The number of ndep values in the ndep_array */
+} ndepcontrol_struct;	
 
 /* meteorological variable arrays */
 /* inputs from mtclim, except for tavg and tavg_ra
@@ -124,6 +137,7 @@ typedef struct
     double soilw_evap;        /* (kgH2O/m2/d) evaporation from soil */
     double soilw_trans;       /* (kgH2O/m2/d) transpiration */     
     double soilw_outflow;     /* (kgH2O/m2/d) outflow */
+		double et;                /* (kgH20/m2/d) evapotranspiration */
 } wflux_struct;
 
 /* carbon state initialization structure */
@@ -583,6 +597,7 @@ typedef struct
 	double daily_gross_nmin; /* (kgN/m2/d) daily gross N mineralization */
 	double daily_gross_nimmob; /* (kgN/m2/d) daily gross N immobilization */ 
 	double daily_net_nmin; /* (kgN/m2/d) daily net N mineralization */
+	double fpi;            /* (DIM) fraction of potential immobilization */
 
     /* the following are optional outputs, usually set if the appropriate
     functions are called with the flag verbose = 1 */
@@ -723,6 +738,12 @@ typedef struct
 	double daily_hr;       /* kgC/m2/day  heterotrophic respiration */
 	double daily_fire;     /* kgC/m2/day  fire losses */
 	double daily_litfallc; /* kgC/m2/day  total litterfall */
+	double daily_et;    /* kgW/m2/day daily evapotranspiration */
+	double daily_evap;    /* kgW/m2/day daily evaporation */
+	double daily_trans;   /* kgW/m2/day daily transpiration */
+	double daily_outflow; /* kgW/m2/day daily outflow */
+	double daily_soilw; /* kgW/m2/day daily soilw */
+	double daily_snoww; /* kgW/m2/day daily snoww */
 	double cum_npp;        /* kgC/m2  Summed over entire simulation */
 	double cum_nep;        /* kgC/m2  Summed over entire simulation */
 	double cum_nee;        /* kgC/m2  Summed over entire simulation */
@@ -814,3 +835,9 @@ typedef struct
 	double dsr;
 	int metyr;
 } restart_data_struct;
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

@@ -1,0 +1,119 @@
+Development Notes for Biome BGC.
+This file is a list of code/internal changes.
+
+======
+4.2 (Final Release)
+======
+* No changes from rc3
+
+======
+4.2rc3
+======
+* Fixed minor memory bugs in new ndep code.
+
+* Added serveral fixes to build code on Win32.
+* Added public domain getops.[ch] files for use on Win32
+* Added Visual Studio solution file.
+
+======
+4.2rc2
+======
+* Fixed Spin & Go so that the '-g' flag actually works.
+
+* IMPORTANT Corrected use of the co2 file. It now correctly looks
+	up the value for the model year. Previously it simply used co2
+	entries starting at the top of the co2 file.
+
+* Added External Nitrogen Deposition File see USAGE.TXT for more
+	information.
+
+======
+4.2rc1
+======
+*	Identical to last 4.2pre
+
+======
+4.2pre
+======
+* Added command line option support using getopts() to add functionality
+	without breaking backwards compatibility. See USAGE.TXT for options.
+
+*	Centralized header files bgc.h for libbgc pointbgc.h for pointbgc
+	C source files now only need to include one header, all others get
+	included automatically in the correct order.
+
+* Added bgc_io.c for non-data I/O. Replaced all printf()s to stdout
+	with the new wrapper function bgc_printf().
+
+	### DO NOT Use printf/sprintf/fprintf for output/error messages
+	###	Use bgc_printf() instead
+
+*	bgc_printf() is for outputing information to standard out and errror
+	it behaves similar to printf but with an extra first argument:
+
+		int bgc_printf(VERBOSITY, "Message\n", ...);
+
+	VERBOSITY is one of several defined keywords. You use the keyword
+	appropriate to when your message should be printed.
+
+		BV_ERROR:			For fatal error messages
+		BV_WARN: 			For non-fatal warnings
+		BV_PROGRESS:	For basic progress information
+		BV_DETAIL:		For detailed progress information
+		BV_DIAG:			For internal diagnostic/debug messages
+	
+	bgc_printf also supports logging functionality see USAGE.TXT
+	for usage.
+
+*	Replaced all DEBUG printf's with proper bgc_printf calls
+
+* Merged Spinup code into main code to reduce code duplication
+	merged spinup_bgc.c into bgc.c
+
+* Added pan arctic summary output. Traditional behavior is set by
+	signed char summary_sanity = INSANE ; in bgc()
+
+	SANE behavior (pan-artic style) calculates these correclty:
+	Maximum Monthly LAI
+	End of month Snow Water
+	End of month Sail Water content
+
+	Also added new output_map variables
+	+   output_map[641] = &summary->daily_et;
+	+   output_map[642] = &summary->daily_outflow;
+	+   output_map[643] = &summary->daily_evap;
+	+   output_map[644] = &summary->daily_trans;
+	+   output_map[645] = &summary->daily_soilw;
+	+   output_map[646] = &summary->daily_snoww;
+
+* Rewrote make files to not use version specific directories
+* Added 'make test' to build then run a spinup and model test
+
+* Moved all photosynthesis science code out of bgc.c and into 
+	photosynthesis.c
+
+* Corrected some sprintf formating to be more ANSI C standards 
+	complient in prephenology.c
+
+* Added tests/corrections for negative variables in radtrans.c and 
+	metarr_init.c: (swavgfd,par,swabs_plaishade,parabs_plaishadei,dal)
+
+* Added code to improve portability and standards compliance.
+
+* Added 'make tools' to master makefile. This builds the restart 
+	diff/view tool.
+
+* Replaced floating point equality tests with tolerance tests.
+	Global tolerance define: FLT_COND_TOL = 1e-10
+	epc_init.c, sitec_init.c
+
+* Various memory leak and pointer assignment fixes in pointbgc.c	
+
+* Fix to prevent SEGFAULT on empty restart file in pointbgc.c
+
+* Split output_init.c into output_ctrl.c and output_init.c
+	output_ctrl.c reads the output controls from the ini file
+	output_init.c initializes the output files
+
+* Added 'spin-n-go' functionality. This mode '-g' flag will run both
+	the model and the spinup without generating the restart file.

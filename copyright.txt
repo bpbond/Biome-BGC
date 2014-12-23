@@ -1,18 +1,21 @@
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGC version 4.1.1
-Copyright 2000, Peter E. Thornton
+Biome-BGC version 4.2 (Final Release)
+Copyright 2006
 Numerical Terradynamics Simulation Group (NTSG)
-School of Forestry, University of Montana
+College of Forestry and Conservation
+University of Montana 	 
 Missoula, MT 59812
+Phone:  (406) 243-6311;  Fax:  (406) 243-4510
+website: http://www.ntsg.umt.edu
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 You are not permitted to make copies of any part of the accompanying
 computer code for distribution to any other person or group. However,
-anyone can get a free, complete copy of the code from the NTSG
-website...
-www.forestry.umt.edu/ntsg  (go to "Models to Download")
+anyone can get a free, complete copy of the code online:
 
-The reason for this copying restriction is that we want to keep track
+http://www.ntsg.umt.edu/models/bgc/
+
+The purpose for this copying restriction is to keep track
 of who has which versions of the code, so that when updates or important
 notices are released, we can reach as much of our user community as possible.
 

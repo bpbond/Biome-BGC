@@ -1,0 +1,78 @@
+Notes on Usage Changes to Biome-BGC version 4.2
+
+
+* Biome-BGC Now support a variety of command line options. Here is
+	the usage statement:
+
+usage: ./bgc {-l <logfile>} {-s | -v [0..4]} {-p} {-V} {-a} {-u | -g | -m} <ini file>
+
+       -l <logfile> send output to logfile, overwrite old logfile
+       -V print version number and build information and exit
+       -p do alternate calculation for summary outputs (see USAGE.TXT)
+       -a output ascii formated data
+       -s run in silent mode, no standard out or error
+       -v [0..4] set the verbosity level 
+           0 ERROR - only report errors 
+           1 WARN - also report warnings
+           2 PROGRESS - also report basic progress information
+           3 DETAIL - also report progress details (default level)
+           4 DIAG - also print internal diagnostics
+       -u Run in spin-up mode (over ride ini setting).
+       -g Run in spin 'n go mode: do spinup and model in one run
+       -m Run in model mode (over ride ini setting).
+			 -n <ndepfile> use an external nitrogen deposition file.
+
+* Notes about the verbosity (-v) flag.
+
+	You can use either the numeric verbosity setting (0-4) or the
+	associated keyword. The verbosity keywords are not case sensitive.
+
+	Also, -v and -s shouldn't be used together. If they are, only the
+	last one on the command line used.
+
+
+* Notes on the logfile (-l) flag.
+
+	Using both -l and -s will always result in an empty logfile being 
+	created
+
+
+* Summary output changes with the '-p' flag
+
+	Using the '-p' flag slightly modifies the way some summary outputs
+	are calculated. (changes taken from the pan-artic bgc variant)
+	*	Annual Max LAI is really the annual max LAI, not some average.
+	* Monthly Max LAI is really the monthly max LAI, not some average.
+	* Monthly Average Snow water is a monthly delta.
+	* Monthly Average Soil water content is monthly delta.
+
+	All other summary variables are calculated the same way as previous
+	versions.
+
+* "Spin & Go" mode (and associated flags)
+	'-g' will run the spinup and then the model all in one run. It will 
+		NOT write a restart file, regardless of what your ini file says.
+	'-u' will spinup the model and write the restart file, overridding
+		your ini settings.
+	'-m' will run the model and write output. Note that your ini must 
+		have some output variables set or this will not work.
+
+* Ascii output with the '-a' flag.
+	Using this flag will produce tab delimited ascii output files with
+	a .ascii extension. These files are ready to be imported into excel
+
+* Nitrogen Deposition File with the '-n' flag.
+	Use an external nitrogen file. It is formatted like the co2 file
+	and there is an example file in co2/ndep.txt
+
+
+## Build System Changes ##
+
+* new 'make test' target. typing 'make test' from the src/ directory
+	will make a clean build and then run the spinup and model for the 
+	included input data for Missoula, MT, USA. This provides a quick 
+	way to test that your build appears to run ok. Note that this does
+	NOT validate the output data. It just tries to produce it.
+
+* BiomeBGC can be built on Windows using Visual Studio (tested with 
+	VS2003). Use the Solution file (.sln) in src/Visual Studio/bgclib

@@ -1,0 +1,5 @@
+Biome-BGC 4.2 includes a new tool called 'restart_diff'
+
+restart_diff will output the contents of your restart file, or
+if you pass it two files, it will output the difference between
+your two restart files.

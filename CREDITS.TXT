@@ -1,0 +1,13 @@
+Biome-BGC is Copyrighted by NTSG, The University of Montana, 2005
+
+Here is a list of developers, and other contributors to Biome-BGC.
+
+Dr. Peter E. Thornton (Original Development), thornton@ucar.edu
+
+Dr. W. Matt Jolly, mattj@ntsg.umt.edu (model development, bug fixing, testing)
+
+Andrew A. Neuschwander, andrew@ntsg.umt.edu (code integration and maintainence)
+
+Andy Michaelis, amac@ntsg.umt.edu (bug fixes)
+
+Saxon Holbrook, saxon@ntsg.umt.edu, (bug fixing, code integration, restart diff tool)
