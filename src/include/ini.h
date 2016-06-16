@@ -1,25 +1,14 @@
-#ifndef INI_H
-#define INI_H
-
 /*
 ini.h
 header file for file I/O handling and initialization file reading
-for use with BIOME-BGC library
+for use with BBGC MuSo v4 library
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGC version 4.2 (final release)
-See copyright.txt for Copyright information
+BBGC MuSo v4
+Copyright 2000, Peter E. Thornton
+Copyright 2014, D. Hidy
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-#define FLT_COND_TOL 1e-10  /* This constant is used in if conditions    *
-                             * where floating point values are compared  */
-
 
 /* structure definition for filename handling */
 typedef struct
@@ -31,10 +20,5 @@ typedef struct
 /* function prototypes */
 int file_open (file *target, char mode);
 int scan_value (file ini, void *var, char mode);
+int scan_array (file ini, void *var, char mode, int nl);
 int scan_open (file ini,file *target,char mode);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif

@@ -1,19 +1,14 @@
-#ifndef POINTBGC_STRUCT_H
-#define POINTBGC_STRUCT_H
 /* 
 pointbgc_struct.h
-for use with pointbgc front-end to BIOME-BGC library
+for use with pointbgc front-end to BBGC MuSo v4 library
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGC version 4.2 (final release)
-See copyright.txt for Copyright information
+BBGC MuSo v4
+Copyright 2000, Peter E. Thornton
+Copyright 2014, D. Hidy
+Hungarian Academy of Sciences
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 /* point simulation control parameters */
 typedef struct
@@ -59,14 +54,27 @@ typedef struct
 	file annavgout;        /* annual average output file */
     file annout;           /* annual output file */
 	file anntext;          /* simple annual text output */
-	file dayoutascii;	/* ASCII daily output file */
-	file monoutascii;	/* ASCII monthly output file */
-	file annoutascii;	/* ASCII annual output file */
-	unsigned char bgc_ascii;	
+	file control_file;	   /* Hidy 2012 - file to write out control variables */
+	file log_file;		   /* Hidy 2015 - main information about model run */
 } output_struct;
 
-#ifdef __cplusplus
-}
-#endif
 
-#endif
+/* GSI arrays - by Hidy 2012.*/
+typedef struct
+{
+	int GSI_flag;					/* flag for doing runoff or not */
+	double snowcover_limit;			/* critical amount of snow (above: no vegetation period) */
+	double heatsum_limit1;			/* lower limit of heatsum to calculate heatsum index */
+    double heatsum_limit2;			/* upper limit of heatsum to calculate heatsum index */
+	double tmin_limit1;				/* lower limit of tmin to calculate tmin index */
+	double tmin_limit2;				/* upper limit of tmin to calculate tmin index  */
+	double vpd_limit1;				/* lower limit of tmin to calculate vpd index  */
+	double vpd_limit2;				/* upper limit of tmin to calculate vpd index  */
+	double dayl_limit1;				/* lower limit of dayl to calculate vpd index  */
+	double dayl_limit2;				/* upper limit of dayl to calculate vpd index  */
+	int n_moving_avg;				/* moving average (calculated from indicatiors to avoid the effects of single extreme events)*/
+	double GSI_limit_SGS;			/* when GSI index fisrt time greater that limit -> start of the growing season */
+	double GSI_limit_EGS;			/* when GSI index fisrt time less that limit -> end of the growing season */
+	file GSI_file;					/* file to write out th estimated start and the end of vegper */
+} GSI_struct;
+

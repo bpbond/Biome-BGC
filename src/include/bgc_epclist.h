@@ -1,19 +1,13 @@
-#ifndef BGC_EPCLIST_H
-#define BGC_EPCLIST_H
 /*
 epclist.h
 structure for array of ecophysiological constants structures 
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGC version 4.2 (final release)
-See copyright.txt for Copyright information
+BBGC MuSo v4
+Copyright 2000, Peter E. Thornton
+Numerical Terradynamics Simulation Group
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 typedef struct
 {
@@ -23,10 +17,4 @@ typedef struct
 
 /* function prototypes */
 int epclist_init(file init, epclist_struct* epclist);
-int epc_init(file init, epconst_struct* epc);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+int epc_init(file init, epconst_struct* epc, control_struct* ctrl); // Hidy 2012 - changing WPM);
