@@ -4,9 +4,10 @@ calculation of soil water content layer by layer taking into account soil hydrol
 (precipitation, evaporation, runoff, percolation, diffusion)
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -38,18 +39,20 @@ int multilayer_hydrolprocess(const control_struct* ctrl, const siteconst_struct*
 	
 
 	/* internal variables */
-	double prcp, runoff, prcp_to_soil,evap_diff;
-	double soilw_hw0, soilw_sat0;  /* (kgH2O/m2/min) */
+	double prcp, evap_diff;
+	double soilw_hw0, soilw_before;  /* (kgH2O/m2/min) */
 	int layer;
 	double coeff_soiltype, coeff_soilmoist, RCN, coeff_runoff;
 	int ok=1;
-
+	soilw_before=0;
 
 	/* *****************************/
 	/* 1. PRECIPITATION AND RUNOFF*/
 
 	/* when the precipitation at the surface exceeds the max. infiltration rate, the excess water is put into surfacerunoff (Balsamo et al. 20008; Eq.(7)) */
-	prcp = (wf->prcp_to_soilw + wf->snoww_to_soilw + wf->IRG_to_prcp);
+	
+
+	prcp = (wf->prcp_to_soilw + wf->snoww_to_soilw + wf->IRG_to_prcp + ws->pond_water);
 
 
 	/* if the precipitation is greater than critical amount a fixed part of prcp is lost due to runoff (based on Campbell and Diaz, 1988) */
@@ -63,68 +66,17 @@ int multilayer_hydrolprocess(const control_struct* ctrl, const siteconst_struct*
 
 	if (prcp > coeff_runoff)
 	{
-		runoff = pow(prcp + ws->pond_water- coeff_runoff, 2) / ((prcp + ws->pond_water) + (1 - coeff_soilmoist)*coeff_soiltype);
+		wf->prcp_to_runoff = pow(prcp - coeff_runoff, 2) / (prcp + (1 - coeff_soilmoist)*coeff_soiltype);
+
 	}
 	else
 	{
-		runoff = 0;
+		wf->prcp_to_runoff = 0;
 	}
-
-	wf->prcp_to_runoff = runoff;
-
-	/* amount of prcp after runoff */
-	prcp_to_soil = prcp - runoff;
-
-	/* if pond water is avaialable -> prcp to pond water, otherwise: prcp to soil */
-	if (ws->pond_water > 0)
-	{
-		ws->pond_water += prcp_to_soil;
-	}
-	else
-	{
-		ws->soilw[0] += prcp_to_soil;
-	}
-
-	/* ********************************************/
-	/* 2. EVAPORATION */
-	
-
-	/* actual soil water content at theoretical lower limit of water content: hygroscopic water content */
-	soilw_hw0 = sitec->vwc_hw[0] * sitec->soillayer_thickness[0] * water_density;
-
-	/* evap_diff: control parameter to avoid negative soil water content (due to overestimated evaporation + dry soil) */
-	evap_diff = ws->soilw[0] - wf->soilw_evap - soilw_hw0;
-
-	/* theoretical lower limit of water content: hygroscopic water content. */
-	if (evap_diff < 0)
-	{
-		wf->soilw_evap += evap_diff;
-	//	if (ctrl->onscreen && fabs(evap_diff) > CRIT_PREC) printf("WARNING: Limited evaporation due to dry soil (multilayer_hydrolprocess.c)\n");
-	}
-	
-	ws->soilw[0] -= wf->soilw_evap;
-
 
 
 	/* ********************************/
-	/* 3.  POND WATER */
-
-	/* 3A. POND WATER ACCUMULATION: water stored on surface which can not infiltrated because of saturation */
-	
-	/* theoretical upper limit of water content: saturation value (amount above saturation is stored on the surface) */
-	soilw_sat0     = sitec->vwc_sat[0] * sitec->soillayer_thickness[0] * water_density;
-
-	if (ws->soilw[0] > soilw_sat0)
-	{
-		ws->pond_water   += ws->soilw[0] - soilw_sat0;
-		ws->soilw[0] = soilw_sat0;
-	}
-
-	epv->vwc[0]  = ws->soilw[0] / sitec->soillayer_thickness[0] / water_density;
-
-
-	/* ********************************/
-	/* 4. PERCOLATION  AND DIFFUSION  */
+	/* 2. PERCOLATION  AND DIFFUSION  */
 	if (epc->SHCM_flag == 0)
 	{
 		if (ok && richards(sitec, epc, epv, ws, wf))
@@ -149,12 +101,37 @@ int multilayer_hydrolprocess(const control_struct* ctrl, const siteconst_struct*
 	}
 
 	/* ---------------------------------------------------------*/	
+
+	/* ********************************************/
+	/* 3. EVAPORATION */
 	
+
+	/* actual soil water content at theoretical lower limit of water content: hygroscopic water content */
+	soilw_hw0 = sitec->vwc_hw[0] * sitec->soillayer_thickness[0] * water_density;
+
+	/* evap_diff: control parameter to avoid negative soil water content (due to overestimated evaporation + dry soil) */
+	evap_diff = ws->soilw[0] - wf->soilw_evap - soilw_hw0;
+
+	/* theoretical lower limit of water content: hygroscopic water content. */
+	if (evap_diff < 0)
+	{
+		wf->soilw_evap += evap_diff;
+	}
+	
+	ws->soilw[0] -= wf->soilw_evap;
+	epv->vwc[0]  = ws->soilw[0] / water_density / sitec->soillayer_thickness[0];
+
+
+	/* ********************************/
 	/* BOTTOM LAYER IS SPECIAL: percolated water is net loss for the system, water content does not change */
+	
+	
 	if (sitec->gwd_act == DATA_GAP || ( sitec->gwd_act != DATA_GAP && sitec->gwd_act > sitec->soillayer_depth[N_SOILLAYERS-1]))
 	{
+		soilw_before              = ws->soilw[N_SOILLAYERS-1];
 		epv->vwc[N_SOILLAYERS-1]  = sitec->vwc_fc[N_SOILLAYERS-1];
 		ws->soilw[N_SOILLAYERS-1] = sitec->vwc_fc[N_SOILLAYERS-1] * (sitec->soillayer_thickness[N_SOILLAYERS-1]) * 1000.0;
+		ws->deeppercolation_snk += (soilw_before - ws->soilw[N_SOILLAYERS-1]);
 	}
 
 	

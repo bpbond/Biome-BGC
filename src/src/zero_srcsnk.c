@@ -3,11 +3,12 @@ zero_srcsnk.c
 fill the source and sink variables with 0.0 at the start of the simulation
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -31,7 +32,6 @@ int zero_srcsnk(cstate_struct* cs, nstate_struct* ns, wstate_struct* ws,
 	ws->soilevap_snk = 0.0;
 	ws->snowsubl_snk = 0.0;
 	ws->canopyevap_snk = 0.0;
-	ws->pondwevap_snk = 0.0;
 	ws->trans_snk = 0.0;
 	ws->pondwevap_snk = 0.0;
 	ws->prcp_src = 0.0;
@@ -56,8 +56,9 @@ int zero_srcsnk(cstate_struct* cs, nstate_struct* ns, wstate_struct* ws,
 	ws->deepdiffusion_snk = 0.0; 
 	ws->deeptrans_src = 0.0; 
 	ws->groundwater_src = 0.0;
+	ws->pondwater_src = 0.0;
+    ws->balance = 0;
 
-;
 
 	/* zero the carbon sources and sinks */
 	cs->psnsun_src = 0.0;
@@ -110,6 +111,7 @@ int zero_srcsnk(cstate_struct* cs, nstate_struct* ns, wstate_struct* ws,
 	/* softstem simulation - Hidy 2013.  */
 	cs->softstem_mr_snk = 0.0;
 	cs->softstem_gr_snk = 0.0;
+	cs->balance = 0;
 
 	/* zero the nitrogen sources and sinks */
 	ns->nfix_src = 0.0;
@@ -144,6 +146,7 @@ int zero_srcsnk(cstate_struct* cs, nstate_struct* ns, wstate_struct* ws,
 	ns->PLG_npool = 0.0;
 	/* fertilizing - Hidy 2012. */
 	ns->FRZsrc = 0.0;
+	ns->balance = 0;
 	
 	/* zero the summary variables */
 	summary->cum_npp_ann = 0.0;

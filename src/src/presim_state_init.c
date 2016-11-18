@@ -4,11 +4,12 @@ Initialize water, carbon, and nitrogen state variables to 0.0 before
 each simulation.
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -34,31 +35,27 @@ int presim_state_init(wstate_struct* ws, cstate_struct* cs, nstate_struct* ns, c
 	}
 	ws->soilw_SUM = 0.0;
 	ws->pond_water = 0.0;
-
-	ws->snoww = 0.0;
-	ws->canopyw = 0.0;
-	ws->prcp_src = 0.0;
-	ws->soilevap_snk = 0.0;
-	ws->snowsubl_snk = 0.0;
-	ws->canopyevap_snk = 0.0;
-	ws->pondwevap_snk = 0.0;
-	ws->trans_snk = 0.0;	
-	/* thinning - Hidy 2012. */
-	ws->canopyw_THNsnk = 0.0;
-	/* mowing - Hidy 2008. */
-	ws->canopyw_MOWsnk = 0.0;
-	/* harvesting - Hidy 2012. */
-	ws->canopyw_HRVsnk = 0.0;
-	/* ploughing - Hidy 2012. */
-	ws->canopyw_PLGsnk = 0.0;
-	/* grazing - Hidy 2008. */
-	ws->canopyw_GRZsnk = 0.0;
-	/* soil-water submodel - Hidy 2010. */
-	ws->runoff_snk = 0.0;
-	ws->deeppercolation_snk = 0.0;
-	ws->deepdiffusion_snk = 0.0;
-	ws->deeptrans_src = 0.0;
-    ws->groundwater_src = 0.0;
+	ws->snoww=0;
+	ws->canopyw=0;
+	ws->prcp_src=0;
+	ws->soilevap_snk=0;
+	ws->snowsubl_snk=0;
+	ws->canopyevap_snk=0;
+	ws->pondwevap_snk=0;
+	ws->trans_snk=0;
+	ws->runoff_snk=0;
+	ws->deeppercolation_snk=0;
+	ws->deepdiffusion_snk=0;
+	ws->deeptrans_src=0;
+	ws->groundwater_src=0;
+	ws->pondwater_src=0;
+	ws->canopyw_THNsnk=0;
+	ws->canopyw_MOWsnk=0;
+	ws->canopyw_HRVsnk=0;
+	ws->canopyw_PLGsnk=0;
+	ws->canopyw_GRZsnk=0;
+	ws->IRGsrc=0;
+	ws->balance = 0;
 
 	cinit->max_leafc = 0.0;
 	cinit->max_stemc = 0.0;
@@ -173,6 +170,7 @@ int presim_state_init(wstate_struct* ws, cstate_struct* cs, nstate_struct* ns, c
 	cs->softstemc_transfer = 0.0;
 	cs->softstem_gr_snk = 0.0;
 	cs->softstem_mr_snk = 0.0;
+	cs->balance = 0;
 	
 	ns->leafn = 0.0;
 	ns->leafn_storage = 0.0;
@@ -272,7 +270,7 @@ int presim_state_init(wstate_struct* ws, cstate_struct* cs, nstate_struct* ns, c
 	ns->softstemn_storage = 0.0;
 	ns->softstemn_transfer = 0.0;
 	
-	
+	ns->balance = 0;
 	return(!ok);
 }
 	

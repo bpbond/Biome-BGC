@@ -3,11 +3,12 @@ check_balance.c
 daily test of mass balance (water, carbon, and nitrogen state variables)
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Siulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -29,7 +30,7 @@ int check_water_balance(wstate_struct* ws, int first_balance)
 	/* DAILY CHECK ON WATER BALANCE */
 	
 	/* sum of sources */
-	in = ws->prcp_src + ws->deeptrans_src + ws->groundwater_src + ws->IRGsrc;
+	in = ws->prcp_src + ws->groundwater_src + ws->IRGsrc;
 	
 	/* sum of sinks */
 	out = ws->soilevap_snk + ws->snowsubl_snk + 
@@ -57,10 +58,9 @@ int check_water_balance(wstate_struct* ws, int first_balance)
 	 
 	if (!first_balance)
 	{
-		if (fabs(old_balance - balance) > 1e-4)
+		if (fabs(old_balance - balance) > CRIT_PREC)
 		{
-			printf("WARNING: Water balance error:\n");
-			printf("Difference (previous - current) = %lf\n",old_balance-balance);
+			if (fabs(old_balance - balance) > ws->balance) ws->balance = fabs(old_balance - balance);
 		}
 	}
 	old_balance = balance;
@@ -136,10 +136,11 @@ int check_carbon_balance(cstate_struct* cs, int first_balance)
 	 
 	if (!first_balance)
 	{
-		if (fabs(old_balance - balance) > 1e-4)
+		if (fabs(old_balance - balance) > 0)
 		{
-	 		printf("WARNING: carbon balance error:\n");
-			printf("Difference (previous - current) = %lf\n",old_balance-balance);
+	 		if (fabs(old_balance - balance) > cs->balance) cs->balance = fabs(old_balance - balance);
+
+
 		}
 	}
 	old_balance = balance;
@@ -215,10 +216,10 @@ int check_nitrogen_balance(nstate_struct* ns, int first_balance)
 	 
 	if (!first_balance)
 	{
-		if (fabs(old_balance - balance) > 1e-4)
+	
+		if (fabs(old_balance - balance) > 0)
 		{
-			printf("WARNING: nitrogen balance error:\n");
-			printf("Difference (previous - current) = %lf\n",old_balance-balance);
+			if (fabs(old_balance - balance) > ns->balance) ns->balance = fabs(old_balance - balance);
 		}
 	}
 	old_balance = balance;

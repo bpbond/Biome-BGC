@@ -6,11 +6,12 @@ end of the daily allocation function, in order to allow competition
 between microbes and plants for available N.
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -311,19 +312,18 @@ nstate_struct* ns, nflux_struct* nf, ntemp_struct* nt)
 	else mineralized += -pmnf_s3s4;
 	mineralized += -pmnf_s4;
 
-	if (layer == 0)
+	/* OTHER GHG FLUX - only from the first layer (Hidy 2016. )*/
+	CNR = (soil1c + soil2c + soil3c + soil4c)/(soil1n + soil2n + soil3n + soil4n);
+	BD  = sitec->BD[0];
+	if (ok && otherGHGflux_estimation(epc, CNR, BD, epv->vwc[0], metv->tsoil[0], &N2O_flux, &CH4_flux))
 	{
-		CNR = (soil1c + soil2c + soil3c + soil4c)/(soil1n + soil2n + soil3n + soil4n);
-		BD  = sitec->BD[layer];
-		if (ok && otherGHGflux_estimation(epc, CNR, BD, epv->vwc[layer], metv->tsoil[layer], &N2O_flux, &CH4_flux))
-		{
-			printf("Error: otherGHGflux_estimation() in decomp.c\n");
-			ok=0;
-		}	
-		nf->N2O_flux_soil = N2O_flux;
-		cf->CH4_flux_soil = CH4_flux;
+		printf("Error: otherGHGflux_estimation() in decomp.c\n");
+		ok=0;
+	}	
+	nf->N2O_flux_soil = N2O_flux;
+	cf->CH4_flux_soil = CH4_flux;
 		
-	}
+
 
 
 

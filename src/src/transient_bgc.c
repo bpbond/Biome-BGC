@@ -10,11 +10,10 @@ This run has no output and it is optional
 (spinup_ini: CO2_CONTROL block varCO2 flag=1)
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 */
@@ -476,7 +475,7 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 
 
 			/* soil hydrological parameters: psi and vwc  */
- 			if (ok && multilayer_hydrolparams(&sitec, &ws, &epv))
+ 			if (ok && multilayer_hydrolparams(&sitec, &ws, &epv, &metv))
 			{
 				printf("Error in multilayer_hydrolparams() from bgc()\n");
 				ok=0;
@@ -487,7 +486,7 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 #endif
 
 			/* daily meteorological variables from metarrays */
-			if (ok && daymet(&ctrl, &metarr, &sitec, &epc, &PLT, &ws, &epv, &metv, &tair_annavg, metday))
+			if (ok && daymet(&ctrl, &metarr, &sitec, &epc, &PLT, &HRV,&ws, &epv, &metv, &tair_annavg, metday))
 			{
 				printf("Error in daymet() from bgc()\n");
 				ok=0;
@@ -539,7 +538,7 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 			/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Hidy 2011 - MULTILAYER SOIL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 			/* rooting depth */
- 			 if (ok && multilayer_rootdepth(&ctrl, &epc, &sitec, &phen,  &PLT, &HRV, &epv, &ns, &metv))
+ 			 if (ok && multilayer_rootdepth(&ctrl, &epc, &sitec, &phen,  &PLT, &HRV, &epv, &ns))
 			 {
 				printf("Error in multilayer_rootdepth() from bgc()\n");
 				ok=0;
@@ -548,7 +547,7 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 			printf("%d\t%d\tdone multilayer_rootdepth\n",simyr,yday);
 #endif
 
-		
+
 			/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 			/* calculate leaf area index, sun and shade fractions, and specific
 			leaf area for sun and shade canopy fractions, then calculate
@@ -825,6 +824,16 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 			printf("%d\t%d\tdone growth_resp\n",simyr,yday);
 #endif
 
+         /* ground water calculation */
+			if (ok && groundwater(&ctrl, &sitec, &epv, &ws, &wf))
+			{
+				printf("Error in groundwater() from bgc()\n");
+				ok=0;
+			}
+
+#ifdef DEBUG
+			printf("%d\t%d\tdone groundwater\n",simyr,yday);
+#endif	
 		
 			/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  MULTILAYER SOIL !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 			/* Hidy 2013 - multilayer soil hydrology: percolation calculation based on PRCP, RUNOFF, EVAP, TRANS */
@@ -846,16 +855,7 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 			printf("%d\t%d\tdone multilayer_hydrolprocess\n",simyr,yday);
 #endif	
 		
-                        /* ground water calculation */
-			if (ok && groundwater(&ctrl, &sitec, &epv, &ws, &wf))
-			{
-				printf("Error in groundwater() from bgc()\n");
-				ok=0;
-			}
-
-#ifdef DEBUG
-			printf("%d\t%d\tdone groundwater\n",simyr,yday);
-#endif	
+               
 			/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 			/* daily update of the water state variables */
@@ -1083,7 +1083,7 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	fprintf(bgcout->log_file.ptr, "Total soil carbon content (kgC/m2):                     %12.1f\n",summary.soilc);
 	fprintf(bgcout->log_file.ptr, "Total soil mineralized nitrogen content (gN/m2):        %12.2f\n",summary.sminn*1000);
 	fprintf(bgcout->log_file.ptr, "Mean annual SWC in rootzone (m3/m3):                    %12.2f\n",summary.vwc_annavg/(ctrl.simyears*NDAY_OF_YEAR));
-	fprintf(bgcout->log_file.ptr, " \n");
+	fprintf(bgcout->log_file.ptr, " \n");	
 	/********************************************************************************************************* */
 
 

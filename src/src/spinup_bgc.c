@@ -9,11 +9,12 @@ Includes in-line output handling routines that write to daily and annual
 output files. 
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -164,8 +165,9 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 		}
 	
 		file_open (&bgcout->control_file, 'o');		/* file of BBGC variables to control the simulation - Hidy 2009.*/
-		fprintf(bgcout->control_file.ptr, "simyr yday tsoil0 tsoil1 tsoil2 GDD vwc0 vwc1 vwc2 SMSI STDBc CTDBc sminn soilc litr_aboveground litr_belowground leafc frootc fruitc softstemc GPP TER evapotransp nplus\n");
+			fprintf(bgcout->control_file.ptr, "simyr yday tsoil0 tsoil1 tsoil2 GDD vwc0 vwc1 vwc2 SMSI STDBc CTDBc sminn soilc litr_aboveground litr_belowground leafc frootc fruitc softstemc GPP TER evapotransp nplus\n");
 	}
+
 
 	/********************************************************************************************************* */
 	/* Hidy 2015 - writing log file */
@@ -583,7 +585,7 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 				nf = zero_nf;
 
 	               /* soil hydrological parameters: psi and vwc  */
- 			if (ok && multilayer_hydrolparams(&sitec, &ws, &epv))
+ 			if (ok && multilayer_hydrolparams(&sitec, &ws, &epv, &metv))
 			{
 				printf("Error in multilayer_hydrolparams() from bgc()\n");
 				ok=0;
@@ -593,7 +595,7 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 			printf("%d\t%d\tdone multilayer_hydrolparams\n",simyr,yday);
 #endif
 				/* daily meteorological variables from metarrays */
-				if (ok && daymet(&ctrl, &metarr, &sitec, &epc, &PLT, &ws, &epv, &metv, &tair_annavg, metday))
+				if (ok && daymet(&ctrl, &metarr, &sitec, &epc, &PLT, &HRV,&ws, &epv, &metv, &tair_annavg, metday))
 				{
 					printf("Error in daymet() from bgc()\n");
 					ok=0;
@@ -648,7 +650,7 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 				/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Hidy 2011 - MULTILAYER SOIL !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 				/* rooting depth */
 
- 				 if (ok && multilayer_rootdepth(&ctrl, &epc, &sitec, &phen, &PLT, &HRV, &epv, &ns, &metv))
+ 				 if (ok && multilayer_rootdepth(&ctrl, &epc, &sitec, &phen, &PLT, &HRV, &epv, &ns))
 				 {
 					printf("Error in multilayer_rootdepth() from bgc()\n");
 					ok=0;
@@ -1058,8 +1060,6 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 #endif
 
 
-		
-
 			/* test for water balance */
 			if (ok && check_water_balance(&ws, first_balance))
 			{
@@ -1112,7 +1112,7 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 
 	
 
-			/* INTERNAL VARIALBE CONTROL - Hidy 2013 */
+				/* INTERNAL VARIALBE CONTROL - Hidy 2013 */
 			if (ctrl.onscreen && (ctrl.spinyears == 0 || ctrl.spinyears == 1 ||  ctrl.spinyears == 100 ||
 			    ctrl.spinyears == 600 || ctrl.spinyears == 1000 || ctrl.spinyears == 2000))
 			{
@@ -1126,6 +1126,7 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 
 			}
 
+	
 
 				/* DAILY OUTPUT HANDLING */
 				/* fill the daily output array if daily output is requested,
@@ -1376,7 +1377,7 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	fprintf(bgcout->log_file.ptr, "Mean annual SWC in rootzone (m3/m3):                    %12.2f\n",summary.vwc_annavg/(ctrl.spinyears*NDAY_OF_YEAR));
 	fprintf(bgcout->log_file.ptr, " \n");
  	fprintf(bgcout->log_file.ptr, "Mean annual N-plus (spinup_daily_allocation) (gN/year): %12.2f\n",summary.cum_nplus/ctrl.spinyears*1000);
-	fprintf(bgcout->log_file.ptr, " \n");
+    fprintf(bgcout->log_file.ptr, " \n");
 
 	fprintf(bgcout->log_file.ptr,"spinyears = %d \n",spinyears);
 	fprintf(bgcout->log_file.ptr, " \n");

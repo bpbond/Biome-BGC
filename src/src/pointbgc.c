@@ -4,11 +4,12 @@ front-end to BIOME-BGC for single-point, single-biome simulations
 Uses BBGC MuSo v4 library function
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -423,6 +424,6 @@ int main(int argc, char *argv[])
 	if (output.doannual) fclose(output.annout.ptr);
 	fclose(output.anntext.ptr);
 	fclose(output.log_file.ptr);
-	
- } /* end of main */
+/* end of main */	
+ } 
 	

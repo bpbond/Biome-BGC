@@ -4,11 +4,11 @@ functions called to copy restart info between restart structure and
 active structures
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
+Biome-BGCMuSo v4.0.1
 Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Numerical Terradynamic Simulation Group (NTSG)
+School of Forestry, University of Montana
+Missoula, MT 59812
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -98,7 +98,7 @@ int restart_input(const control_struct* ctrl, const epconst_struct* epc, wstate_
 	cs->CTDBc                     = restart->CTDBc;
 
 	
-	/* spinup - normal C and N pool adjustment in order to avoud negative N pools in case of land se change (changing EOC) */
+	/* spinup - normal C and N pool adjustment in order to avoud negative N pools in case of land use change (changing EOC) */
 	if (epc->leaf_cn > 0)
 	{
 		ns->leafn                         = cs->leafc           / epc->leaf_cn;
@@ -124,6 +124,7 @@ int restart_input(const control_struct* ctrl, const epconst_struct* epc, wstate_
 		ns->frootn_storage                = 0;
 		ns->frootn_transfer               = 0;
 	}
+
 	/* fruit simulation - Hidy 2013. */
 	if (epc->fruit_cn > 0)
 	{
@@ -137,7 +138,7 @@ int restart_input(const control_struct* ctrl, const epconst_struct* epc, wstate_
 		ns->fruitn_storage                = 0;
 		ns->fruitn_transfer               = 0;
 	}
-	/* softstem simulation - Hidy 2015. */
+	/* softstem simulation - Hidy 2015.*/ 
 	if (epc->softstem_cn)
 	{
 		ns->softstemn                     = cs->softstemc          / epc->softstem_cn;
@@ -190,14 +191,6 @@ int restart_input(const control_struct* ctrl, const epconst_struct* epc, wstate_
 		ns->deadcrootn_transfer           = 0;
 		ns->cwdn						  = 0;
 	}
-
-
-	ns->livestemn                         = restart->livestemn;
-	ns->livestemn_storage                 = restart->livestemn_storage;
-	ns->livestemn_transfer                = restart->livestemn_transfer;
-	ns->livecrootn                        = restart->livecrootn;
-	ns->livecrootn_storage                = restart->livecrootn_storage;
-	ns->livecrootn_transfer               = restart->livecrootn_transfer;
 
 
  	ns->litr1n                            = restart->litr1n;

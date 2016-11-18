@@ -2,11 +2,12 @@
 transfer one day of meteorological data from metarr struct to metv struct
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -20,7 +21,7 @@ Hungarian Academy of Sciences
 #include "bgc_constants.h"
 
 int daymet(const control_struct* ctrl, const metarr_struct* metarr, const siteconst_struct* sitec, const epconst_struct* epc,  
-		   planting_struct* PLT, wstate_struct* ws, epvar_struct* epv, metvar_struct* metv, double* tair_annavg_ptr, int metday)
+		   planting_struct* PLT, harvesting_struct* HRV, wstate_struct* ws, epvar_struct* epv, metvar_struct* metv, double* tair_annavg_ptr, int metday)
 {
 	/* generates daily meteorological variables from the metarray struct */
 	int ok=1;
@@ -55,6 +56,7 @@ int daymet(const control_struct* ctrl, const metarr_struct* metarr, const siteco
 	else
 	{
 		if (PLT->afterPLT == 0) metv->GDD = 0;
+                if (!HRV->HRV_flag && ctrl->yday == 0) metv->GDD = 0; // if no harvesting, only palnting, the start of the "new year" is the first day of year
 	}
 
 	/* start of GDD calucaltion - first day of vegetation period (if no planting), day of planting (if planting) */

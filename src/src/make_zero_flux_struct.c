@@ -4,11 +4,12 @@ create structures initialized with zero for forcing fluxes to zero
 between simulation days
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -25,30 +26,38 @@ int make_zero_flux_struct(wflux_struct* wf, cflux_struct* cf, nflux_struct* nf)
 {
 	int ok=1;
 	int layer;
-	/* daily water fluxes */
-	wf->prcp_to_canopyw = 0.0;
-	wf->prcp_to_soilw = 0.0;
-	wf->prcp_to_snoww = 0.0;
-	wf->canopyw_evap = 0.0;
-	wf->canopyw_to_soilw = 0.0;
-	wf->snoww_subl = 0.0;
-	wf->pondw_evap = 0.0;
-	wf->snoww_to_soilw = 0.0;
-	wf->soilw_evap = 0.0;
+	/* water */
+	for (layer = 0; layer < N_SOILLAYERS; layer++)
+	{
+		wf->soilw_trans[layer]=0;
+		wf->soilw_percolated[layer]=0;
+		wf->soilw_diffused[layer]=0;
+		wf->soilw_from_GW[layer]=0;
+	}
 
-	/* Hidy 2010. - developed hydrological module */
-	wf->prcp_to_runoff = 0.0;
-	wf->soilw_trans_SUM = 0.0;
-	wf->evapotransp = 0.0;
-	
-	/* Hidy 2012. - mangement fluxes */
-	wf->canopyw_to_THN = 0.0;
-	wf->canopyw_to_MOW = 0.0;
-	wf->canopyw_to_HRV = 0.0;
-	wf->canopyw_to_PLG = 0.0;
-	wf->canopyw_to_GRZ = 0.0;
-	wf->IRG_to_prcp = 0.0;
-	wf->pot_evap = 0.0;
+	wf->prcp_to_canopyw=0;
+	wf->prcp_to_soilw=0;
+	wf->prcp_to_snoww=0;
+	wf->prcp_to_runoff=0;
+    wf->prcp_to_pondw = 0.;
+	wf->canopyw_evap=0;
+	wf->canopyw_to_soilw=0;
+	wf->pondw_evap=0;
+	wf->snoww_subl=0;
+	wf->snoww_to_soilw=0;
+	wf->soilw_evap=0;
+	wf->soilw_trans_SUM=0;
+	wf->evapotransp=0;
+	wf->prcp_to_pondw=0;
+	wf->pondw_to_soilw=0;
+	wf->soilw_to_pondw=0;
+	wf->canopyw_to_THN=0;
+	wf->canopyw_to_MOW=0;
+	wf->canopyw_to_HRV=0;
+	wf->canopyw_to_PLG=0;
+	wf->canopyw_to_GRZ=0;
+	wf->IRG_to_prcp=0;
+	wf->pot_evap=0;
 	
 	/* Hidy 2010 - multilayer soil */
 	for (layer = 0; layer < N_SOILLAYERS; layer ++)

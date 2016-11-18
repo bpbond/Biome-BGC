@@ -3,9 +3,12 @@ bgc_struct.h
 header file for structure definitions
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2000, Peter E. Thornton
-Copyright 2013, D. Hidy
+Biome-BGCMuSo v4.0.1
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 Modified:
 4/17/2000 (PET): Added new nf structure element (sminn_to_denitrif). This is
@@ -159,6 +162,7 @@ typedef struct
 	double deepdiffusion_snk;		 /* (kgH2O/m2) SUM of percolated water out of the system */
 	double deeptrans_src;			 /* (kgH2O/m2) SUM of transpirated water from the bottom layer */
 	double groundwater_src;			 /* (kgH2O/m2) SUM of water plus from goundwater */
+    double pondwater_src;			 /* (kgH2O/m2) SUM of water plus from goundwater */
 	/* thinning - Hidy 2012. */
 	double canopyw_THNsnk;				/* (kgH2O/m2) water stored on canopy is disappered because of thinning*/
 	/* mowing - Hidy 2008. */
@@ -171,6 +175,7 @@ typedef struct
 	double canopyw_GRZsnk;				/* (kgH2O/m2) water stored on canopy is disappered because of grazing*/
 	/* irrigation - by Hidy 2015. */
     double IRGsrc;						/* (kgH2O/m2) planted N */
+    double balance;
 } wstate_struct;
 
 /* water flux variables */
@@ -184,11 +189,14 @@ typedef struct
     double canopyw_to_soilw;						/* (kgH2O/m2/d) canopy drip and stemflow -  Hidy 2010: on the top soil layer */
 	double pondw_evap;                              /* (kgH2O/m2/d) pond water evaporation -  Hidy 2014 */
 	double snoww_subl;								/* (kgH2O/m2/d) sublimation from snowpack */
-    double snoww_to_soilw;							/* (kgH2O/m2/d) melt from snowpack -  Hidy 2010: on the top soil layer */
+	double snoww_to_soilw;							/* (kgH2O/m2/d) melt from snowpack -  Hidy 2010: on the top soil layer */
     double soilw_evap;								/* (kgH2O/m2/d) evaporation from soil */
     double soilw_trans[N_SOILLAYERS];				/* (kgH2O/m2/d) Hidy 2010 - transpiration from the soil layers */
     double soilw_trans_SUM;	
 	double evapotransp;								/* (kgH2O/m2/d) Hidy 2013 - total water evaporation (canopyw_evap+soilw_evap+soilw_trans+snoww_subl) */
+    double prcp_to_pondw;
+	double pondw_to_soilw;
+	double soilw_to_pondw;
 	double soilw_percolated[N_SOILLAYERS];		    /* (kgH2O/m2/d) Hidy 2010 - percolation fluxes between soil layers */
 	double soilw_diffused[N_SOILLAYERS];			/* (kgH2O/m2/d) Hidy 2010 - diffusion flux between the soil layers (positive: downward) */
 	double soilw_from_GW[N_SOILLAYERS];				/* (kgH2O/m2/d) Hidy 2013 - soil water pélus from ground water */
@@ -326,6 +334,7 @@ typedef struct
      double softstemc_transfer;    /* (kgC/m2) SUM of softstemc */
 	 double softstem_gr_snk;       /* (kgC/m2) SUM of softstem growth resp. */
 	 double softstem_mr_snk;       /* (kgC/m2) SUM of softstem maint resp.*/
+         double balance;
 } cstate_struct;
 
 /* daily carbon flux variables */
@@ -778,6 +787,7 @@ typedef struct
 	/* effect of boundary layer with constant N-content - Hidy 2015 */
 	double BNDRYsrc;             /* (kgN/m2) leaf N from fertilizer*/
 	double sum_ndemand;          /* (kgN/m2) leaf N from fertilizer*/
+        double balance;
 } nstate_struct;
 
 /* daily nitrogen flux variables */
@@ -1195,7 +1205,7 @@ typedef struct
 	int n_maxrootlayers;							/* (number) number of of the soil layers in which root can be found  - potential */
 	double rooting_depth;							/* (m) actual depth of the rooting zone */
 	double psi_avg;									/* (MPa) average water potential of soil and leaves  - Hidy 2010 */
-    double vwc_avg;									/* (m3/m3) average volumetric water content  - Hidy 2010 */
+    double vwc_avg;									/* (m3/m3) average volumetric water content in active soil  - Hidy 2010 */
     double vwc_ratio_crit1[N_SOILLAYERS];			/* (DIM) volumetric water content ratio at start of conductance reduction - Hidy 2012*/
 	double vwc_ratio_crit2[N_SOILLAYERS];			/* (DIM) volumetric water content ratio at stomatal closure - Hidy 2012*/
     double vwc_crit1[N_SOILLAYERS];					/* (DIM) volumetric water content at start of conductance reduction - Hidy 2012*/

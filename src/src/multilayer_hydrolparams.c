@@ -4,9 +4,10 @@ calcultion of soil water potential, hydr. conductivity and hydr. diffusivity as 
 constants related to texture
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -19,7 +20,7 @@ Hungarian Academy of Sciences
 #include "bgc_func.h"
 #include "bgc_constants.h"
 
-int multilayer_hydrolparams(const siteconst_struct* sitec,  wstate_struct* ws, epvar_struct* epv)
+int multilayer_hydrolparams(const siteconst_struct* sitec,  wstate_struct* ws, epvar_struct* epv, metvar_struct* metv)
 {
 	/* given a list of site constants and the soil water mass (kg/m2),
 	this function returns the soil water potential (MPa)
@@ -58,8 +59,8 @@ int multilayer_hydrolparams(const siteconst_struct* sitec,  wstate_struct* ws, e
 
 	int ok=1;
 	int layer;
-
-
+	double vwc_avg, psi_avg, tsoil_avg;
+	vwc_avg=psi_avg=tsoil_avg=0;
 
 	/* ***************************************************************************************************** */
 	/* calculating vwc psi and hydr. cond. to every layer */
@@ -71,6 +72,7 @@ int multilayer_hydrolparams(const siteconst_struct* sitec,  wstate_struct* ws, e
 		/* convert kg/m2 --> m3/m2 --> m3/m3 */
 		epv->vwc[layer] = ws->soilw[layer] / (water_density * sitec->soillayer_thickness[layer]);
 
+
 	   
 		/* psi, hydr_conduct and hydr_diffus ( Cosby et al.) from vwc ([1MPa=100m] [m/s] [m2/s] */
 		epv->psi[layer]  = sitec->psi_sat[layer] * pow( (epv->vwc[layer] /sitec->vwc_sat[layer]), -1* sitec->soil_b[layer]);
@@ -79,6 +81,15 @@ int multilayer_hydrolparams(const siteconst_struct* sitec,  wstate_struct* ws, e
 		/* pF from psi: cm from MPa */
 		epv->pF[layer] =log10(fabs(10000*epv->psi[layer] ));
 	
+
+		/*  calculating averages */
+
+		if (layer < N_SOILLAYERS-1)
+		{
+			tsoil_avg += metv->tsoil[layer] * (sitec->soillayer_thickness[layer] / sitec->soillayer_depth[N_SOILLAYERS-2]);
+			vwc_avg	  += epv->vwc[layer]    * (sitec->soillayer_thickness[layer] / sitec->soillayer_depth[N_SOILLAYERS-2]);
+			psi_avg	  += epv->psi[layer]    * (sitec->soillayer_thickness[layer] / sitec->soillayer_depth[N_SOILLAYERS-2]);
+		}
        
 
 		/* CONTROL - unrealistic VWC content (higher than saturation value) */
@@ -102,10 +113,9 @@ int multilayer_hydrolparams(const siteconst_struct* sitec,  wstate_struct* ws, e
 
 
 
-
-
-
-
+  	epv->vwc_avg	= vwc_avg;
+	epv->psi_avg	= psi_avg;
+	metv->tsoil_avg = tsoil_avg;
 
 
 	return(!ok);

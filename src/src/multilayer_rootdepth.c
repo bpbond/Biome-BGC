@@ -2,9 +2,10 @@
 multilayer_rootdepth.c
 Hidy 2011 - calculation of changing rooting depth based on empirical function and state update of rootzone sminn content (sminn_RZ)
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -19,7 +20,7 @@ Hungarian Academy of Sciences
 
 int multilayer_rootdepth(const control_struct* ctrl, const epconst_struct* epc, const siteconst_struct* sitec, 
 						 phenology_struct* phen, planting_struct* PLT, harvesting_struct* HRV, 
-						 epvar_struct* epv, nstate_struct* ns,metvar_struct* metv)
+						 epvar_struct* epv, nstate_struct* ns)
 {
 
 
@@ -27,11 +28,10 @@ int multilayer_rootdepth(const control_struct* ctrl, const epconst_struct* epc, 
 	int layer, yday, ny;
 
 	double onday, offday, plant_day, matur_day, rootdepthmin, RLprop_sum1, RLprop_sum2, sminn_RZ, maturity_coeff;
-	double vwc_avg, psi_avg, tsoil_avg;
 
 
 	/* initalizing internal variables */
-	vwc_avg=psi_avg=tsoil_avg=0;
+
 	onday=offday=plant_day=matur_day=rootdepthmin=RLprop_sum1=RLprop_sum2=sminn_RZ=maturity_coeff=0;
 
 	maturity_coeff = epc->maturity_coeff;
@@ -277,20 +277,7 @@ int multilayer_rootdepth(const control_struct* ctrl, const epconst_struct* epc, 
 	ns->sminn_RZ	  = sminn_RZ;
 
 	
-	/* ***************************************************************************************************** */	
-	/* 6. Calculating averages */
-
-	for (layer = 0; layer < epv->n_maxrootlayers-1; layer++)
-	{
-		tsoil_avg += metv->tsoil[layer] * (sitec->soillayer_thickness[layer] / sitec->soillayer_depth[epv->n_maxrootlayers-2]);
-		vwc_avg	  += epv->vwc[layer]    * (sitec->soillayer_thickness[layer] / sitec->soillayer_depth[epv->n_maxrootlayers-2]);
-		psi_avg	  += epv->psi[layer]    * (sitec->soillayer_thickness[layer] / sitec->soillayer_depth[epv->n_maxrootlayers-2]);
-	}
-
-
-	epv->vwc_avg	= vwc_avg;
-	epv->psi_avg	= psi_avg;
-	metv->tsoil_avg = tsoil_avg;
+	
 
 
 

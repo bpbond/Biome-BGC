@@ -3,9 +3,10 @@ harvesting.c
 do harvesting  - decrease the plant material (leafc, leafn, canopy water)
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 */
@@ -51,6 +52,8 @@ int harvesting(const control_struct* ctrl, const epconst_struct* epc, harvesting
 		ny = ctrl->simyr;
 	}
 	else ny=0;
+
+
 
 	/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                                                     CALCULATING FLUXES 
@@ -168,7 +171,7 @@ int harvesting(const control_struct* ctrl, const epconst_struct* epc, harvesting
 
 	HRV_to_litr1n_strg = (nf->leafn_to_HRV*epc->leaflitr_flab + nf->softstemn_to_HRV*epc->softstemlitr_flab  + litr1n_STDB_to_HRV) * remained_prop +
 						 (nf->leafn_transfer_to_HRV + cf->leafc_storage_to_HRV + nf->softstemn_transfer_to_HRV + cf->softstemc_storage_to_HRV +
-						  nf->retransn_to_HRV) ;
+						  nf->retransn_to_HRV) * remained_prop;
 
 	HRV_to_litr2n_strg =  (nf->leafn_to_HRV * epc->leaflitr_fucel + nf->softstemn_to_HRV * epc->softstemlitr_fucel +
 						   litr2n_STDB_to_HRV) * remained_prop;
@@ -212,57 +215,57 @@ int harvesting(const control_struct* ctrl, const epconst_struct* epc, harvesting
                                                     STATE UPDATE 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/ 
 
-	/* 1. carbon */
-	cs->HRVsnk += cf->leafc_to_HRV;
-	cs->leafc -= cf->leafc_to_HRV;
-	cs->HRVsnk += cf->leafc_transfer_to_HRV;
-	cs->leafc_transfer -= cf->leafc_transfer_to_HRV;
-	cs->HRVsnk += cf->leafc_storage_to_HRV;
-	cs->leafc_storage -= cf->leafc_storage_to_HRV;
-	cs->HRVsnk += cf->gresp_transfer_to_HRV;
-	cs->gresp_transfer -= cf->gresp_transfer_to_HRV;
-	cs->HRVsnk += cf->gresp_storage_to_HRV;
-	cs->gresp_storage -= cf->gresp_storage_to_HRV;
+	/* 1. leaf and gresp */
+	cs->HRVsnk           += cf->leafc_to_HRV;
+	cs->leafc            -= cf->leafc_to_HRV;
+	cs->HRVsnk           += cf->leafc_transfer_to_HRV;
+	cs->leafc_transfer   -= cf->leafc_transfer_to_HRV;
+	cs->HRVsnk           += cf->leafc_storage_to_HRV;
+	cs->leafc_storage    -= cf->leafc_storage_to_HRV;
+	cs->HRVsnk           += cf->gresp_transfer_to_HRV;
+	cs->gresp_transfer   -= cf->gresp_transfer_to_HRV;
+	cs->HRVsnk           += cf->gresp_storage_to_HRV;
+	cs->gresp_storage    -= cf->gresp_storage_to_HRV;
 
 	/* dead standing biomass */
-	cs->HRVsnk += litr1c_STDB_to_HRV;
-	cs->litr1c_STDB -= litr1c_STDB_to_HRV;
-	cs->HRVsnk += litr2c_STDB_to_HRV;
-	cs->litr2c_STDB -= litr2c_STDB_to_HRV;
-	cs->HRVsnk += litr3c_STDB_to_HRV;
-	cs->litr3c_STDB -= litr3c_STDB_to_HRV;
-	cs->HRVsnk += litr4c_STDB_to_HRV;
-	cs->litr4c_STDB -=litr4c_STDB_to_HRV;
+	cs->HRVsnk           += litr1c_STDB_to_HRV;
+	cs->litr1c_STDB      -= litr1c_STDB_to_HRV;
+	cs->HRVsnk           += litr2c_STDB_to_HRV;
+	cs->litr2c_STDB      -= litr2c_STDB_to_HRV;
+	cs->HRVsnk           += litr3c_STDB_to_HRV;
+	cs->litr3c_STDB      -= litr3c_STDB_to_HRV;
+	cs->HRVsnk           += litr4c_STDB_to_HRV;
+	cs->litr4c_STDB      -=litr4c_STDB_to_HRV;
 
-	cs->SNSCsrc += cf->STDBc_to_HRV;
-	cs->STDBc -= cf->STDBc_to_HRV;
+	cs->SNSCsrc          += cf->STDBc_to_HRV;
+	cs->STDBc            -= cf->STDBc_to_HRV;
 
 
 	/* fruit simulation - Hidy 2013. */
-	cs->HRVsnk += cf->fruitc_to_HRV;
-	cs->fruitc -= cf->fruitc_to_HRV;
-	cs->HRVsnk += cf->fruitc_transfer_to_HRV;
-	cs->fruitc_transfer -= cf->fruitc_transfer_to_HRV;
-	cs->HRVsnk += cf->fruitc_storage_to_HRV;
-	cs->fruitc_storage -= cf->fruitc_storage_to_HRV;
+	cs->HRVsnk             += cf->fruitc_to_HRV;
+	cs->fruitc             -= cf->fruitc_to_HRV;
+	cs->HRVsnk             += cf->fruitc_transfer_to_HRV;
+	cs->fruitc_transfer    -= cf->fruitc_transfer_to_HRV;
+	cs->HRVsnk             += cf->fruitc_storage_to_HRV;
+	cs->fruitc_storage     -= cf->fruitc_storage_to_HRV;
 	/* softstem simulation - Hidy 2013. */
-	cs->HRVsnk += cf->softstemc_to_HRV;
-	cs->softstemc -= cf->softstemc_to_HRV;
-	cs->HRVsnk += cf->softstemc_transfer_to_HRV;
+	cs->HRVsnk             += cf->softstemc_to_HRV;
+	cs->softstemc          -= cf->softstemc_to_HRV;
+	cs->HRVsnk             += cf->softstemc_transfer_to_HRV;
 	cs->softstemc_transfer -= cf->softstemc_transfer_to_HRV;
-	cs->HRVsnk += cf->softstemc_storage_to_HRV;
-	cs->softstemc_storage -= cf->softstemc_storage_to_HRV;
+	cs->HRVsnk             += cf->softstemc_storage_to_HRV;
+	cs->softstemc_storage  -= cf->softstemc_storage_to_HRV;
 
-	cs->litr1c += cf->HRV_to_litr1c;
-	cs->litr2c += cf->HRV_to_litr2c;
-	cs->litr3c += cf->HRV_to_litr3c;
-	cs->litr4c += cf->HRV_to_litr4c;
+	/* litter: incresing litter pools and decreasing litter storage state variables*/
+	cs->litr1c             += cf->HRV_to_litr1c;
+	cs->litr2c             += cf->HRV_to_litr2c;
+	cs->litr3c             += cf->HRV_to_litr3c;
+	cs->litr4c             += cf->HRV_to_litr4c;
 	
-       /* decreasing litter storage state variables*/
-	cs->litr1c_strg_HRV -= cf->HRV_to_litr1c;
-	cs->litr2c_strg_HRV -= cf->HRV_to_litr2c;
-	cs->litr3c_strg_HRV -= cf->HRV_to_litr3c;
-	cs->litr4c_strg_HRV -= cf->HRV_to_litr4c;
+	cs->litr1c_strg_HRV    -= cf->HRV_to_litr1c;
+	cs->litr2c_strg_HRV    -= cf->HRV_to_litr2c;
+	cs->litr3c_strg_HRV    -= cf->HRV_to_litr3c;
+	cs->litr4c_strg_HRV    -= cf->HRV_to_litr4c;
 
 	/* litter plus because of HRVing and returning of dead plant material */
 	cs->HRVsrc += cf->HRV_to_litr1c + cf->HRV_to_litr2c + cf->HRV_to_litr3c + cf->HRV_to_litr4c;
@@ -352,9 +355,9 @@ int harvesting(const control_struct* ctrl, const epconst_struct* epc, harvesting
 	diffN = (ns->HRVsnk-ns->HRVsrc) - ns->HRV_transportN - 
 		    (ns->litr1n_strg_HRV+ns->litr2n_strg_HRV+ns->litr3n_strg_HRV+ns->litr4n_strg_HRV) ;
 
-	if (fabs(diffC) > 1e-3 || fabs(diffN) > 1e-3 || cs->litr_belowground < 0)
+	if (mgmd >= 0 && (fabs(diffC) > 1e-3 || fabs(diffN) > 1e-3 || cs->litr_belowground < 0))
 	{
-//		printf("Warning: small rounding error in harvesting pools (harvesting.c)\n");
+	//	printf("Warning: small rounding error in harvesting pools (harvesting.c)\n");
 	}
 	
 

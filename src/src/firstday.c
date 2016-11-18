@@ -4,11 +4,12 @@ Initializes the state variables for the first day of a simulation that
 is not using a restart file.
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -80,8 +81,8 @@ int firstday(const siteconst_struct* sitec, const epconst_struct* epc, const cin
 		epv->m_soilstress_layer[layer]= 1;
 	}
 
-	epv->vwc_avg		    = sitec->vwc_fc[layer];
-	epv->psi_avg		    = sitec->psi_fc[layer];
+	epv->vwc_avg		    = sitec->vwc_fc[0];
+	epv->psi_avg		    = sitec->psi_fc[0];
 	metv->tsoil_avg	   	    = sitec->tair_annavg;
 	metv->tsoil_surface_pre	= sitec->tair_annavg;	
 	epv->m_soilstress	    = 1;

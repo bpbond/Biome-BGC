@@ -1,5 +1,5 @@
-Notes on usage of Biome-BGCMuSo v4.0
-_____________________________________
+Notes on usage of Biome-BGCMuSo v4.0.1
+______________________________________
 
 
 Biome-BGCMuSo was developed from Biome-BGC v4.1.1 Max Planck Institute version, so extended command line options are not available that are implemented in Biome-BGC v4.2 [see master branch].

@@ -6,9 +6,10 @@ calculation of soil water content layer by layer taking into account soil hydrol
  and conductivity values were valid all the day we would overestimate the velocity diffusion and percolation process) 
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -30,7 +31,7 @@ int richards(const siteconst_struct* sitec, const epconst_struct* epc, epvar_str
 	
 	/* internal variables */
 	int layer;
-	double pondw_to_soilw;
+	double INFILT, DRAIN;
 
 
 	/* diffusion and percolation calculation */
@@ -38,10 +39,11 @@ int richards(const siteconst_struct* sitec, const epconst_struct* epc, epvar_str
 	double hydr_diffus0, hydr_diffus1;	  /* hydrological diffusion coefficient (m2/s) */
 	double hydr_conduct[N_SOILLAYERS],hydr_diffus[N_SOILLAYERS];  /* hydrological conduction coefficient (m/s) */
 
-	double diffus, percol, wflux, wflux_limit, soilw_sat, vwc_diff_max;
+	double diffus, percol, wflux,  vwc_diff_max;
 	double localvalue,  exponent_discretlevel;
-	double soilw_sat0, dz0, dz1;  /* (kgH2O/m2/min) */
-	double soilw0, soilw1, vwc0, vwc1, vwc_diff0, vwc_diff1;
+	double soilw0, soilw1, vwc0, vwc1, vwc_diff0, vwc_diff1, diff0, diff1, limit;
+	double soilw_sat0, soilw_sat1, soilw_hw0, soilw_fc0,  soilw_hw1, soilw_fc1, dz0, dz1;
+	double soilw_act[N_SOILLAYERS], vwc_act[N_SOILLAYERS];
 	int ok, n_second, step, n_sec, discretlevel;
 
 	/* INITALIZATION */
@@ -50,126 +52,147 @@ int richards(const siteconst_struct* sitec, const epconst_struct* epc, epvar_str
 	discretlevel = epc->discretlevel_Richards + 3; /* discretization level: change in VWC 1% -> timestep: second */
 
 
+
+	/* --------------------------------------------------------------------------------------------------------*/
+	/* INITALIZATION */
+
+	for (layer=0 ; layer < N_SOILLAYERS ; layer++)
+	{
+		soilw_act[layer] = ws->soilw[layer];
+		vwc_act[layer]   = epv->vwc[layer];
+	}
+	
+	/* ********************************/
+	/* 1. WATER DRAIN */
+
+
+	wf->pondw_to_soilw = ws->pond_water;
+	INFILT = (wf->canopyw_to_soilw + wf->prcp_to_soilw + wf->snoww_to_soilw + wf->IRG_to_prcp + wf->pondw_to_soilw - wf->prcp_to_runoff);
+	  
+
 	/* ********************************/	
-	/*  CALCULATE PROCESSES WITH DYNAMIC TIME STEP (except of bottom layer) */
+	/* 2. CALCULATE PROCESSES WITH DYNAMIC TIME STEP (except of bottom layer) */
 
 	while (n_second < n_sec_in_day)
 	{
-	
+
+		DRAIN = INFILT;
+		soilw_sat0 = sitec->vwc_sat[0]  * sitec->soillayer_thickness[0] * water_density;
+		if (DRAIN > soilw_sat0 - soilw_act[0]) 
+		{
+			DRAIN = soilw_sat0 - soilw_act[0];
+		}
+		soilw_act[0] += DRAIN;
+		vwc_act[0] = soilw_act[0] / sitec->soillayer_thickness[0] / water_density;
+		INFILT -= DRAIN;
+		
+		
 		vwc_diff_max=0;
 	
 		/* ********************************/	
 		/* CALCULATE PROCESSES LAYER TO LAYER (except of bottom layer) */
 		for (layer=0 ; layer < N_SOILLAYERS-1 ; layer++)
 		{
+
+			/* -----------------------------*/
+			/* 2.1. INITALITAZION - actual soil water content at theoretical lower and upper limit of water content:  hygroscopic water content and saturation */		
 		
-			/* 1. INITALITAZION - actual soil water content at theoretical lower and upper limit of water content:  hygroscopic water content and saturation */		
 			dz0 = sitec->soillayer_thickness[layer];
 			dz1 = sitec->soillayer_thickness[layer+1];
-		
-			/* -----------------------------*/
-			/* 2. POND WATER INFILTRATION: in case of pont water possible water flux from pond to the first layer */
-			if (layer == 0 && ws->pond_water > 0)
-			{
-				soilw_sat0 = sitec->vwc_sat[layer]   * dz0   * water_density;
-				if ((soilw_sat0 - ws->soilw[layer]) < ws->pond_water)
-					pondw_to_soilw = soilw_sat0 - ws->soilw[layer];
-				else
-					pondw_to_soilw = ws->pond_water;
-
-				ws->pond_water -= pondw_to_soilw;
-				ws->soilw[0]   += pondw_to_soilw;
-				epv->vwc[0]    = ws->soilw[layer] / dz0 / water_density;
-			}
+			soilw_hw0  = sitec->vwc_hw[layer]   * dz0 * water_density; 
+			soilw_fc0  = sitec->vwc_fc[layer]   * dz0 * water_density;
+			soilw_sat0 = sitec->vwc_sat[layer]  * dz0 * water_density;
+			soilw_hw1  = sitec->vwc_hw[layer+1] * dz1 * water_density; 
+			soilw_fc1  = sitec->vwc_fc[layer+1] * dz1 * water_density;
+			soilw_sat1 = sitec->vwc_sat[layer+1]* dz1 * water_density;
 
 			/* -----------------------------*/
-			/* 3. PERCOLATION */
+			/* 2.2. PERCOLATION */
 
 			/* conductivity coefficient - theoretical upper limit: saturation value */
-			hydr_conduct[layer] = sitec->hydr_conduct_sat[layer] * pow(epv->vwc[layer]/sitec->vwc_sat[layer], 2*(sitec->soil_b[layer])+3);
+			hydr_conduct[layer] = sitec->hydr_conduct_sat[layer] * pow(vwc_act[layer]/sitec->vwc_sat[layer], 2*(sitec->soil_b[layer])+3);
  
 
 			/* percolation flux - ten minute amount */
 			percol = hydr_conduct[layer] * water_density;
 
 	
+	
 			/* -----------------------------*/
-			/* 4. DIFFUSION */
-			
-			/* diffusivity coefficient */	
+			/* 2.3. DIFFUSION */
+		
+			/* diffusivity coefficient 	*/
 			
 	       	hydr_diffus0 = (((sitec->soil_b[layer] * sitec->hydr_conduct_sat[layer] * (-100*sitec->psi_sat[layer]))) / 
-				             sitec->vwc_sat[layer]) * pow(epv->vwc[layer]/sitec->vwc_sat[layer], sitec->soil_b[layer]+2);
+				             sitec->vwc_sat[layer]) * pow(vwc_act[layer]/sitec->vwc_sat[layer], sitec->soil_b[layer]+2);
 			
 			hydr_diffus1 = (((sitec->soil_b[layer+1] * sitec->hydr_conduct_sat[layer+1] * (-100*sitec->psi_sat[layer+1]))) / 
-				             sitec->vwc_sat[layer+1]) * pow(epv->vwc[layer+1]/sitec->vwc_sat[layer+1], sitec->soil_b[layer+1]+2);
+				             sitec->vwc_sat[layer+1]) * pow(vwc_act[layer+1]/sitec->vwc_sat[layer+1], sitec->soil_b[layer+1]+2);
 
 			hydr_diffus[layer] = (hydr_diffus0 * dz0 + hydr_diffus1 * dz1) /(dz0 + dz1);
 	
-			/* diffusion flux  */
-			diffus = (((epv->vwc[layer] - epv->vwc[layer+1]) / (sitec->soillayer_midpoint[layer+1]-sitec->soillayer_midpoint[layer])) 
-						* hydr_diffus[layer]) 	* water_density; 
+		
+			diffus = (vwc_act[layer] - vwc_act[layer+1]) 	* hydr_diffus[layer] 	* water_density;
 
+		
 
 			/* -----------------------------*/
-			/* 5. LIMITATION OF WATER FLUX: SATURATION 
-				 (downward movement: if lower layer, upward movement if upper layer is saturated -> no wflux */
-
-		
-			if (sitec->vwc_sat[layer+1] - epv->vwc[layer+1] < 1e-3) 
-			{
-				percol = 0;
-				if (diffus > 0) diffus = 0;
-			}
-		
-			if (sitec->vwc_sat[layer] - epv->vwc[layer]   < 1e-3) 
-			{	
-				if (diffus < 0) diffus = 0;
-			}
-
+			/* 2.4. LIMITATION OF WATER FLUX: SATURATION */
+			
 			wflux       = (percol + diffus)  * n_sec;
-			wflux_limit = wflux;
-	
-
+			
+		
 			if (wflux > 0)
 			{
-				soilw_sat = sitec->vwc_sat[layer+1] * water_density * dz1;
-				if (ws->soilw[layer+1] + wflux > soilw_sat)
-				{
-					wflux_limit = soilw_sat - ws->soilw[layer+1];
-					percol = wflux_limit / n_sec - diffus;
-					wflux  = wflux_limit;
+				if (soilw_act[layer] > soilw_fc0)
+					diff0 = soilw_act[layer] - soilw_fc0;
+				else
+					diff0 = soilw_act[layer] - soilw_hw0;
 
+				diff1 = soilw_sat1 - soilw_act[layer+1];
+				limit = MIN(diff0, diff1);
+
+				if (wflux > limit)
+				{
+					wflux = limit;
+					percol = wflux / n_sec;
+					diffus = 0;
 				}
-			
 			}
 			else
 			{
-				soilw_sat = sitec->vwc_sat[layer] * water_density * dz0;
-				if (ws->soilw[layer] - wflux > soilw_sat)
-				{
-					wflux_limit  = ws->soilw[layer] - soilw_sat;
-					diffus = wflux_limit / n_sec - percol;
-					wflux  = wflux_limit;
+				if (soilw_act[layer+1] > soilw_fc1)
+					diff1 = soilw_act[layer+1] - soilw_fc1;
+				else
+					diff1 = soilw_act[layer+1] - soilw_hw1;
 
+				diff0 = soilw_sat0 - soilw_act[layer];
+
+				limit = MIN(diff0, diff1);
+
+				if (fabs(wflux) > limit)
+				{
+					wflux = -1*limit;
+					diffus = wflux / n_sec;
+					percol = 0;
 				}
 			}
 
 		
 			/* -----------------------------*/
-			/* 5. FINDING THE MAXIMAL CHANGE to determine discretization step */
+			/* 2.5. FINDING THE MAXIMAL CHANGE to determine discretization step */
 		
 		
-			soilw0 = ws->soilw[layer]   - (percol + diffus);
+			soilw0 = soilw_act[layer]   - (percol + diffus);
 			vwc0   = soilw0 / dz0 / water_density;
-			vwc_diff0 = fabs(epv->vwc[layer]   - vwc0);
+			vwc_diff0 = fabs(vwc_act[layer]   - vwc0);
 
 			/* bottom layer is special: i+1 layer is he boundary layer of which water content does not change */
 			if (layer < N_SOILLAYERS-2)
 			{
-				soilw1 = ws->soilw[layer+1] + (percol + diffus);
+				soilw1 = soilw_act[layer+1] + (percol + diffus);
 				vwc1   = soilw1 / dz1 / water_density;
-				vwc_diff1 = fabs(epv->vwc[layer+1] - vwc1);
+				vwc_diff1 = fabs(vwc_act[layer+1] - vwc1);
 		
 				if (vwc_diff_max < vwc_diff0 || vwc_diff_max < vwc_diff1) vwc_diff_max = MAX(vwc_diff0, vwc_diff1);			
 			}
@@ -179,29 +202,23 @@ int richards(const siteconst_struct* sitec, const epconst_struct* epc, epvar_str
 			}
 		
 			/* -----------------------------*/
-			/* 6. UPDATING STATE VARIABLES    */
+			/* 2.6. UPDATING STATE VARIABLES    */
 
 	
-			ws->soilw[layer]    -= wflux;
-			epv->vwc[layer]   = ws->soilw[layer]   / dz0 / water_density;
+			soilw_act[layer]    -= wflux;
+			vwc_act[layer]   = soilw_act[layer]   / dz0 / water_density;
 
-			/* 6.1 bottom layer is special:: i+1 layer is he boundary layer of which water content does not change */
-			if (layer < N_SOILLAYERS-2)
-			{
-				ws->soilw[layer+1]  += wflux;
-				epv->vwc[layer+1] = ws->soilw[layer+1] / dz1 / water_density;
-			}
+			soilw_act[layer+1]  += wflux;
+			vwc_act[layer+1] = soilw_act[layer+1] / dz1 / water_density;
 			
-
 			wf->soilw_percolated[layer] += percol * n_sec;
 			wf->soilw_diffused[layer]   += diffus * n_sec;
 
-
-
 		}
 
-
-		/* if the maximal change of VWC is not equal to 0 (greater than) -> discretlevel is the function of local value of the change */
+		/* ********************************/	
+		/* 3. CALCULATION OF DISCRETE LEVEL: if the maximal change of VWC is not equal to 0 (greater than) -> discretlevel is the function of local value of the change */
+	
 		if (vwc_diff_max > 0)
 		{
 			localvalue=floor(log10(vwc_diff_max));
@@ -217,8 +234,10 @@ int richards(const siteconst_struct* sitec, const epconst_struct* epc, epvar_str
 			n_sec = n_sec_in_day;
 		}
 
-
-		/* hydr_conduct and hydr_diffus at the beginning of the calculation  */
+		/* ********************************/
+		/* 4. CALCULATION OF CONDUCTANCE AND DIFFUSION PARAMETERS */
+		
+		/* 4.1 hydr_conduct and hydr_diffus at the beginning of the calculation  */
 		if (step == 0)
 		{	for (layer = 0; layer < N_SOILLAYERS; layer++)
 			{
@@ -227,10 +246,11 @@ int richards(const siteconst_struct* sitec, const epconst_struct* epc, epvar_str
 			}
 		}
 
+		/* 4.2. hydr_conduct and hydr_diffus at the end of the calculation  */
 		if (n_second + n_sec >= n_sec_in_day) 
 		{
 			n_sec = n_sec_in_day - n_second;
-			/* hydr_conduct and hydr_diffus at the end of the calculation  */
+			
 			for (layer = 0; layer < N_SOILLAYERS; layer++)
 			{
 				epv->hydr_conduct_E[layer] = hydr_conduct[layer];
@@ -250,7 +270,16 @@ int richards(const siteconst_struct* sitec, const epconst_struct* epc, epvar_str
 
 	}
 
+	/* ********************************/
+	/* 5. UPDATE STATE VARIBLES */
 
+	for (layer=0 ; layer < N_SOILLAYERS-1; layer++)
+	{
+		ws->soilw[layer] = soilw_act[layer];
+		epv->vwc[layer]  = vwc_act[layer];
+	}
+	/* 5.1 bottom layer is special:: i+1 layer is he boundary layer of which water content does not change */
+	wf->soilw_percolated[N_SOILLAYERS-1] = soilw_act[N_SOILLAYERS-1] - ws->soilw[N_SOILLAYERS-1];
 
 	return (!ok);
 }

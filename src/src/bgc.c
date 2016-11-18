@@ -7,18 +7,21 @@ output files. This is the only library module that has external
 I/O connections, and so it is the only module that includes bgc_io.h.
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo MuSo v4
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Biome-BGCMuSo v4.0.1
+
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified:
 4/17/2000 (PET): Added annual average temperature and annual total precipitation
 to the simple annual text output file.
 Modified:
 13/07/2000: Added input of Ndep from file. Changes are made by Galina Churkina. 
-*/
+
+Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**/
+
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -183,7 +186,7 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 #ifdef DEBUG
 	printf("done copy input\n");
 #endif
-
+ 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	if (ctrl.onscreen)
 	{
@@ -193,8 +196,8 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 		}
 	
 		file_open (&bgcout->control_file, 'w');		/* file of BBGC variables to control the simulation - Hidy 2009.*/
-		fprintf(bgcout->control_file.ptr, "simyr yday tsoil0 tsoil1 tsoil2 GDD vwc0 vwc1 vwc2 SMSI STDBc CTDBc sminn soilc litr_aboveground litr_belowground leafc fruitc cumNPP abgC GPP TER evapotransp\n");
- 
+//		fprintf(bgcout->control_file.ptr, "simyr yday tsoil0 tsoil1 tsoil2 GDD vwc0 vwc1 vwc2 SMSI STDBc CTDBc sminn soilc litr_aboveground litr_belowground leafc fruitc cumNPP abgC GPP TER evapotransp\n");
+ 	fprintf(bgcout->control_file.ptr, "simyr yday HRV_transportC litr1c_strg_HRV litrA litrB fruitC soilC litrC totalC\n");
 	}
 
 
@@ -608,7 +611,7 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 
 		
 			/* soil hydrological parameters: psi and vwc  */
- 			if (ok && multilayer_hydrolparams(&sitec, &ws, &epv))
+ 			if (ok && multilayer_hydrolparams(&sitec, &ws, &epv, &metv))
 			{
 				printf("Error in multilayer_hydrolparams() from bgc()\n");
 				ok=0;
@@ -619,7 +622,7 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 #endif
 
 			/* daily meteorological variables from metarrays */
-			if (ok && daymet(&ctrl, &metarr, &sitec, &epc, &PLT, &ws, &epv, &metv, &tair_annavg, metday))
+			if (ok && daymet(&ctrl, &metarr, &sitec, &epc, &PLT,  &HRV, &ws, &epv, &metv, &tair_annavg, metday))
 			{
 				printf("Error in daymet() from bgc()\n");
 				ok=0;
@@ -675,7 +678,7 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 			/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Hidy 2011 - MULTILAYER SOIL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 			/* rooting depth */
- 			 if (ok && multilayer_rootdepth(&ctrl, &epc, &sitec, &phen, &PLT, &HRV, &epv, &ns, &metv))
+ 			 if (ok && multilayer_rootdepth(&ctrl, &epc, &sitec, &phen, &PLT, &HRV, &epv, &ns))
 			 {
 				printf("Error in multilayer_rootdepth() from bgc()\n");
 				ok=0;
@@ -1212,7 +1215,7 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 
 			/* INTERNAL VARIALBE CONTROL - Hidy 2013 */
 			if (ctrl.onscreen && simyr < 40 && ctrl.spinyears < 3)
-			{
+		/*	{
 				fprintf(bgcout->control_file.ptr, "%i %i %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f\n",
 		                    ctrl.simyr,yday,metv.tsoil[0], metv.tsoil[1], metv.tsoil[2], metv.GDD,
 							epv.vwc[0], epv.vwc[1], epv.vwc[2],
@@ -1224,7 +1227,16 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 							summary.daily_gpp, summary.daily_tr, wf.evapotransp); 
 
 
+			} */
+			if (ctrl.onscreen && simyr < 40 && ctrl.spinyears < 3)
+			{
+				fprintf(bgcout->control_file.ptr, "%i %i %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f\n",
+		                    ctrl.simyr,yday,cs.HRV_transportC, cs.litr1c_strg_HRV, cs.litr_aboveground, cs.litr_belowground, cs.fruitc, summary.soilc, summary.litrc, summary.litrc); 
+
+
 			}
+
+
 			/* DAILY OUTPUT HANDLING */
 			/* fill the daily output array if daily output is requested,
 			or if the monthly or annual average of daily output variables

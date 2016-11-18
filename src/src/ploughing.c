@@ -3,9 +3,10 @@ ploughing.c
 do ploughing  - decrease the plant material (leafc, leafn, canopy water)
 
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 */
@@ -32,6 +33,7 @@ int ploughing(const control_struct* ctrl, const epconst_struct* epc, siteconst_s
 	double litr1n_STDB_to_PLG, litr2n_STDB_to_PLG, litr3n_STDB_to_PLG, litr4n_STDB_to_PLG;
 	double litr1c_CTDB_to_PLG, litr2c_CTDB_to_PLG, litr3c_CTDB_to_PLG, litr4c_CTDB_to_PLG;
 	double litr1n_CTDB_to_PLG, litr2n_CTDB_to_PLG, litr3n_CTDB_to_PLG, litr4n_CTDB_to_PLG;
+	double diffC, diffN;
 
 	/* test variable */
 	double storage_MGMmort=epc->storage_MGMmort;
@@ -484,6 +486,17 @@ int ploughing(const control_struct* ctrl, const epconst_struct* epc, siteconst_s
 	ws->soilw[0] += wf->canopyw_to_PLG;
 
 
+		
+	/* CONTROL */
+	diffC = (cs->PLGsnk-cs->PLGsrc) - (PLG->PLG_pool_litr1c + PLG->PLG_pool_litr2c + PLG->PLG_pool_litr3c + PLG->PLG_pool_litr4c);
+
+	diffN = (ns->PLGsnk-ns->PLGsrc) - (PLG->PLG_pool_litr1n + PLG->PLG_pool_litr2n + PLG->PLG_pool_litr3n + PLG->PLG_pool_litr4n);
+
+	if (mgmd >= 0 && (fabs(diffC) > 1e-3 || fabs(diffN) > 1e-4))
+	{
+	//	printf("Warning: small rounding error in harvesting pools (harvesting.c)\n");
+	}
+	
 
    return (!ok);
 }

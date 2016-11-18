@@ -3,11 +3,12 @@ state_update.c
 Resolve the fluxes in bgc() daily loop to update state variables
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 Modified:
 4/17/2000 (PET): Included the new denitrification flux. See daily_allocation.c
@@ -62,7 +63,7 @@ int daily_water_state_update(wflux_struct* wf, wstate_struct* ws)
 	/* MODIFICATIONS -  Hidy 2011 */
 	
 	/* bare soil evaporation */
-	ws->soilevap_snk   += wf->soilw_evap + wf->canopyw_to_soilw;
+	ws->soilevap_snk   += wf->soilw_evap;
 	
 	/* transpiration */
 	ws->trans_snk      += wf->soilw_trans_SUM;
@@ -71,10 +72,10 @@ int daily_water_state_update(wflux_struct* wf, wstate_struct* ws)
 	ws->runoff_snk	   += wf->prcp_to_runoff;
 
 	/* deep percolation: percolation of the bottom layer is net loss for the sytem*/
-	ws->deeppercolation_snk += wf->soilw_percolated[N_SOILLAYERS-2];
+	ws->deeppercolation_snk += wf->soilw_percolated[N_SOILLAYERS-1];
 
 	/* deep diffusion: diffusion (downward) of the bottom layer is net loss for the sytem*/
-	ws->deepdiffusion_snk += wf->soilw_diffused[N_SOILLAYERS-2];
+	ws->deepdiffusion_snk += wf->soilw_diffused[N_SOILLAYERS-1];
 
 	/* deep transpiration: transpiration from bottom layer is net gain for the sytem*/
 	ws->deeptrans_src += wf->soilw_trans[N_SOILLAYERS-1];
@@ -82,7 +83,7 @@ int daily_water_state_update(wflux_struct* wf, wstate_struct* ws)
    
 	
 	/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!! MULTILAYER SOIL !!!!!!!!!!!!!!!!!!!!!!!!!! */	
-	for (layer = 0; layer < N_SOILLAYERS-1; layer++)
+	for (layer = 0; layer < N_SOILLAYERS; layer++)
 	{
 		soilw_SUM           +=  ws->soilw[layer];
 		ws->groundwater_src += wf->soilw_from_GW[layer];

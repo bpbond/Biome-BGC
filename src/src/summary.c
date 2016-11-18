@@ -3,11 +3,12 @@ summary.c
 summary variables for potential output
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -34,9 +35,7 @@ int cnw_summary(int yday, cstate_struct* cs, cflux_struct* cf, nstate_struct* ns
 
 	/* summarize carbon stocks */
 
-	summary->abgc = cs->leafc+cs->fruitc+cs->softstemc+
-		cs->leafc_storage+cs->leafc_transfer+cs->leafc_storage+cs->fruitc_storage+cs->softstemc_storage+
-	    cs->leafc_transfer+cs->fruitc_transfer+cs->softstemc_transfer;
+	summary->abgc = cs->leafc+cs->fruitc+cs->softstemc;
 	
 
 	summary->vegc = cs->leafc + cs->leafc_storage + cs->leafc_transfer + 
@@ -93,7 +92,7 @@ int cnw_summary(int yday, cstate_struct* cs, cflux_struct* cf, nstate_struct* ns
 	nep = npp - hr;
 	
 	/* Hidy 2012 - calculating soil respiration */
-	sr = cf->froot_mr + cf->livecroot_mr +
+	sr = cf->froot_mr + cf->livecroot_mr + 
 		 cf->cpool_froot_gr + cf->cpool_froot_storage_gr + cf->transfer_froot_gr + 
 		 cf->cpool_livecroot_gr + cf->cpool_livecroot_storage_gr + cf->transfer_livecroot_gr + 
 		 cf->cpool_deadcroot_gr + cf->cpool_deadcroot_storage_gr + cf->transfer_deadcroot_gr +

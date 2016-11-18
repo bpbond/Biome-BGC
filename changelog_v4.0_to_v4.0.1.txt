@@ -1,0 +1,11 @@
+Bug fixes within the tipping bucket method: tipping.c
+
+Bug fixes within the DSSAT soil temperature estimation method: multilayer_tsoil.c
+
+Bug fixes within the hydrological calculation method: groundwater.c, multilayer_hydrolparams.c and multilayer_hydrolprocess.c
+
+Bug fixes within GDD calculation method: daymet.c
+
+Bug fixes within soil variables initalization: firstday.c
+
+Slight change of the model logic: bottom inacitve layer is now part of the soil system - which means that water/nitrogen flows from (or into) the bottom layer is net sink (or source) to the soil system. In this version soil parameters refers to all 6 layers instead of only the active layers (conduct_calc.c).

@@ -1,4 +1,4 @@
-# Makefile for Biome-BGC MuSo v4.0
+# Makefile for Biome-BGC MuSo v4.0.1
 # invoke by issuing command "make" from this directory!
 # Modified by Zoltan BARCZA and Richard KOVACS for Biome-BGC MuSo 4.0;  Sept 2015
 # REMARK: on MS Windows standard compiler settings are used [no optimization for speed]

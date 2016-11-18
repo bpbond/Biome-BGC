@@ -5,9 +5,10 @@ based on literure (Jolly et al, 2005) and own method. The goal is to replace pre
 of the model-defined onset and offset day does not work correctly
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -312,7 +313,7 @@ int GSI_calculation(const metarr_struct* metarr, const control_struct* ctrl, con
 				if (onday_flag == 0) 
 				{	
 					onday_arr[ny] = yday-2;
-					if (ctrl->onscreen) printf("WARNING: no real vegetation period - check meteorological data");
+					if (ctrl->onscreen) printf("WARNING: no real vegetation period - check meteorological data\n");
 				}
 				onday_flag     = 0;
 				offday_flag    = 1;

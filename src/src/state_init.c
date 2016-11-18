@@ -3,11 +3,12 @@ state_init.c
 Initialize water, carbon, and nitrogen state variables for pointbgc simulation  
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -66,7 +67,7 @@ int wstate_init(file init, const siteconst_struct* sitec, wstate_struct* ws)
 		for (layer = 0; layer < N_SOILLAYERS; layer ++)
 		{
 			ws->soilw[layer] = sitec->vwc_fc[layer] * (sitec->soillayer_thickness[layer]) * 1000.0;
-			if (layer < N_SOILLAYERS-2) ws->soilw_SUM += ws->soilw[layer];
+			ws->soilw_SUM += ws->soilw[layer];
 
 		}
 	

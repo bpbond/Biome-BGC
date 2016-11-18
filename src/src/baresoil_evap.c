@@ -3,11 +3,11 @@ baresoil_evap.c
 daily bare soil evaporation
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
+Biome-BGCMuSo v4.0.1
 Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy (dori.hidy@gmail.com)
-Hungarian Academy of Sciences
+Numerical Terradynamic Simulation Group (NTSG)
+School of Forestry, University of Montana
+Missoula, MT 59812
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 

@@ -1,13 +1,14 @@
-/*
+  /*
 bgc_func.h
 header file for function prototypes
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-BBGC MuSo v4
-Copyright 2000, Peter E. Thornton
-Numerical Terradynamics Simulation Group
-Copyright 2014, D. Hidy
-Hungarian Academy of Sciences
+Biome-BGCMuSo v4.0.1
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
 
@@ -36,7 +37,7 @@ int zero_srcsnk(cstate_struct* cs, nstate_struct* ns, wstate_struct* ws,
 
 /* Hidy 2010 - plus/new input variables */
 int daymet(const control_struct* ctrl, const metarr_struct* metarr, const siteconst_struct* sitec, const epconst_struct* epc, 
-		   planting_struct* PLT, wstate_struct* ws, epvar_struct* epv, metvar_struct* metv, double* tair_annavg_ptr, int metday);
+		   planting_struct* PLT, harvesting_struct* HRV, wstate_struct* ws, epvar_struct* epv, metvar_struct* metv, double* tair_annavg_ptr, int metday);
 int dayphen(const phenarray_struct* phenarr, phenology_struct* phen, int metday, int metyr);
 int phenology(const control_struct* ctrl, const epconst_struct* epc, const phenology_struct* phen,
 	epvar_struct* epv, cstate_struct* cs, cflux_struct* cf, nstate_struct* ns,
@@ -115,7 +116,7 @@ int multilayer_sminn(const epconst_struct* epc, const siteconst_struct* sitec, c
 					 nstate_struct* ns, nflux_struct* nf, wstate_struct* ws, wflux_struct* wf);
 
 /* calculate the hydrological parameters in the multilayer soil */
-int multilayer_hydrolparams(const siteconst_struct* sitec,  wstate_struct* ws, epvar_struct* epv);
+int multilayer_hydrolparams(const siteconst_struct* sitec,  wstate_struct* ws, epvar_struct* epv, metvar_struct* metv);
 
 /* calculate the hydrological processes in the multilayer soil */
 int multilayer_hydrolprocess(const control_struct* ctrl, const siteconst_struct* sitec, const epconst_struct* epc,
@@ -138,7 +139,7 @@ int multilayer_tsoil(int yday, const epconst_struct* epc, const siteconst_struct
 /* calculating rooting depth in the multilayer soil  */
 int multilayer_rootdepth(const control_struct* ctrl, const epconst_struct* epc, const siteconst_struct* sitec, 
 						 phenology_struct* phen, planting_struct* PLT, harvesting_struct* HRV,
-						 epvar_struct* epv, nstate_struct* ns, metvar_struct* metv);
+						 epvar_struct* epv, nstate_struct* ns);
 
 /* planting - Hidy 2012 */
 int planting(const control_struct* ctrl,const epconst_struct* epc, 
