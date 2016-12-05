@@ -6,7 +6,7 @@ end of the daily allocation function, in order to allow competition
 between microbes and plants for available N.
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.1
+Biome-BGCMuSo v4.0.2
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
@@ -35,7 +35,7 @@ nstate_struct* ns, nflux_struct* nf, ntemp_struct* nt)
 	double rate_scalar = 0;
 	double rate_scalar_total = 0;
 	double tk, tsoil;
-	double minvwc, maxvwc, optvwc, vwc;
+	double minvwc, maxvwc, opt1vwc, opt2vwc, vwc;
 	double rfl1s1, rfl2s2,rfl4s3,rfs1s2,rfs2s3,rfs3s4;
 	double kl1_base,kl2_base,kl4_base,ks1_base,ks2_base,ks3_base,ks4_base,kfrag_base;
 	double kl1,kl2,kl4,ks1,ks2,ks3,ks4,kfrag;
@@ -115,30 +115,46 @@ nstate_struct* ns, nflux_struct* nf, ntemp_struct* nt)
 		and soil moisture. Soil Biol. Biochem., 15(4):447-453.
 		*/
 		/* Hidy 2013 . set the maximum and minimum values for water content limits (m3/m3) */
-		minvwc = sitec->vwc_hw[layer];
-		maxvwc = sitec->vwc_sat[layer]*1.01;
-		optvwc = epv->vwc_crit2[layer]; 
-		vwc    = epv->vwc[layer];
+		minvwc  = sitec->vwc_hw[layer];
+		maxvwc  = sitec->vwc_sat[layer];
+		opt1vwc = epv->vwc_crit1[layer]; 
+		opt2vwc = epv->vwc_crit2[layer]; 
+		vwc     = epv->vwc[layer];
 
-		if (vwc < minvwc)
+		if (vwc <= minvwc)
 		{
-			/* no decomp below the minimum soil water potential and at saturation*/
+			/* no decomp below the minimum soil water potential*/
 			w_scalar = 0.0;
 		}
 		else
 		{
-			/* decreasing decomp near to total saturation*/
-			if (vwc >= optvwc) 
+			/* increasing decomp approaching to optimum range (between opt1 and opt2) */
+			if (vwc < opt1vwc) 
 			{
-				if (maxvwc == optvwc) 
-					w_scalar=1;
-				else
-					if (fabs(maxvwc - vwc) < 0.00001) 
-						w_scalar = 0;	
-					else
-						w_scalar = (maxvwc - vwc) / (maxvwc - optvwc);
+				w_scalar = (vwc - minvwc) / (opt1vwc - minvwc);
 			}
-			else w_scalar = (vwc - minvwc) / (optvwc - minvwc);		
+			else 
+			{
+				/* optimalrange (between opt1 and opt2) */
+				if (vwc <= opt2vwc) 
+				{
+					w_scalar = 1;
+				}
+				else
+				{
+					/* decreasing decomp near to total saturation and no decomp above saturation */
+					if (vwc < maxvwc) 
+					{
+						w_scalar = (maxvwc - vwc) / (maxvwc - opt2vwc);
+					}
+					else
+					{
+						w_scalar = 0;	
+					}
+				}
+				
+			}
+					
 		}
 
 

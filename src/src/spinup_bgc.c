@@ -9,7 +9,7 @@ Includes in-line output handling routines that write to daily and annual
 output files. 
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.1
+Biome-BGCMuSo v4.0.2
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
@@ -165,7 +165,8 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 		}
 	
 		file_open (&bgcout->control_file, 'o');		/* file of BBGC variables to control the simulation - Hidy 2009.*/
-			fprintf(bgcout->control_file.ptr, "simyr yday tsoil0 tsoil1 tsoil2 GDD vwc0 vwc1 vwc2 SMSI STDBc CTDBc sminn soilc litr_aboveground litr_belowground leafc frootc fruitc softstemc GPP TER evapotransp nplus\n");
+		fprintf(bgcout->control_file.ptr, "simyr yday tsoil0 tsoil1 tsoil2 GDD vwc0 vwc1 vwc2 SMSI STDBc CTDBc sminn soilc litr_aboveground litr_belowground leafc fruitc cumNPP abgC GPP TER evapotransp\n");
+
 	}
 
 
@@ -1116,13 +1117,15 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 			if (ctrl.onscreen && (ctrl.spinyears == 0 || ctrl.spinyears == 1 ||  ctrl.spinyears == 100 ||
 			    ctrl.spinyears == 600 || ctrl.spinyears == 1000 || ctrl.spinyears == 2000))
 			{
-				fprintf(bgcout->control_file.ptr, "%i %i %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f\n",
-		        ctrl.spinyears, yday, metv.tsoil[0], metv.tsoil[1], metv.tsoil[2], metv.GDD, 
-						epv.vwc[0], epv.vwc[5], epv.vwc[6], epv.m_soilstress,
-						cs.STDBc, cs.CTDBc,
-						(ns.sminn[0]+ns.sminn[1]+ns.sminn[2]+ns.sminn[3]+ns.sminn[4]+ns.sminn[5]+ns.sminn[6]), 
-				        summary.soilc, cs.litr_aboveground, cs.litr_belowground, 
-						cs.leafc, cs.frootc, cs.fruitc, cs.softstemc, summary.daily_gpp,summary.daily_tr, wf.evapotransp, nf.nplus);
+					fprintf(bgcout->control_file.ptr, "%i %i %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f\n",
+		            ctrl.simyr,yday,metv.tsoil[0], metv.tsoil[1], metv.tsoil[2], metv.GDD,
+					epv.vwc[0], epv.vwc[1], epv.vwc[2],
+					epv.m_soilstress, 
+					cs.STDBc, cs.CTDBc,
+					(ns.sminn[0]+ns.sminn[1]+ns.sminn[2]+ns.sminn[3]+ns.sminn[4]+ns.sminn[5]+ns.sminn[6]), 
+				    summary.soilc, cs.litr_aboveground, cs.litr_belowground, 
+					cs.leafc, cs.fruitc, summary.cum_npp_ann, summary.abgc, 
+					summary.daily_gpp, summary.daily_tr, wf.evapotransp); 
 
 			}
 

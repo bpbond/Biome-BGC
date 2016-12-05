@@ -4,7 +4,7 @@ calculation of soil temperature in the different soil layers based on the change
 to top soil layer and based on empirical function of temperature gradient in soil (Zheng et al.1993)
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.1
+Biome-BGCMuSo v4.0.2
 Copyright 2016, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.

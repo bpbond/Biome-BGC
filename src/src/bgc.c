@@ -7,7 +7,7 @@ output files. This is the only library module that has external
 I/O connections, and so it is the only module that includes bgc_io.h.
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.1
+Biome-BGCMuSo v4.0.2
 
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
@@ -196,8 +196,7 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 		}
 	
 		file_open (&bgcout->control_file, 'w');		/* file of BBGC variables to control the simulation - Hidy 2009.*/
-//		fprintf(bgcout->control_file.ptr, "simyr yday tsoil0 tsoil1 tsoil2 GDD vwc0 vwc1 vwc2 SMSI STDBc CTDBc sminn soilc litr_aboveground litr_belowground leafc fruitc cumNPP abgC GPP TER evapotransp\n");
- 	fprintf(bgcout->control_file.ptr, "simyr yday HRV_transportC litr1c_strg_HRV litrA litrB fruitC soilC litrC totalC\n");
+		fprintf(bgcout->control_file.ptr, "simyr yday tsoil0 tsoil1 tsoil2 GDD vwc0 vwc1 vwc2 SMSI STDBc CTDBc sminn soilc litr_aboveground litr_belowground leafc fruitc cumNPP abgC GPP TER evapotransp\n");
 	}
 
 
@@ -1214,8 +1213,8 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
  		
 
 			/* INTERNAL VARIALBE CONTROL - Hidy 2013 */
-			if (ctrl.onscreen && simyr < 40 && ctrl.spinyears < 3)
-		/*	{
+			if (ctrl.onscreen && simyr < 40)
+			{
 				fprintf(bgcout->control_file.ptr, "%i %i %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f\n",
 		                    ctrl.simyr,yday,metv.tsoil[0], metv.tsoil[1], metv.tsoil[2], metv.GDD,
 							epv.vwc[0], epv.vwc[1], epv.vwc[2],
@@ -1227,14 +1226,8 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 							summary.daily_gpp, summary.daily_tr, wf.evapotransp); 
 
 
-			} */
-			if (ctrl.onscreen && simyr < 40 && ctrl.spinyears < 3)
-			{
-				fprintf(bgcout->control_file.ptr, "%i %i %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f\n",
-		                    ctrl.simyr,yday,cs.HRV_transportC, cs.litr1c_strg_HRV, cs.litr_aboveground, cs.litr_belowground, cs.fruitc, summary.soilc, summary.litrc, summary.litrc); 
-
-
-			}
+			} 
+		
 
 
 			/* DAILY OUTPUT HANDLING */

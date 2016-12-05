@@ -1,9 +1,10 @@
-# Makefile for Biome-BGC MuSo v4.0.1
+# Makefile for Biome-BGC MuSo v4
 # invoke by issuing command "make" from this directory!
-# Modified by Zoltan BARCZA and Richard KOVACS for Biome-BGC MuSo 4.0;  Sept 2015
+# Modified by Zoltan BARCZA and Richard KOVACS for Biome-BGC MuSo 4.0;  Nov 2016
 # REMARK: on MS Windows standard compiler settings are used [no optimization for speed]
 # so we decided to use un-optimized comlining here as well, in order to match settings under Linux and Windows.
 # This is why Generic UNIX flags are used
+# Static linking is used so 32 bit executable will run in 64 bit Linux box
 
 ROOTDIR=${PWD}
 LIBDIR=${ROOTDIR}/lib
@@ -14,7 +15,7 @@ HOST=`hostname`
 
 # Not including these CFLAGS/LDFLAGS will surely break something
 # So DON'T MODIFY THESE LINES. Modify the platform specific lines down below
-CFLAGS_GENERIC = -I${INCDIR} -DVERS="\\\"${VERSION}\\\"" -DUSER="\\\"${USER}\\\"" -DHOST="\\\"${HOST}\\\""
+CFLAGS_GENERIC = -I${INCDIR} -DVERS="\\\"${VERSION}\\\"" -DUSER="\\\"${USER}\\\"" -DHOST="\\\"${HOST}\\\"" -static
 LDFLAGS_GENERIC = -lm
 
 # For Linux

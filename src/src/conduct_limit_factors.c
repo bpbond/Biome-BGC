@@ -2,7 +2,7 @@
 conduct_limit_factors.c
 calculate the limitation factors of conductance
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.1
+Biome-BGCMuSo v4.0.2
 Copyright 2016, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
@@ -75,7 +75,7 @@ int conduct_limit_factors(file logfile, const control_struct* ctrl,const sitecon
 				}
 				else
 				{
-					printf("ERROR: PSI_crit1 data (EPC file) is greater than saturation value in layer:%i\n", layer);
+					printf("ERROR: PSI_crit1 data (EPC file) is greater than saturation value\n");
 					ok=0;
 				}
 				
@@ -88,7 +88,7 @@ int conduct_limit_factors(file logfile, const control_struct* ctrl,const sitecon
 			/* CONTROL */
 			if (vwc_crit1 > vwc_sat)
 			{
-				printf("ERROR: VWC_crit1 data (calculated from relVWC_crit1 in EPC file) is greater than saturation value in layer:%i\n", layer);
+				printf("ERROR: VWC_crit1 data (calculated from relVWC_crit1 in EPC file) is greater than saturation value\n");
 				ok=0;
 			}
 			
@@ -115,7 +115,7 @@ int conduct_limit_factors(file logfile, const control_struct* ctrl,const sitecon
 				}
 				else
 				{
-					printf("ERROR: PSI_crit2 data (EPC file) is greater than saturation value in layer:%i\n", layer);
+					printf("ERROR: PSI_crit2 data (EPC file) is greater than saturation value\n");
 					ok=0;
 				}
 
@@ -131,14 +131,14 @@ int conduct_limit_factors(file logfile, const control_struct* ctrl,const sitecon
 		/* CONTROL */
 		if (vwc_crit2 > vwc_sat)
 		{
-			printf("ERROR: VWC_crit2 data (calculated from relVWC_crit2 in EPC file) is greater than saturation value in layer:%i\n", layer);
+			printf("ERROR: VWC_crit2 data (calculated from relVWC_crit2 in EPC file) is greater than saturation value\n");
 			ok=0;
 		}
 
 		/* CONTROL */
 		if (ok && vwc_crit2 < vwc_crit1)
 		{
-			printf("ERROR: VWC_crit1 data is greater then VWC_crit2 data (calculated from relVWC_crit2 in EPC file) in layer:%i\n", layer);
+			printf("ERROR: VWC_crit1 data is greater then VWC_crit2 data (calculated from relVWC_crit2 in EPC file)\n");
 			ok=0;
 		}
 			

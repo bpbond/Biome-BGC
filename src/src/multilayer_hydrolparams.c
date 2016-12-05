@@ -4,7 +4,7 @@ calcultion of soil water potential, hydr. conductivity and hydr. diffusivity as 
 constants related to texture
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.1
+Biome-BGCMuSo v4.0.2
 Copyright 2016, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.

@@ -3,7 +3,7 @@ ndep_init.c
 Initialize the varied N deposition parameters for bgc simulation
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.1
+Biome-BGCMuSo v4.0.2
 Copyright 2016, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
