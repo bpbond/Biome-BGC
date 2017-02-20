@@ -4,7 +4,7 @@ calculation of soil water content layer by layer taking into account soil hydrol
 (precipitation, evaporation, runoff, percolation, diffusion)
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.2
+Biome-BGCMuSo v4.0.3
 Copyright 2016, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.

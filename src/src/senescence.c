@@ -4,7 +4,7 @@ calculation of daily senescence mortality fluxes (due to drought/water stress)
 Senescence mortality: these fluxes all enter litter sinks due to  low VWC during a long period
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.2
+Biome-BGCMuSo v4.0.3
 Copyright 2016, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.

@@ -7,7 +7,7 @@ output files. This is the only library module that has external
 I/O connections, and so it is the only module that includes bgc_io.h.
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.2
+Biome-BGCMuSo v4.0.3
 
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
@@ -192,10 +192,10 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	{
 		if (ctrl.GSI_flag)
 		{
-			file_open (&GSI.GSI_file, 'w');				/* file of GSI parameters - Hidy 2009.*/
+			file_open (&GSI.GSI_file, 'o');				/* file of GSI parameters - Hidy 2009.*/
 		}
 	
-		file_open (&bgcout->control_file, 'w');		/* file of BBGC variables to control the simulation - Hidy 2009.*/
+		file_open (&bgcout->control_file, 'o');		/* file of BBGC variables to control the simulation - Hidy 2009.*/
 		fprintf(bgcout->control_file.ptr, "simyr yday tsoil0 tsoil1 tsoil2 GDD vwc0 vwc1 vwc2 SMSI STDBc CTDBc sminn soilc litr_aboveground litr_belowground leafc fruitc cumNPP abgC GPP TER evapotransp\n");
 	}
 

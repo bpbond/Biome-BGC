@@ -3,7 +3,7 @@ epc_init.c
 read epc file for pointbgc simulation
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.2
+Biome-BGCMuSo v4.0.3
 
 Original code: Copyright 2000, Peter E. Thornton
 20.03.01 Galina Churkina added variable "sum" substituting  t1+t2+t3 in IF statement,
