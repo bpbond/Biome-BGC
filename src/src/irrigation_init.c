@@ -3,8 +3,8 @@ irrigation_init.c
 read irrigation information for pointbgc simulation
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.3
-Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Biome-BGCMuSo v4.0.4
+Copyright 2017, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -69,6 +69,7 @@ int irrigation_init(file init, control_struct* ctrl, irrigation_struct* IRG)
 		{
 			
 			ok=1;
+			if (ctrl->onscreen) printf("But it is not a problem (it is only due to the reading of irrigation file)\n");
 			if (ctrl->onscreen) printf("INFORMATION: irrigation information from file\n");
 			IRG->IRG_flag = 2;
 			strcpy(IRG_file.name, IRG_filename);

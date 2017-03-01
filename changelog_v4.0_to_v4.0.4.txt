@@ -12,5 +12,4 @@ Slight change of the model logic: bottom inacitve layer is now part of the soil 
 
 Bug fixes within the decomposition routine.
 
-Bug fixes in spinup_bgc.c and bgc.c (writing GSI and contol file)
-
+Bug fixes in spinup_bgc.c and bgc.c (writing GSI,contol and log file)

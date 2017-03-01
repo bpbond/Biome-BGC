@@ -1,4 +1,4 @@
-Notes on usage of Biome-BGCMuSo v4.0.1
+Notes on usage of Biome-BGCMuSo v4.0
 ______________________________________
 
 

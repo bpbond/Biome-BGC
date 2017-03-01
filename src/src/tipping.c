@@ -3,8 +3,8 @@ tipping.c
 Tipping model for INFILT simulation()
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.3
-Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Biome-BGCMuSo v4.0.4
+Copyright 2017, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -266,10 +266,12 @@ int tipping(const siteconst_struct* sitec, const epconst_struct* epc, epvar_stru
 
 	
 	}
+/* --------------------------------------------------------------------------------------------------------*/
+	/* 3. UPWARD WATER MOVEMENT - based on 4M method  */
 
-	ws->pond_water    += wf->prcp_to_pondw + wf->soilw_to_pondw;
+	ws->pond_water    += wf->soilw_to_pondw;
 	ws->pond_water    -= wf->pondw_to_soilw;
-	ws->pondwater_src += wf->prcp_to_pondw;
+	
 	if (ws->pond_water > pondmax)
 	{
 		wf->prcp_to_runoff += (ws->pond_water - pondmax);
@@ -278,7 +280,7 @@ int tipping(const siteconst_struct* sitec, const epconst_struct* epc, epvar_stru
 
 
 	/* --------------------------------------------------------------------------------------------------------*/
-	/* 3. UPWARD WATER MOVEMENT - based on 4M method  */
+	/* 4. UPWARD WATER MOVEMENT - based on 4M method  */
 
 	if (epc->SHCM_flag != 2)
 	{

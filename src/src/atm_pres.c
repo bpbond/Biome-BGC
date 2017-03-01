@@ -3,7 +3,7 @@ atm_pres.c
 estimate atmospheric pressure as a function of elevation
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.3
+Biome-BGCMuSo v4.0.4
 Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group (NTSG)
 School of Forestry, University of Montana

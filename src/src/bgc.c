@@ -7,7 +7,7 @@ output files. This is the only library module that has external
 I/O connections, and so it is the only module that includes bgc_io.h.
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.3
+Biome-BGCMuSo v4.0.4
 
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
@@ -17,7 +17,7 @@ to the simple annual text output file.
 Modified:
 13/07/2000: Added input of Ndep from file. Changes are made by Galina Churkina. 
 
-Modified code: Copyright 2016, D. Hidy [dori.hidy@gmail.com]
+Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**/
@@ -1218,7 +1218,8 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 				fprintf(bgcout->control_file.ptr, "%i %i %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f\n",
 		                    ctrl.simyr,yday,metv.tsoil[0], metv.tsoil[1], metv.tsoil[2], metv.GDD,
 							epv.vwc[0], epv.vwc[1], epv.vwc[2],
-							epv.m_soilstress, 
+							//epv.m_soilstress, 
+							ws.pond_water,
 							cs.STDBc, cs.CTDBc,
 							(ns.sminn[0]+ns.sminn[1]+ns.sminn[2]+ns.sminn[3]+ns.sminn[4]+ns.sminn[5]+ns.sminn[6]), 
 				            summary.soilc, cs.litr_aboveground, cs.litr_belowground, 
