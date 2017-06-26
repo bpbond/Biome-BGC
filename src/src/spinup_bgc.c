@@ -9,7 +9,7 @@ Includes in-line output handling routines that write to daily and annual
 output files. 
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.4
+Biome-BGCMuSo v4.0.6
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -155,23 +155,17 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 #endif
 
  
+	/********************************************************************************************************* */
+	/* writing ctrl file - Hidy */
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	if (ctrl.onscreen)
 	{
-		if (ctrl.GSI_flag)
-		{
-			file_open (&GSI.GSI_file, 'o');				/* file of GSI parameters - Hidy 2009.*/
-		}
-	
-		file_open (&bgcout->control_file, 'o');		/* file of BBGC variables to control the simulation - Hidy 2009.*/
-		fprintf(bgcout->control_file.ptr, "simyr yday tsoil0 tsoil1 tsoil2 GDD vwc0 vwc1 vwc2 SMSI STDBc CTDBc sminn soilc litr_aboveground litr_belowground leafc fruitc cumNPP abgC GPP TER evapotransp\n");
-	
-
+		fprintf(bgcout->control_file.ptr, "simyr yday tsoil0-10cm tsoil10-30cm GDD vwc0-10cm vwc10-30cm SMSI STDBc CTDBc sminn soilc litr_aboveground litr_belowground LAI abgC cumNPP GPP TER evapotransp\n");
 	}
 
 	/********************************************************************************************************* */
-	/* Hidy 2015 - writing log file */
+	/* writing log file - Hidy */
+	
 	fprintf(bgcout->log_file.ptr, "SPINUP RUN\n");
 	fprintf(bgcout->log_file.ptr, " \n");
 
@@ -545,7 +539,8 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 				printf("-----------------------------------------\n");
 				printf("Start of spinup simulation. Please, wait!\n");
 			}
-			if (ctrl.onscreen) printf("*");
+			if (ctrl.onscreen) printf("o");
+		
 			
 			/* set the max lai, maturity and flowering variables, for annual diagnostic output */
 			epv.ytd_maxplai = 0.0;
@@ -945,7 +940,7 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 			printf("%d\t%d\tdone growth_resp\n",simyr,yday);
 #endif
 
-	
+
 			/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  MULTILAYER SOIL !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */	
 			/* Hidy 2013 - multilayer soil hydrology: percolation calculation based on PRCP, RUNOFF, EVAP, TRANS */
      		if (ok && multilayer_hydrolprocess(&ctrl, &sitec, &epc, &epv, &ws, &wf))
@@ -1111,22 +1106,19 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 			printf("%d\t%d\tdone carbon summary\n",simyr,yday);
 #endif
 
-	
 
-				/* INTERNAL VARIALBE CONTROL - Hidy 2013 */
-			if (ctrl.onscreen && (ctrl.spinyears == 0 || ctrl.spinyears == 1 ||  ctrl.spinyears == 100 ||
-			    ctrl.spinyears == 600 || ctrl.spinyears == 1000 || ctrl.spinyears == 2000))
+			
+			/* INTERNAL VARIALBE CONTROL - Hidy 2017 */
+			if (ctrl.onscreen && (ctrl.spinyears < 100 || (ctrl.spinyears > 1000 && ctrl.spinyears < 1100)))
 			{
-				fprintf(bgcout->control_file.ptr, "%i %i %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f\n",
-		        ctrl.spinyears, yday, metv.tsoil[0], metv.tsoil[1], metv.tsoil[2], metv.GDD, 
-						epv.vwc[0], epv.vwc[5], epv.vwc[6], epv.m_soilstress,
-						cs.STDBc, cs.CTDBc,
-						(ns.sminn[0]+ns.sminn[1]+ns.sminn[2]+ns.sminn[3]+ns.sminn[4]+ns.sminn[5]+ns.sminn[6]), 
-				        summary.soilc, cs.litr_aboveground, cs.litr_belowground, 
-						cs.leafc, cs.fruitc, summary.cum_npp, summary.abgc, summary.daily_gpp,summary.daily_tr, wf.evapotransp);
-}
-
+				fprintf(bgcout->control_file.ptr, "%i %i %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f\n",
+						ctrl.spinyears, yday, metv.tsoil[0], metv.tsoil[1], metv.GDD, epv.vwc[0], epv.vwc[1], epv.m_soilstress,
+						cs.STDBc, cs.CTDBc,(ns.sminn[0]+ns.sminn[1]+ns.sminn[2]+ns.sminn[3]+ns.sminn[4]+ns.sminn[5]+ns.sminn[6]), 
+				        summary.soilc, cs.litr_aboveground, cs.litr_belowground, epv.proj_lai, 
+						summary.abgc, summary.cum_npp, summary.daily_gpp,summary.daily_tr, wf.evapotransp);
+			}
 	
+
 
 				/* DAILY OUTPUT HANDLING */
 				/* fill the daily output array if daily output is requested,
@@ -1404,14 +1396,6 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 		ok=0;
 	}
 	
-	if (ctrl.onscreen)
-	{
-		if (ctrl.GSI_flag)
-		{
-			fclose (GSI.GSI_file.ptr);
-		}
-		fclose (bgcout->control_file.ptr);
-	}
    
 	/*----------------------------------------------------------*/
 	/* TRANSIENT RUN between spinup and normal run - Hidy 2014 */

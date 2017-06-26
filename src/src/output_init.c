@@ -3,7 +3,7 @@ output_init.c
 Reads output control information from initialization file
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.4
+Biome-BGCMuSo v4.0.6
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -112,6 +112,8 @@ int output_init(file init, output_struct* output)
 			ok=0;
 		}
 	}
+
+
 
 	/* open outfiles if specified */
 	if (ok && output->dodaily)

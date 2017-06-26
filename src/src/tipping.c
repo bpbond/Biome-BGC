@@ -3,7 +3,7 @@ tipping.c
 Tipping model for INFILT simulation()
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.4
+Biome-BGCMuSo v4.0.6
 Copyright 2017, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
@@ -81,12 +81,13 @@ int tipping(const siteconst_struct* sitec, const epconst_struct* epc, epvar_stru
 			{
 				conduct_sat = 0;
 			}
-
-			/* soil water conductitvity constans [1/day] */
-			drain_coeff = 0.1122 * pow(conduct_sat,0.339);
+	
 
 			/* hydraulic conductivity in actual layer (cm/day = m/s * 100 * n_sec_in_day) */
 			conduct = conduct_sat * pow(epv->vwc[layer]/sitec->vwc_sat[layer], 2*(sitec->soil_b[layer])+3);
+
+			/* soil water conductitvity constans [1/day] */
+			drain_coeff = 0.1122 * pow(conduct_sat,0.339);
 	
 			/* [cm = m3/m3 * cm */
 			HOLD = (sitec->vwc_sat[layer] - vwc) * dz0;
@@ -189,6 +190,13 @@ int tipping(const siteconst_struct* sitec, const epconst_struct* epc, epvar_stru
 			/* water flux: cm/day to kg/(m2*day) */
 			wf->soilw_percolated[layer] = (DRN[layer] / m_to_cm) * water_density;
 			
+			/* tipping variables */
+			epv->drcoeff_tipping[layer] = drain_coeff;
+			epv->conduct_tipping[layer] = conduct;
+            epv->INFILT_tipping[layer]  = INFILT;
+            epv->DRAIN_tipping[layer]   = DRAIN;
+			epv->DRN_tipping[layer]     = DRN[layer];
+			epv->HOLD_tipping[layer]    = HOLD;
  
 		} /* END FOR (layer) */
 
@@ -260,6 +268,12 @@ int tipping(const siteconst_struct* sitec, const epconst_struct* epc, epvar_stru
 			epv->vwc[layer]=vwc;
 			ws->soilw[layer]=soilw;
 			
+			/* tipping variables */
+			epv->drcoeff_tipping[layer] = drain_coeff;
+			epv->conduct_tipping[layer] = conduct;
+            epv->INFILT_tipping[layer]  = INFILT;
+            epv->DRAIN_tipping[layer]   = 0;
+			epv->DRN_tipping[layer]     = DRN[layer];
 			
  
 		} /* END LOOP: VWC_sat flow */

@@ -20,21 +20,13 @@ Missoula, MT 59812
 #include "bgc_func.h"
 #include "bgc_constants.h"
 
-int atm_pres(double elev, double* pa)
+int helloworld()
 {
-	/* daily atmospheric pressure (Pa) as a function of elevation (m) */
-	/* From the discussion on atmospheric statics in:
-	Iribane, J.V., and W.L. Godson, 1981. Atmospheric Thermodynamics, 2nd
-		Edition. D. Reidel Publishing Company, Dordrecht, The Netherlands.
-		(p. 168)
-	*/
 	
 	int ok=1;
 	double t1,t2;
 	
-	t1 = 1.0 - (LR_STD * elev)/T_STD;
-	t2 = G_STD / (LR_STD * (R / MA));
-	*pa = P_STD * pow(t1,t2);
+	printf("Hello world");
 	
 	return(!ok);
 }

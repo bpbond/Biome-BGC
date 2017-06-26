@@ -4,7 +4,7 @@ front-end to BIOME-BGC for single-point, single-biome simulations
 Uses BBGC MuSo v4 library function
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.4
+Biome-BGCMuSo v4.0.6
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -179,6 +179,21 @@ int main(int argc, char *argv[])
 		printf("Error in call to output_init() from pointbgc.c... Exiting\n");
 		exit(1);
 	}
+
+	if (output.onscreen)
+	{
+		if (file_open(&(output.control_file),'o'))
+		{
+			printf("Error opening control_file (%s) in poinbgc.c()\n",output.control_file.name);
+			exit(1);
+		}
+
+		if (file_open(&(bgcin.GSI.GSI_file),'o'))
+		{
+			printf("Error opening GSI_file (%s) in poinbgc.c()\n",bgcin.GSI.GSI_file.name);
+			exit(1);
+		}
+	}
 	
 	 /* -------------------------------------------------------------------------*/
 	/* MANAGEMENT SECTION - Hidy 2012.. */
@@ -330,9 +345,10 @@ int main(int argc, char *argv[])
 	if (output.domonavg) bgcout.monavgout = output.monavgout;
 	if (output.doannavg) bgcout.annavgout = output.annavgout;
 	if (output.doannual) bgcout.annout = output.annout;
-	bgcout.anntext = output.anntext;
+	bgcout.anntext      = output.anntext;
+	bgcout.log_file     = output.log_file;
 	bgcout.control_file = output.control_file;
-	bgcout.log_file = output.log_file;
+	bgcout.GSI_file     = bgcin.GSI.GSI_file;
 	
 	
 	
@@ -422,8 +438,11 @@ int main(int argc, char *argv[])
 	if (output.domonavg) fclose(output.monavgout.ptr);
 	if (output.doannavg) fclose(output.annavgout.ptr);
 	if (output.doannual) fclose(output.annout.ptr);
+	if (output.onscreen) fclose(output.control_file.ptr);
+	if (output.onscreen) fclose(bgcin.GSI.GSI_file.ptr);
 	fclose(output.anntext.ptr);
 	fclose(output.log_file.ptr);
+
 /* end of main */	
  } 
 	

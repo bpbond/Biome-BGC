@@ -51,8 +51,9 @@ typedef struct
 	file anntext;           /* file containing simple annual text output */
 	double spinup_resid_trend; /* kgC/m2/yr remaining trend after spinup */
 	int spinup_years;       /* number of years before reaching steady-state */
-	file control_file;
 	file log_file;
+	file control_file;
+	file GSI_file;
 } bgcout_struct;
 
 /* function prototypes for calling bgc */

@@ -4,7 +4,7 @@ Initializes the state variables for the first day of a simulation that
 is not using a restart file.
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.4
+Biome-BGCMuSo v4.0.6
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -79,6 +79,12 @@ int firstday(const siteconst_struct* sitec, const epconst_struct* epc, const cin
 		epv->hydr_diffus_E[layer]	  = sitec->hydr_diffus_fc[layer];
 		epv->pF[layer]				  = log10(fabs(10000*sitec->psi_fc[layer]));	// dimension of psi: MPa to cm (10000 MPa = 1 cm)
 		epv->m_soilstress_layer[layer]= 1;
+		epv->drcoeff_tipping[layer] = 0;
+		epv->conduct_tipping[layer] = 0;
+        epv->INFILT_tipping[layer]  = 0;
+        epv->DRAIN_tipping[layer]   = 0;
+		epv->DRN_tipping[layer]     = 0;
+		epv->HOLD_tipping[layer]    = 0;
 	}
 
 	epv->vwc_avg		    = sitec->vwc_fc[0];

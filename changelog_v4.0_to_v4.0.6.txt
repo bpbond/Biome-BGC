@@ -12,4 +12,9 @@ Slight change of the model logic: bottom inacitve layer is now part of the soil 
 
 Bug fixes within the decomposition routine.
 
-Bug fixes in spinup_bgc.c and bgc.c (writing GSI,contol and log file)
+Bug fixes in spinup_bgc.c and bgc.c (writing log file)
+
+Bug fixes in bgc_constant.h: grazing parameters from 14 to 15
+
+Bug fixes within the tipping bucket method: tipping.c
+

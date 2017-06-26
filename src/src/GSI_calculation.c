@@ -5,7 +5,7 @@ based on literure (Jolly et al, 2005) and own method. The goal is to replace pre
 of the model-defined onset and offset day does not work correctly
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.4
+Biome-BGCMuSo v4.0.6
 Copyright 2017, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
@@ -110,19 +110,16 @@ int GSI_calculation(const metarr_struct* metarr, const control_struct* ctrl, con
 		}
 	}
 		
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/* ******************************************************************* */
+	/* 0. writing output */
+
 	if (ctrl->onscreen)
 	{
 		fprintf(GSI->GSI_file.ptr, "year yday snowcover heatsum_act tmin_index vpd_index dayl_index heatsum_index GSI_index_avg GSI_index_total\n");
-		
-		if (ctrl->spinup == 0)
-		{	
-			printf("-----------------\n");
-			printf("ONDAYS AND OFFDAYS\n");
-		}
+	
 	}
-	////////////////////////////////////////////////////////////////////
+	/* ******************************************************************* */
+
 
 	for (ny=0; ny<nyears; ny++)
 	{
@@ -345,6 +342,7 @@ int GSI_calculation(const metarr_struct* metarr, const control_struct* ctrl, con
 			fprintf(GSI->GSI_file.ptr, "%i\n", offday_arr[ny]);
 		}
 	}
+
 
 	phenarr->onday_arr = onday_arr;
 	phenarr->offday_arr= offday_arr;

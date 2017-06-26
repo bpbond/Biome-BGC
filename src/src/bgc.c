@@ -7,7 +7,7 @@ output files. This is the only library module that has external
 I/O connections, and so it is the only module that includes bgc_io.h.
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.4
+Biome-BGCMuSo v4.0.6
 
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
@@ -184,25 +184,20 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	
 
 #ifdef DEBUG
-	printf("done copy input\n");
+	 f("done copy input\n");
 #endif
  
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	 /********************************************************************************************************* */
+	/* writing ctrl file - Hidy */
+
 	if (ctrl.onscreen)
 	{
-		if (ctrl.GSI_flag)
-		{
-			file_open (&GSI.GSI_file, 'o');				/* file of GSI parameters - Hidy 2009.*/
-		}
-	
-		file_open (&bgcout->control_file, 'o');		/* file of BBGC variables to control the simulation - Hidy 2009.*/
-		fprintf(bgcout->control_file.ptr, "simyr yday tsoil0 tsoil1 tsoil2 GDD vwc0 vwc1 vwc2 SMSI STDBc CTDBc sminn soilc litr_aboveground litr_belowground leafc fruitc cumNPP abgC GPP TER evapotransp\n");
+		fprintf(bgcout->control_file.ptr, "simyr yday tsoil0-10cm tsoil10-30cm GDD vwc0-10cm vwc10-30cm SMSI STDBc CTDBc sminn soilc litr_aboveground litr_belowground LAI abgC cumNPP GPP TER evapotransp\n");
+
 	}
-
-
-
 	/********************************************************************************************************* */
-	/* Hidy 2015 - writing log file */
+	/*  writing log file - Hidy */
+
 	fprintf(bgcout->log_file.ptr, "NORMAL RUN\n");
 	fprintf(bgcout->log_file.ptr, " \n");
 
@@ -1211,24 +1206,17 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 #endif
 
  		
-
-			/* INTERNAL VARIALBE CONTROL - Hidy 2013 */
-			if (ctrl.onscreen && simyr < 40)
+			/* INTERNAL VARIALBE CONTROL - Hidy 2017 */
+			if (ctrl.onscreen)
 			{
-				fprintf(bgcout->control_file.ptr, "%i %i %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f\n",
-		                    ctrl.simyr,yday,metv.tsoil[0], metv.tsoil[1], metv.tsoil[2], metv.GDD,
-							epv.vwc[0], epv.vwc[1], epv.vwc[2],
-							//epv.m_soilstress, 
-							ws.pond_water,
-							cs.STDBc, cs.CTDBc,
-							(ns.sminn[0]+ns.sminn[1]+ns.sminn[2]+ns.sminn[3]+ns.sminn[4]+ns.sminn[5]+ns.sminn[6]), 
-				            summary.soilc, cs.litr_aboveground, cs.litr_belowground, 
-							cs.leafc, cs.fruitc, summary.cum_npp_ann, summary.abgc, 
-							summary.daily_gpp, summary.daily_tr, wf.evapotransp); 
-
-
-			} 
+				fprintf(bgcout->control_file.ptr, "%i %i %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f\n",
+						ctrl.simyr, yday, metv.tsoil[0], metv.tsoil[1], metv.GDD, epv.vwc[0], epv.vwc[1], epv.m_soilstress,
+						cs.STDBc, cs.CTDBc,(ns.sminn[0]+ns.sminn[1]+ns.sminn[2]+ns.sminn[3]+ns.sminn[4]+ns.sminn[5]+ns.sminn[6]), 
+				        summary.soilc, cs.litr_aboveground, cs.litr_belowground, epv.proj_lai, 
+						summary.abgc, summary.cum_npp, summary.daily_gpp,summary.daily_tr, wf.evapotransp);
 		
+	
+			}
 
 
 			/* DAILY OUTPUT HANDLING */
@@ -1464,15 +1452,6 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	}
 	
 
-	/* !!!!!!!!!!! close control file - Hidy 2009.!!!!!!!!!!!!*/
-	if (ctrl.onscreen)
-	{
-		if (ctrl.GSI_flag)
-		{
-			fclose (GSI.GSI_file.ptr);
-		}
-		fclose (bgcout->control_file.ptr);
-	}
 
 	/* return error status */	
 	return (!ok);

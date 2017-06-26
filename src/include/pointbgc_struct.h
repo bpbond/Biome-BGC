@@ -56,8 +56,8 @@ typedef struct
 	file annavgout;        /* annual average output file */
     file annout;           /* annual output file */
 	file anntext;          /* simple annual text output */
-	file control_file;	   /* Hidy 2012 - file to write out control variables */
-	file log_file;		   /* Hidy 2015 - main information about model run */
+	file control_file;	   /* Hidy  - file to write out control variables */
+	file log_file;		   /* Hidy  - main information about model run */
 } output_struct;
 
 

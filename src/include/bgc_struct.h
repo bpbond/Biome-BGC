@@ -162,7 +162,7 @@ typedef struct
 	double deepdiffusion_snk;		 /* (kgH2O/m2) SUM of percolated water out of the system */
 	double deeptrans_src;			 /* (kgH2O/m2) SUM of transpirated water from the bottom layer */
 	double groundwater_src;			 /* (kgH2O/m2) SUM of water plus from goundwater */
-    double pondwater_src;			 /* (kgH2O/m2) SUM of water plus from goundwater */
+    double pondwater_src;			 /* (kgH2O/m2) SUM of water plus from pondwater */
 	/* thinning - Hidy 2012. */
 	double canopyw_THNsnk;				/* (kgH2O/m2) water stored on canopy is disappered because of thinning*/
 	/* mowing - Hidy 2008. */
@@ -1253,6 +1253,14 @@ typedef struct
 	/* diagnostic variables for ouput purposes only */
 	double ytd_maxplai;    /* (DIM) year-to-date maximum projected LAI */
 	double n_limitation;	     /* Hidy 2010 - flag for nitrogen limitation */
+
+	/* tipping variables */
+	double drcoeff_tipping[N_SOILLAYERS];
+	double conduct_tipping[N_SOILLAYERS];
+    double INFILT_tipping[N_SOILLAYERS];
+    double DRAIN_tipping[N_SOILLAYERS];
+	double DRN_tipping[N_SOILLAYERS];
+	double HOLD_tipping[N_SOILLAYERS];
 } epvar_struct;
 
 /* soil and site constants */
