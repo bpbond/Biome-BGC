@@ -3,7 +3,7 @@ end_init.c
 Final housekeeping for initialization file reading 
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.6
+Biome-BGCMuSo v4.0.7
 Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group (NTSG)
 School of Forestry, University of Montana

@@ -7,7 +7,7 @@ output files. This is the only library module that has external
 I/O connections, and so it is the only module that includes bgc_io.h.
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.6
+Biome-BGCMuSo v4.0.7
 
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA

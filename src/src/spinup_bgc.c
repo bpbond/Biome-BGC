@@ -9,7 +9,7 @@ Includes in-line output handling routines that write to daily and annual
 output files. 
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.6
+Biome-BGCMuSo v4.0.7
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -1109,7 +1109,8 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 
 			
 			/* INTERNAL VARIALBE CONTROL - Hidy 2017 */
-			if (ctrl.onscreen && (ctrl.spinyears < 100 || (ctrl.spinyears > 1000 && ctrl.spinyears < 1100)))
+			if (ctrl.onscreen && (ctrl.spinyears < 100 || (ctrl.spinyears > 300 && ctrl.spinyears < 310) || (ctrl.spinyears > 500 && ctrl.spinyears < 510) || 
+				(ctrl.spinyears > 700 && ctrl.spinyears < 710) || (ctrl.spinyears > 900 && ctrl.spinyears < 910) ))
 			{
 				fprintf(bgcout->control_file.ptr, "%i %i %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f\n",
 						ctrl.spinyears, yday, metv.tsoil[0], metv.tsoil[1], metv.GDD, epv.vwc[0], epv.vwc[1], epv.m_soilstress,

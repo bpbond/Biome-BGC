@@ -3,7 +3,7 @@ check_balance.c
 daily test of mass balance (water, carbon, and nitrogen state variables)
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.6
+Biome-BGCMuSo v4.0.7
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]

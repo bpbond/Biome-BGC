@@ -3,7 +3,7 @@ sitec_init.c
 Initialize the site physical constants for bgc simulation
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.6
+Biome-BGCMuSo v4.0.7
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -386,7 +386,7 @@ int soilb_estimation(double sand, double silt, double* soil_b, double* vwc_sat, 
 	double VWCfc_array[12]      = {0.155, 0.190, 0.250, 0.310, 0.360, 0.380, 0.390, 0.405, 0.420, 0.435, 0.445, 0.460};
 	double VWCwp_array[12]      = {0.030, 0.050, 0.090, 0.130, 0.170, 0.190, 0.205, 0.220, 0.240, 0.260, 0.275, 0.290};
 	double BD_array[12]         = {1.6,   1.58,  1.56,  1.54,  1.52,  1.5,   1.48,  1.46,  1.44,  1.42,  1.4,   1.38};
-	double RCN_array[12]        = {50,    52,    54,    58,    60,    56,    62,    66,    64,    68,    70,    72};
+	double RCN_array[12]        = {50,    52,    54,    56,    58,    60,    62,    64,    66,    68,    70,    72};
 
 
 	

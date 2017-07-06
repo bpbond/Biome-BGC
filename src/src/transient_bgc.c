@@ -10,7 +10,7 @@ This run has no output and it is optional
 (spinup_ini: CO2_CONTROL block varCO2 flag=1)
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.6
+Biome-BGCMuSo v4.0.7
 Copyright 2017, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
@@ -110,6 +110,11 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	
 	/* summary variable structure */
 	summary_struct     summary;
+
+	/* simple annual variables for text output  - Hidy 2008. */
+	double annmaxlai,annet,anndeeppercol,annnpp, annnee, annnbp, annprcp,anntavg, 
+		ann_Cchange_SNSC, ann_Cchange_THN,  ann_Cchange_MOW,  ann_Cchange_HRV,ann_Cchange_PLG, ann_Cchange_GRZ, 
+		ann_Cchange_FRZ, ann_Cchange_PLT, ann_Nplus_GRZ, ann_Nplus_FRZ;
 
 
 	/* output mapping (array of pointers to double) */
@@ -398,6 +403,25 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 
 	for (simyr=0 ; ok && simyr<ctrl.simyears ; simyr++)
 	{
+		/* reset the simple annual output variables for text output */
+		annmaxlai = 0.0;
+		annet = 0.0;
+		anndeeppercol = 0.0;/* by Hidy 2011. - deeppercolation is calculated instead of outflow */
+		annnpp = 0.0;
+		annnee= 0.0;
+		annnbp = 0.0;		/* by Hidy 2009. - including effect of management strategies */
+		annprcp = 0.0;
+		anntavg = 0.0;
+		ann_Cchange_SNSC = 0.0;	
+		ann_Cchange_THN = 0.0;     /* by Hidy 2012. - calculation effect of management strategies and senescence */
+		ann_Cchange_MOW = 0.0;       
+		ann_Cchange_HRV = 0.0;       
+		ann_Cchange_PLG = 0.0;       
+		ann_Cchange_GRZ = 0.0;       
+		ann_Cchange_FRZ= 0.0;		 
+		ann_Cchange_PLT = 0.0;		 
+		ann_Nplus_GRZ = 0.0;		 
+		ann_Nplus_FRZ = 0.0;
 
 		/* output to screen to indicate start of simulation year */
 		if (ctrl.onscreen) printf("Year: %6d\n",ctrl.simstartyear+simyr);
@@ -1025,7 +1049,7 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 #endif
 
 	
-                         /* test for carbon balance */
+            /* test for carbon balance */
 			if (ok  && check_carbon_balance(&cs, first_balance))
 			{
 				printf("Error in check_carbon_balance() from bgc()\n");
@@ -1065,16 +1089,48 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 			printf("%d\t%d\tdone carbon summary\n",simyr,yday);
 #endif
 
+			/********************************************************************************************************* */
+		
+			/* very simple annual summary variables for text file output */
+			if (epv.proj_lai > annmaxlai) annmaxlai = epv.proj_lai;
+		
+			annet += wf.evapotransp;			
+			anndeeppercol += wf.soilw_percolated[N_SOILLAYERS-2] + wf.soilw_diffused[N_SOILLAYERS-2];
+			annnpp += summary.daily_npp * 1000.0;		/* (kgC/m2 -> gC/m2) */
+			annnee += summary.daily_nee * 1000.0;		/* (kgC/m2 -> gC/m2) */
+			annnbp += summary.daily_nbp * 1000.0;
+			annprcp += metv.prcp;
+			anntavg += metv.tavg / NDAY_OF_YEAR;
+			ann_Cchange_SNSC += summary.Cchange_SNSC * 1000.0	;	/* (kgC/m2 -> gN/m2) ;  Hidy 2013. */
+			ann_Cchange_THN += summary.Cchange_THN * 1000.0;		/* (kgC/m2 -> gC/m2) ;  Hidy 2012. */
+			ann_Cchange_MOW += summary.Cchange_MOW * 1000.0;		/* (kgC/m2 -> gC/m2) ;  Hidy 2008. */
+			ann_Cchange_HRV += summary.Cchange_HRV * 1000.0;		/* (kgC/m2 -> gC/m2) ;  Hidy 2008. */
+			ann_Cchange_PLG += summary.Cchange_PLG * 1000.0;        /* (kgC/m2 -> gC/m2) ;  Hidy 2008. */
+			ann_Cchange_GRZ += summary.Cchange_GRZ * 1000.0;		/* (kgC/m2 -> gC/m2) ;  Hidy 2008. */
+			ann_Cchange_FRZ += summary.Cchange_FRZ * 1000.0;		/* (kgC/m2 -> gC/m2) ;  Hidy 2008. */
+			ann_Cchange_PLT += summary.Cchange_PLT * 1000.0;		/* (kgC/m2 -> gC/m2) ;  Hidy 2008. */
+			ann_Nplus_GRZ += summary.Nplus_GRZ * 1000.0	;			/* (kgN/m2 -> gN/m2) ;  Hidy 2013. */	
+			ann_Nplus_FRZ += summary.Nplus_FRZ * 1000.0	;
 	          
 		
 	}
+
+	/* write the simple annual text output - Hidy 2008. */
+	fprintf(bgcout->anntext.ptr,"%i %10.2f %10.2f %10.2f %10.2f %10.2f %10.2f %10.2f %10.2f %10.2f %10.2f %10.2f %10.2f %10.2f %10.2f %10.2f %10.2f\n",
+			ctrl.simstartyear+simyr,annprcp,anntavg,annmaxlai,annet,anndeeppercol,annnee,annnbp,
+			ann_Cchange_SNSC,ann_Cchange_PLT, ann_Cchange_THN, ann_Cchange_MOW, ann_Cchange_GRZ, ann_Cchange_HRV, ann_Cchange_FRZ,  
+			ann_Nplus_GRZ, ann_Nplus_FRZ);
+	metyr++;
 }
 	bgcin->ws = ws;
 	bgcin->cs = cs;
 	bgcin->ns = ns;
 
-	/********************************************************************************************************* */
-	/* Hidy 2015 - writing log file */
+
+
+	
+
+	/* write log file */
 	fprintf(bgcout->log_file.ptr, "Some important annual outputs\n");
 	fprintf(bgcout->log_file.ptr, "Mean annual GPP (gC/m2/year):                           %12.1f\n",summary.cum_gpp/ctrl.simyears*1000);
 	fprintf(bgcout->log_file.ptr, "Mean annual NEE (gC/m2/year):                           %12.1f\n",summary.cum_nee/ctrl.simyears*1000);

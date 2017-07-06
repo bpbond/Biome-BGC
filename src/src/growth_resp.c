@@ -3,7 +3,7 @@ growth_resp.c
 daily growth respiration rates
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.4
+Biome-BGCMuSo v4.0.7
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]

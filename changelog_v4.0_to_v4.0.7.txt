@@ -10,11 +10,17 @@ Bug fixes within soil variables initalization: firstday.c
 
 Slight change of the model logic: bottom inacitve layer is now part of the soil system - which means that water/nitrogen flows from (or into) the bottom layer is net sink (or source) to the soil system. In this version soil parameters refers to all 6 layers instead of only the active layers (conduct_calc.c).
 
-Bug fixes within the decomposition routine.
+Bug fixes within the decomposition routine: decomposition.c
 
 Bug fixes in spinup_bgc.c and bgc.c (writing log file)
 
 Bug fixes in bgc_constant.h: grazing parameters from 14 to 15
 
 Bug fixes within the tipping bucket method: tipping.c
+
+Bug fixes in RCN number:sitec.c
+
+Bug fixes in metday of transient run: transient_bgc.c
+
+New feature: ann.txt of spinup run now contains data from transient run: transient_bgc.c
 

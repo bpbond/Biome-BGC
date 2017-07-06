@@ -8,7 +8,7 @@ mineral N is added at each time step to satisfy the total demand of
 plant and microbe.
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.6
+Biome-BGCMuSo v4.0.7
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -179,6 +179,8 @@ int spinup_daily_allocation(const epconst_struct* epc, const siteconst_struct* s
 	}
 	else
 		nf->nplus    = 0;
+
+
 	
 	if (sum_ndemand <= ns->sminn_RZ)
 	{
