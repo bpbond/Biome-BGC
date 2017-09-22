@@ -3,7 +3,7 @@ zero_srcsnk.c
 fill the source and sink variables with 0.0 at the start of the simulation
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -57,7 +57,7 @@ int zero_srcsnk(cstate_struct* cs, nstate_struct* ns, wstate_struct* ws,
 	ws->deeptrans_src = 0.0; 
 	ws->groundwater_src = 0.0;
 	ws->pondwater_src = 0.0;
-    ws->balance = 0;
+    ws->balanceERR = 0;
 
 
 	/* zero the carbon sources and sinks */
@@ -111,7 +111,7 @@ int zero_srcsnk(cstate_struct* cs, nstate_struct* ns, wstate_struct* ws,
 	/* softstem simulation - Hidy 2013.  */
 	cs->softstem_mr_snk = 0.0;
 	cs->softstem_gr_snk = 0.0;
-	cs->balance = 0;
+	cs->balanceERR = 0;
 
 	/* zero the nitrogen sources and sinks */
 	ns->nfix_src = 0.0;
@@ -146,7 +146,7 @@ int zero_srcsnk(cstate_struct* cs, nstate_struct* ns, wstate_struct* ws,
 	ns->PLG_npool = 0.0;
 	/* fertilizing - Hidy 2012. */
 	ns->FRZsrc = 0.0;
-	ns->balance = 0;
+	ns->balanceERR = 0;
 	
 	/* zero the summary variables */
 	summary->cum_npp_ann = 0.0;
@@ -179,6 +179,7 @@ int zero_srcsnk(cstate_struct* cs, nstate_struct* ns, wstate_struct* ws,
 	summary->litrc = 0.0;
 	summary->Nplus_FRZ = 0.0;
 	summary->Nplus_GRZ = 0.0;
+	summary->daily_N2O = 0.0;
 	summary->soilc = 0.0;
 	summary->vegc = 0.0;
 	summary->abgc = 0.0;

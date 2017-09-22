@@ -3,7 +3,7 @@ mortality.c
 daily mortality fluxes
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.1
+Biome-BGCMuSo v4.0.7
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -380,14 +380,11 @@ nstate_struct* ns, nflux_struct* nf, int simyr)
 	mort = epc->daily_fire_turnover;
 	
 	/* daily carbon fluxes due to mortality */
-	/* mortality fluxes out of actual pools */
+	/* mortality fluxes out of leaf and fine root pools */
 	cf->m_leafc_to_fire = mort * cs->leafc;  	 
 	cf->m_frootc_to_fire = mort * cs->frootc;
+	/* fruit simulation - Hidy 2013. */
 	cf->m_fruitc_to_fire = mort * cs->fruitc;  
-
-	/* mortality fluxes out of standing dead biome pools */
-	cf->m_STDBc_to_fire = mort * (cs->STDB_litr1c + cs->STDB_litr2c + cs->STDB_litr3c + cs->STDB_litr4c);
-	cf->m_CTDBc_to_fire = mort * (cs->CTDB_litr1c + cs->CTDB_litr2c + cs->CTDB_litr3c + cs->CTDB_litr4c + cs->CTDB_cwdc);
 	
 	/* mortality fluxes out of storage and transfer pools */
 	cf->m_leafc_storage_to_fire  = mort * cs->leafc_storage;
@@ -404,6 +401,7 @@ nstate_struct* ns, nflux_struct* nf, int simyr)
 	cf->m_deadcrootc_transfer_to_fire = mort * cs->deadcrootc_transfer;
 	cf->m_gresp_storage_to_fire =  mort * cs->gresp_storage;
 	cf->m_gresp_transfer_to_fire = mort * cs->gresp_transfer;
+	/* fruit simulation - Hidy 2013. */
 	cf->m_fruitc_storage_to_fire  = mort * cs->fruitc_storage;
 	cf->m_fruitc_transfer_to_fire = mort * cs->fruitc_transfer;
 
@@ -455,14 +453,10 @@ nstate_struct* ns, nflux_struct* nf, int simyr)
 	nf->m_livecrootn_transfer_to_fire = mort * ns->livecrootn_transfer;
 	nf->m_deadcrootn_transfer_to_fire = mort * ns->deadcrootn_transfer;
 	nf->m_retransn_to_fire = mort * ns->retransn;
+	/* fruit simulation - Hidy 2013. */
 	nf->m_fruitn_storage_to_fire  = mort * ns->fruitn_storage;
 	nf->m_fruitn_transfer_to_fire = mort * ns->fruitn_transfer;
-
-	/* mortality fluxes out of standing dead biome pools */
-	nf->m_STDBn_to_fire = mort * (ns->STDB_litr1n + ns->STDB_litr2n + ns->STDB_litr3n + ns->STDB_litr4n);
-	nf->m_CTDBn_to_fire = mort * (ns->CTDB_litr1n + ns->CTDB_litr2n + ns->CTDB_litr3n + ns->CTDB_litr4n + ns->CTDB_cwdn);
-
-
+	
 	/* TREE-specific and NON-WOODY SPECIFIC fluxes */
 	if (epc->woody)
 	{   /* woody-specific nitrogen fluxes */
@@ -510,24 +504,21 @@ nstate_struct* ns, nflux_struct* nf, int simyr)
 	with the other fluxes that are based on proportions of state variables,
 	especially the phenological fluxes */
 	/* CARBON mortality state variable update */	
-	/*   Leaf, fine root, fruit mortality */
+	/*   Leaf mortality */
 	cs->fire_snk       += cf->m_leafc_to_fire;
 	cs->leafc          -= cf->m_leafc_to_fire;
+	/*   Fine root mortality */
 	cs->fire_snk       += cf->m_frootc_to_fire;
 	cs->frootc         -= cf->m_frootc_to_fire;
+	/*   Fruit mortality - Hidy 2013. */
 	cs->fire_snk       += cf->m_fruitc_to_fire;
 	cs->fruitc         -= cf->m_fruitc_to_fire;
-
 	/*   Storage and transfer mortality */
 	cs->fire_snk            += cf->m_leafc_storage_to_fire;
 	cs->leafc_storage       -= cf->m_leafc_storage_to_fire;
 	cs->fire_snk            += cf->m_frootc_storage_to_fire;
 	cs->frootc_storage      -= cf->m_frootc_storage_to_fire;
 	cs->fire_snk            += cf->m_livestemc_storage_to_fire;
-	cs->fire_snk            += cf->m_fruitc_storage_to_fire;
-	cs->fruitc_storage      -= cf->m_fruitc_storage_to_fire;
-	cs->fire_snk            += cf->m_fruitc_transfer_to_fire;
-	cs->fruitc_transfer     -= cf->m_fruitc_transfer_to_fire;
 	cs->livestemc_storage   -= cf->m_livestemc_storage_to_fire;
 	cs->fire_snk            += cf->m_deadstemc_storage_to_fire;
 	cs->deadstemc_storage   -= cf->m_deadstemc_storage_to_fire;
@@ -551,18 +542,12 @@ nstate_struct* ns, nflux_struct* nf, int simyr)
 	cs->gresp_storage       -= cf->m_gresp_storage_to_fire;
 	cs->fire_snk            += cf->m_gresp_transfer_to_fire;
 	cs->gresp_transfer      -= cf->m_gresp_transfer_to_fire;
+	/* fruit simulation - Hidy 2013. */
+	cs->fire_snk            += cf->m_fruitc_storage_to_fire;
+	cs->fruitc_storage      -= cf->m_fruitc_storage_to_fire;
+	cs->fire_snk            += cf->m_fruitc_transfer_to_fire;
+	cs->fruitc_transfer     -= cf->m_fruitc_transfer_to_fire;
 
-	/* standing and cut-down dead stem */
-	cs->STDB_litr1c -= mort * cs->STDB_litr1c;
-	cs->STDB_litr2c -= mort * cs->STDB_litr2c;
-	cs->STDB_litr3c -= mort * cs->STDB_litr3c;
-	cs->STDB_litr4c -= mort * cs->STDB_litr4c;
-
-	cs->CTDB_litr1c -= mort * cs->CTDB_litr1c;
-	cs->CTDB_litr2c -= mort * cs->CTDB_litr2c;
-	cs->CTDB_litr3c -= mort * cs->CTDB_litr3c;
-	cs->CTDB_litr4c -= mort * cs->CTDB_litr4c;
-	cs->CTDB_cwdc   -= mort * cs->CTDB_cwdc;
 	
 	/* TREE-specific and NON-WOODY SPECIFIC fluxes */
 	if (epc->woody)
@@ -679,18 +664,6 @@ nstate_struct* ns, nflux_struct* nf, int simyr)
 	ns->litr4n   -= nf->m_litr4n_to_fire;
 	ns->fire_snk += nf->m_cwdn_to_fire;
 	ns->cwdn     -= nf->m_cwdn_to_fire;
-
-	/* standing and cut-down dead stem */
-	ns->STDB_litr1n -= mort * ns->STDB_litr1n;
-	ns->STDB_litr2n -= mort * ns->STDB_litr2n;
-	ns->STDB_litr3n -= mort * ns->STDB_litr3n;
-	ns->STDB_litr4n -= mort * ns->STDB_litr4n;
-	
-	ns->CTDB_litr1n -= mort * ns->CTDB_litr1n;
-	ns->CTDB_litr2n -= mort * ns->CTDB_litr2n;
-	ns->CTDB_litr3n -= mort * ns->CTDB_litr3n;
-	ns->CTDB_litr4n -= mort * ns->CTDB_litr4n;
-	ns->CTDB_cwdn   -= mort * ns->CTDB_cwdn;
 	
 	return (!ok);
 }

@@ -4,7 +4,7 @@ calculation of soil temperature in the different soil layers based on the change
 to top soil layer and based on empirical function of temperature gradient in soil (Zheng et al.1993)
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Copyright 2017, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
@@ -37,11 +37,11 @@ int multilayer_tsoil(int yday, const epconst_struct* epc, const siteconst_struct
 
 
 	/* daily averaged air tempreture on the given day (calculated from tmax and tmin), temp.gradient and local temperatures */
-	double temp_diff_total, temp_diff, tsoil;
+	double temp_diff_total, temp_diff, tsoil, tsoil_avg;
 
 	double STv1, STv2, WC, FX, f1, ALX, TA, Td, ZD;
 	
-
+	tsoil_avg=0;
 
 	/* *********************************************************** */
 	/* 1. FIRST LAYER PROPERTIES */
@@ -100,10 +100,14 @@ int multilayer_tsoil(int yday, const epconst_struct* epc, const siteconst_struct
 		if (epc->STCM_flag) 
 			metv->tsoil[layer] = tsoil;
 
+		if (layer < N_SOILLAYERS-1) tsoil_avg += metv->tsoil[layer] * (sitec->soillayer_thickness[layer] / sitec->soillayer_depth[N_SOILLAYERS-2]);
+
+
 	}
 
 	metv->tsoil_surface_pre = metv->tsoil_surface;
 	metv->tday_pre          = metv->tday; 
+	metv->tsoil_avg         = tsoil_avg;
    
 	return (!ok);
 }

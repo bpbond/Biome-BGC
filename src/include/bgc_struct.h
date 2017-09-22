@@ -3,7 +3,7 @@ bgc_struct.h
 header file for structure definitions
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -175,7 +175,7 @@ typedef struct
 	double canopyw_GRZsnk;				/* (kgH2O/m2) water stored on canopy is disappered because of grazing*/
 	/* irrigation - by Hidy 2015. */
     double IRGsrc;						/* (kgH2O/m2) planted N */
-    double balance;
+    double balanceERR;
 } wstate_struct;
 
 /* water flux variables */
@@ -253,12 +253,17 @@ typedef struct
 	double litr_aboveground; /* (kgC/m2) total belowground litter (due to ploughing) - Hidy 2015*/
 	double litr_belowground; /* (kgC/m2) total belowground litter (due to ploughing) - Hidy 2015*/
 	/* Hidy 2013: senescence */
-	double litr1c_STDB; /* (kgC/m2)  amount of wilted plant biomass before turning into litter pool */
-	double litr2c_STDB; /* (kgC/m2)  amount of wilted plant biomass before turning into litter pool */
-	double litr3c_STDB; /* (kgC/m2)  amount of wilted plant biomass before turning into litter pool */
-	double litr4c_STDB; /* (kgC/m2)  amount of wilted plant biomass before turning into litter pool */
-	double STDBc;/* (kgC/m2)  amount of standing dead biomass */
-	double CTDBc;/* (kgC/m2)  amount of cut-down dead biomass */
+	double STDB_litr1c;		 /* (kgC/m2)  amount of wilted plant biomass before turning into litter pool */
+	double STDB_litr2c;		 /* (kgC/m2)  amount of wilted plant biomass before turning into litter pool */
+	double STDB_litr3c;		 /* (kgC/m2)  amount of wilted plant biomass before turning into litter pool */
+	double STDB_litr4c;		 /* (kgC/m2)  amount of wilted plant biomass before turning into litter pool */
+	double STDBc;			 /* (kgC/m2)  amount of standing dead biomass */
+	double CTDB_litr1c;      /* (kgC/m2)  amount of cut-down plant biomass before turning into litter pool */
+	double CTDB_litr2c;		 /* (kgC/m2)  amount of cut-down plant biomass before turning into litter pool */
+	double CTDB_litr3c;		 /* (kgC/m2)  amount of cut-down plant biomass before turning into litter pool */
+	double CTDB_litr4c;		 /* (kgC/m2)  amount of cut-down plant biomass before turning into litter pool */
+	double CTDB_cwdc;		 /* (kgC/m2)  amount of cut-down woody plant biomass before turning into litter pool */
+	double CTDBc;			 /* (kgC/m2)  amount of cut-down dead biomass */
     double soil1c;           /* (kgC/m2) microbial recycling pool C (fast) */
     double soil2c;           /* (kgC/m2) microbial recycling pool C (medium) */
     double soil3c;           /* (kgC/m2) microbial recycling pool C (slow) */
@@ -292,27 +297,14 @@ typedef struct
 	double THNsnk;              /* (kgC/m2) thinned leaf C */
 	double THNsrc;			    /* (kgC/m2) thinned plant material (C content) returns to the litter  */
 	double THN_transportC;      /* (kgC/m2) thinned and transported plant material (C content)  */
-	double litr1c_strg_THN;     /* (kgC/m2) amount of thinned plant biomass before turning into litter pool */
-	double litr2c_strg_THN;		/* (kgC/m2) amount of thinned plant biomass before turning into litter pool */
-	double litr3c_strg_THN;		/* (kgC/m2) amount of thinned plant biomass before turning into litter pool */
-	double litr4c_strg_THN;		/* (kgC/m2) amount of thinned plant biomass before turning into litter pool */
-	double cwdc_strg_THN;		/* (kgC/m2) amount of thinned plant biomass before turning into litter pool */
 	/* mowing - by Hidy 2008.   */
 	double MOWsnk;              /* (kgC/m2) mowed leaf C */
 	double MOWsrc;			    /* (kgC/m2) mowed plant material (C content) returns to the litter */
 	double MOW_transportC;      /* (kgC/m2) mowed and transported plant material (C content)  */
-	double litr1c_strg_MOW;     /* (kgC/m2) amount of mowed plant biomass before turning into litter pool */
-	double litr2c_strg_MOW;		/* (kgC/m2) amount of mowed plant biomass before turning into litter pool */
-	double litr3c_strg_MOW;		/* (kgC/m2) amount of mowed plant biomass before turning into litter pool */
-	double litr4c_strg_MOW;		/* (kgC/m2) amount of mowed plant biomass before turning into litter pool */
 	/* harvesting - Hidy 2012.  */
 	double HRVsnk;              /* (kgC/m2) harvested leaf C */
 	double HRVsrc;			    /* (kgC/m2) harvested plant material (C content) returns to the litter */
 	double HRV_transportC;      /* (kgC/m2) harvested and transported plant material (C content)  */
-	double litr1c_strg_HRV;     /* (kgC/m2)  amount of harvested plant biomass before turning into litter pool */
-	double litr2c_strg_HRV;		/* (kgC/m2)  amount of harvested plant biomass before turning into litter pool */
-	double litr3c_strg_HRV;		/* (kgC/m2)  amount of harvested plant biomass before turning into litter pool */
-	double litr4c_strg_HRV;		/* (kgC/m2)  amount of harvested plant biomass before turning into litter pool */
 	/* ploughing - Hidy 2012.   */
 	double PLGsnk;              /* (kgC/m2) ploughed leaf C */
 	double PLGsrc;			    /* (kgC/m2) ploughed plant material (C content)to the soil (labile litter) */
@@ -334,7 +326,7 @@ typedef struct
      double softstemc_transfer;    /* (kgC/m2) SUM of softstemc */
 	 double softstem_gr_snk;       /* (kgC/m2) SUM of softstem growth resp. */
 	 double softstem_mr_snk;       /* (kgC/m2) SUM of softstem maint resp.*/
-         double balance;
+     double balanceERR;
 } cstate_struct;
 
 /* daily carbon flux variables */
@@ -415,6 +407,9 @@ typedef struct
 	double m_softstemc_to_fire;               /* (kgC/m2/d) */
 	double m_softstemc_storage_to_fire;       /* (kgC/m2/d) */
 	double m_softstemc_transfer_to_fire;      /* (kgC/m2/d) */
+	/* standing and cut-down ded biomass (Hidy 2017) */
+	double m_STDBc_to_fire;               /* (kgC/m2/d) */
+	double m_CTDBc_to_fire;               /* (kgC/m2/d) */
 	/* Hidy 2010 - senescence fluxes */
 	double m_vegc_to_SNSC;                /* (kgC/m2/d) */
 	double m_leafc_to_SNSC;                /* (kgC/m2/d) */
@@ -724,11 +719,17 @@ typedef struct
     double softstemn_storage;      /* (kgN/m2) softstem N */
     double softstemn_transfer;     /* (kgN/m2) softstem N */
 	/* Hidy 2013: senescence */
-	double litr1n_STDB;	/* (kgC/m2)  amount of wilted plant biomass before turning into litter pool */
-	double litr2n_STDB;	/* (kgC/m2)  amount of wilted plant biomass before turning into litter pool */
-	double litr3n_STDB;	/* (kgC/m2)  amount of wilted plant biomass before turning into litter pool */
-	double litr4n_STDB;	/* (kgC/m2)  amount of wilted plant biomass before turning into litter pool */
-	double STDBn;  /* (kgC/m2)  amount of standing dead biomass */
+	double STDB_litr1n;			/* (kgN/m2)  amount of wilted plant biomass before turning into litter pool */
+	double STDB_litr2n;			/* (kgN/m2)  amount of wilted plant biomass before turning into litter pool */
+	double STDB_litr3n;			/* (kgN/m2)  amount of wilted plant biomass before turning into litter pool */
+	double STDB_litr4n;			/* (kgN/m2)  amount of wilted plant biomass before turning into litter pool */
+	double STDBn;				/* (kgN/m2)  amount of standing dead biomass */
+	double CTDB_litr1n;			/* (kgN/m2)  amount of cut-down plant biomass before turning into litter pool */
+	double CTDB_litr2n;			/* (kgN/m2)  amount of cut-down plant biomass before turning into litter pool */
+	double CTDB_litr3n;			/* (kgN/m2)  amount of cut-down plant biomass before turning into litter pool */
+	double CTDB_litr4n;			/* (kgN/m2)  amount of cut-down plant biomass before turning into litter pool */
+	double CTDB_cwdn;			/* (kgN/m2)  amount of cut-down woody plant biomass before turning into litter pool */
+	double CTDBn;				/* (kgN/m2)  amount of CUT-DOWN dead biomass */
     double soil1n;             /* (kgN/m2) microbial recycling pool N (fast) */
     double soil2n;             /* (kgN/m2) microbial recycling pool N (medium) */
     double soil3n;             /* (kgN/m2) microbial recycling pool N (slow) */
@@ -753,41 +754,28 @@ typedef struct
 	/* planting - by Hidy 2012. */
     double PLTsrc;				 /* (kgN/m2) planted leaf N */
 	/* thinning - by Hidy 2008. */
-	double THNsnk;				 /* (kgN/m2) thinned leaf N */
-	double THNsrc;				 /* (kgC/m2) thinned plant material (N content) returns to the soil (labile litter) */
-	double THN_transportN; 		/* (kgC/m2) thinned and transported plant material (N content)  */
-	double litr1n_strg_THN;		/* (kgC/m2)  amount of thinned plant biomass before turning into litter pool */
-	double litr2n_strg_THN;		/* (kgC/m2)  amount of thinned plant biomass before turning into litter pool */
-	double litr3n_strg_THN;		/* (kgC/m2)  amount of thinned plant biomass before turning into litter pool */
-	double litr4n_strg_THN;		/* (kgC/m2)  amount of thinned plant biomass before turning into litter pool */
-	double cwdn_strg_THN;		/* (kgC/m2) amount of thinned plant biomass before turning into litter pool */
+	double THNsnk;              /* (kgN/m2) thinned leaf N */
+	double THNsrc;			    /* (kgN/m2) thinned plant material (N content) returns to the litter  */
+	double THN_transportN;      /* (kgN/m2) thinned and transported plant material (N content)  */
 	/* mowing - by Hidy 2008. */
 	double MOWsnk;              /* (kgN/m2) mowed leaf N */
-	double MOWsrc;				/* (kgC/m2) mowed plant material (N content) returns to the soil (labile litter) */
-	double MOW_transportN; 		/* (kgC/m2) harvested and transported plant material (N content)  */
-	double litr1n_strg_MOW;		/* (kgC/m2)  amount of mowed plant biomass before turning into litter pool */
-	double litr2n_strg_MOW;		/* (kgC/m2)  amount of mowed plant biomass before turning into litter pool */
-	double litr3n_strg_MOW;		/* (kgC/m2)  amount of mowed plant biomass before turning into litter pool */
-	double litr4n_strg_MOW;		/* (kgC/m2)  amount of mowed plant biomass before turning into litter pool */
+	double MOWsrc;				/* (kgN/m2) mowed plant material (N content) returns to the soil (labile litter) */
+	double MOW_transportN; 		/* (kgN/m2) harvested and transported plant material (N content)  */
 	/* harvesting - by Hidy 2012. */
 	double HRVsnk;
 	double HRVsrc;				/* (kgN/m2) harvested leaf N */
-	double HRV_transportN; 		/* (kgC/m2) harvested and transported plant material (N content)  */
-	double litr1n_strg_HRV;		/* (kgC/m2)  amount of harvested plant biomass before turning into litter pool */
-	double litr2n_strg_HRV;		/* (kgC/m2)  amount of harvested plant biomass before turning into litter pool */
-	double litr3n_strg_HRV;		/* (kgC/m2)  amount of harvested plant biomass before turning into litter pool */
-	double litr4n_strg_HRV;		/* (kgC/m2)  amount of harvested plant biomass before turning into litter pool */
+	double HRV_transportN; 		/* (kgN/m2) harvested and transported plant material (N content)  */
 	/* ploughing - Hidy 2012.    */
 	double PLGsnk;				/* (kgN/m2) plouhged leaf N */
-	double PLGsrc;				/* (kgC/m2) ploughed plant material (N content) returns to the soil (labile litter) */
-	double PLG_npool;			/* (kgC/m2) temporary pool of ploughed plant material (N content) before entering litter  */
+	double PLGsrc;				/* (kgN/m2) ploughed plant material (N content) returns to the soil (labile litter) */
+	double PLG_npool;			/* (kgN/m2) temporary pool of ploughed plant material (N content) before entering litter  */
 	/* grazing - by Hidy 2009.   */
 	double GRZsnk;              /* (kgN/m2) grazed leaf N */
 	double GRZsrc;              /* (kgN/m2) leaf N from fertilizer*/
 	/* effect of boundary layer with constant N-content - Hidy 2015 */
 	double BNDRYsrc;             /* (kgN/m2) leaf N from fertilizer*/
 	double sum_ndemand;          /* (kgN/m2) leaf N from fertilizer*/
-        double balance;
+    double balanceERR;
 } nstate_struct;
 
 /* daily nitrogen flux variables */
@@ -814,7 +802,7 @@ typedef struct
 	double m_deadstemn_transfer_to_litr1n; /* (kgN/m2/d) */
 	double m_livecrootn_transfer_to_litr1n;/* (kgN/m2/d) */
 	double m_deadcrootn_transfer_to_litr1n;/* (kgN/m2/d) */
-        double m_livestemn_to_litr1n;          /* (kgN/m2/d) */
+    double m_livestemn_to_litr1n;          /* (kgN/m2/d) */
 	double m_livestemn_to_cwdn;            /* (kgN/m2/d) */
 	double m_deadstemn_to_cwdn;            /* (kgN/m2/d) */
 	double m_livecrootn_to_litr1n;         /* (kgN/m2/d) */
@@ -889,6 +877,10 @@ typedef struct
 	double m_softstemn_to_fire;                /* (kgN/m2/d) */
 	double m_softstemn_storage_to_fire;		   /* (kgN/m2/d) */
 	double m_softstemn_transfer_to_fire;       /* (kgN/m2/d) */
+	/* fire - standing and cut-down dead biomass simulation (Hidy 2017.) */
+	double m_STDBn_to_fire;               /* (kgN/m2/d) */
+	double m_CTDBn_to_fire;               /* (kgN/m2/d) */
+
 	/* phenology fluxes from transfer pool */
 	double leafn_transfer_to_leafn;           /* (kgN/m2/d) */
 	double frootn_transfer_to_frootn;         /* (kgN/m2/d) */
@@ -1658,6 +1650,7 @@ typedef struct
 	double Cchange_SNSC;   /* kgC/m2  total of senescence carbon change   */
 	double Nplus_GRZ;      /* kgN/m2  N from grazing   */
 	double Nplus_FRZ;      /* kgN/m2  N from fertilizing   */
+	double daily_N2O;       /* sum of daily N2O flux (kgN/m2/d) */
 	/* new tpye of output data - Hidy 2015 */
 	double cum_ET;			/* kgH2O/m2	ET summed over entire simulation */
 
@@ -1694,23 +1687,16 @@ typedef struct
 	double litr2c;
 	double litr3c;
 	double litr4c;
-	/* Hidy 2015: standing dead biome, cut-dowd dead biome and litter */
-	double litr1c_STDB;
-	double litr2c_STDB;
-	double litr3c_STDB;
-	double litr4c_STDB;
-	double litr1c_strg_HRV;
-	double litr2c_strg_HRV;
-	double litr3c_strg_HRV;
-	double litr4c_strg_HRV;
-	double litr1c_strg_MOW;
-	double litr2c_strg_MOW;
-	double litr3c_strg_MOW;
-	double litr4c_strg_MOW;
-	double litr1c_strg_THN;
-	double litr2c_strg_THN;
-	double litr3c_strg_THN;
-	double litr4c_strg_THN;
+	/* standing dead biome, cut-dowd dead biome and litter */
+	double STDB_litr1c;	
+	double STDB_litr2c;	
+	double STDB_litr3c;	
+	double STDB_litr4c;	
+	double CTDB_litr1c;
+	double CTDB_litr2c;
+	double CTDB_litr3c;
+	double CTDB_litr4c;
+	double CTDB_cwdc;
 	double litr_aboveground;
 	double litr_belowground;
 	double soil1c;
@@ -1742,24 +1728,16 @@ typedef struct
 	double litr3n;
 	double litr4n;
 	/* Hidy 2015: standing dead biome, cut-dowd dead biome and litter */
-	double litr1n_STDB;
-	double litr2n_STDB;
-	double litr3n_STDB;
-	double litr4n_STDB;
-	double litr1n_strg_HRV;
-	double litr2n_strg_HRV;
-	double litr3n_strg_HRV;
-	double litr4n_strg_HRV;
-	double litr1n_strg_MOW;
-	double litr2n_strg_MOW;
-	double litr3n_strg_MOW;
-	double litr4n_strg_MOW;
-	double litr1n_strg_THN;
-	double litr2n_strg_THN;
-	double litr3n_strg_THN;
-	double litr4n_strg_THN;
-	double CTDBc;
-
+	/* standing dead biome, cut-dowd dead biome and litter */
+	double STDB_litr1n;	
+	double STDB_litr2n;	
+	double STDB_litr3n;	
+	double STDB_litr4n;	
+	double CTDB_litr1n;
+	double CTDB_litr2n;
+	double CTDB_litr3n;
+	double CTDB_litr4n;
+	double CTDB_cwdn;
 	double soil1n;
 	double soil2n;
 	double soil3n;

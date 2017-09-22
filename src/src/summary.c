@@ -3,7 +3,7 @@ summary.c
 summary variables for potential output
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -334,6 +334,8 @@ int cnw_summary(int yday, cstate_struct* cs, cflux_struct* cf, nstate_struct* ns
 	summary->Nplus_GRZ = (nf->GRZ_to_litr1n + nf->GRZ_to_litr2n + nf->GRZ_to_litr3n  + nf->GRZ_to_litr4n);  
 	summary->Nplus_FRZ = (nf->FRZ_to_sminn+nf->FRZ_to_litr1n + nf->FRZ_to_litr2n + nf->FRZ_to_litr3n  + nf->FRZ_to_litr4n);  
 	
+	/* daily sum of nitrogen fluxes (based on empirical estimation (unit change: mg to g) */
+	summary->daily_N2O = (nf->N2O_flux_FRZ + nf->N2O_flux_GRZ + nf->N2O_flux_soil) / 1000000;
 
 	
 	return(!ok);

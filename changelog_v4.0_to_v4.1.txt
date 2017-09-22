@@ -24,3 +24,19 @@ Bug fixes in metday of transient run: transient_bgc.c
 
 New feature: ann.txt of spinup run now contains data from transient run: transient_bgc.c
 
+Bug fixes in ploughing: now cut-down biomass returns to ploughing pool
+
+Bug fixes in mortality: now standing dead and cut-down biomass is affected by fire
+
+New variable: N content of cut-down dead biomass (output_map[330] = &ns->CTDBn)
+
+Changed variables name: standing and cut-down dead biomass pools
+
+New variable: daily_N2O - sum of daily N2O fluxes (based on empirical estimation) in kgN/m2/d (output_map[611] = &summary->daily_N2O)
+
+Bug fixes in tsoil_avg calculation
+
+Bug fixes in array definition: some of the variables are handled as double instead of float
+
+
+

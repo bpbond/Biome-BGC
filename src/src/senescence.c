@@ -4,7 +4,7 @@ calculation of daily senescence mortality fluxes (due to drought/water stress)
 Senescence mortality: these fluxes all enter litter sinks due to  low VWC during a long period
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Copyright 2017, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
@@ -33,8 +33,8 @@ int senescence(const epconst_struct* epc, const grazing_struct* GRZ,
 	double SNSC_coeff = 0;
 	double smsi_effect, dsws_effectA, dsws_effectB;
 
-	double litr1c_STDB_to_SNSC, litr2c_STDB_to_SNSC, litr3c_STDB_to_SNSC, litr4c_STDB_to_SNSC;
-	double litr1n_STDB_to_SNSC, litr2n_STDB_to_SNSC, litr3n_STDB_to_SNSC, litr4n_STDB_to_SNSC;
+	double STDB_litr1c_to_SNSC, STDB_litr2c_to_SNSC, STDB_litr3c_to_SNSC, STDB_litr4c_to_SNSC;
+	double STDB_litr1n_to_SNSC, STDB_litr2n_to_SNSC, STDB_litr3n_to_SNSC, STDB_litr4n_to_SNSC;
 
 
 	
@@ -160,25 +160,25 @@ int senescence(const epconst_struct* epc, const grazing_struct* GRZ,
 	cs->SNSCsnk  += cf->m_vegc_to_SNSC; 
 						
 	/* update state variables - increasing litter storage state variables*/
-	cs->litr1c_STDB += (cf->m_leafc_to_SNSC     * epc->leaflitr_flab     + cf->m_leafc_storage_to_SNSC     + cf->m_leafc_transfer_to_SNSC + 
+	cs->STDB_litr1c += (cf->m_leafc_to_SNSC     * epc->leaflitr_flab     + cf->m_leafc_storage_to_SNSC     + cf->m_leafc_transfer_to_SNSC + 
 							 cf->m_fruitc_to_SNSC    * epc->fruitlitr_flab    + cf->m_fruitc_storage_to_SNSC    + cf->m_fruitc_transfer_to_SNSC + 
 							 cf->m_softstemc_to_SNSC * epc->softstemlitr_flab + cf->m_softstemc_storage_to_SNSC + cf->m_softstemc_transfer_to_SNSC + 	
 							 cf->m_gresp_storage_to_SNSC + cf->m_gresp_transfer_to_SNSC) ;
-	cs->litr2c_STDB  += cf->m_leafc_to_SNSC * epc->leaflitr_fucel + 
+	cs->STDB_litr2c  += cf->m_leafc_to_SNSC * epc->leaflitr_fucel + 
 							 cf->m_fruitc_to_SNSC * epc->fruitlitr_fucel + cf->m_softstemc_to_SNSC * epc->softstemlitr_fucel;
-	cs->litr3c_STDB  += cf->m_leafc_to_SNSC  * epc->leaflitr_fscel   + 
+	cs->STDB_litr3c  += cf->m_leafc_to_SNSC  * epc->leaflitr_fscel   + 
 							 cf->m_fruitc_to_SNSC * epc->fruitlitr_fscel  + cf->m_softstemc_to_SNSC * epc->softstemlitr_fscel;
-	cs->litr4c_STDB  += cf->m_leafc_to_SNSC  * epc->leaflitr_flig    + 
+	cs->STDB_litr4c  += cf->m_leafc_to_SNSC  * epc->leaflitr_flig    + 
 							 cf->m_fruitc_to_SNSC * epc->fruitlitr_flig   + cf->m_softstemc_to_SNSC* epc->softstemlitr_flig;
 
 	/* mortality fluxes into litter pools */
-	cf->SNSC_to_litr1c = cs->litr1c_STDB * SNSC_coeff + 
+	cf->SNSC_to_litr1c = cs->STDB_litr1c * SNSC_coeff + 
 						 cf->m_frootc_to_SNSC * epc->frootlitr_flab + cf->m_frootc_storage_to_SNSC + cf->m_frootc_transfer_to_SNSC;
-	cf->SNSC_to_litr2c = cs->litr2c_STDB * SNSC_coeff +
+	cf->SNSC_to_litr2c = cs->STDB_litr2c * SNSC_coeff +
 						 cf->m_frootc_to_SNSC * epc->frootlitr_fucel;
-	cf->SNSC_to_litr3c = cs->litr3c_STDB * SNSC_coeff +
+	cf->SNSC_to_litr3c = cs->STDB_litr3c * SNSC_coeff +
 						 cf->m_frootc_to_SNSC * epc->frootlitr_fscel;
-	cf->SNSC_to_litr4c = cs->litr4c_STDB * SNSC_coeff +
+	cf->SNSC_to_litr4c = cs->STDB_litr4c * SNSC_coeff +
 						 cf->m_frootc_to_SNSC * epc->frootlitr_flig;
 
 
@@ -192,18 +192,18 @@ int senescence(const epconst_struct* epc, const grazing_struct* GRZ,
 
 	
 	/* standing dead biomass to litter */
-	litr1c_STDB_to_SNSC = cs->litr1c_STDB * SNSC_coeff;
-	litr2c_STDB_to_SNSC = cs->litr2c_STDB * SNSC_coeff;
-	litr3c_STDB_to_SNSC = cs->litr3c_STDB * SNSC_coeff;
-	litr4c_STDB_to_SNSC = cs->litr4c_STDB * SNSC_coeff;
+	STDB_litr1c_to_SNSC = cs->STDB_litr1c * SNSC_coeff;
+	STDB_litr2c_to_SNSC = cs->STDB_litr2c * SNSC_coeff;
+	STDB_litr3c_to_SNSC = cs->STDB_litr3c * SNSC_coeff;
+	STDB_litr4c_to_SNSC = cs->STDB_litr4c * SNSC_coeff;
 
-	cs->litr1c_STDB -= litr1c_STDB_to_SNSC;
-	cs->litr2c_STDB -= litr2c_STDB_to_SNSC;
-	cs->litr3c_STDB -= litr3c_STDB_to_SNSC;
-	cs->litr4c_STDB -= litr4c_STDB_to_SNSC;
+    cs->STDB_litr1c -= STDB_litr1c_to_SNSC;
+	cs->STDB_litr2c -= STDB_litr2c_to_SNSC;
+	cs->STDB_litr3c -= STDB_litr3c_to_SNSC;
+	cs->STDB_litr4c -= STDB_litr4c_to_SNSC;
 	
-	cs->STDBc           = cs->litr1c_STDB + cs->litr2c_STDB + cs->litr3c_STDB + cs->litr4c_STDB;
-	cf->m_STDBc_to_SNSC = litr1c_STDB_to_SNSC + litr2c_STDB_to_SNSC + litr3c_STDB_to_SNSC + litr4c_STDB_to_SNSC;
+	cs->STDBc           = cs->STDB_litr1c + cs->STDB_litr2c + cs->STDB_litr3c + cs->STDB_litr4c;
+	cf->m_STDBc_to_SNSC = STDB_litr1c_to_SNSC + STDB_litr2c_to_SNSC + STDB_litr3c_to_SNSC + STDB_litr4c_to_SNSC;
 
 	/************************************************************/
 	/* 4. NITROGEN mortality state variable update */	
@@ -256,25 +256,25 @@ int senescence(const epconst_struct* epc, const grazing_struct* GRZ,
 
 
 	/* increasing litter storage state variables*/
-	ns->litr1n_STDB  += (nf->m_leafn_to_SNSC * epc->leaflitr_flab) + nf->m_leafn_storage_to_SNSC + nf->m_leafn_transfer_to_SNSC +
+	ns->STDB_litr1n  += (nf->m_leafn_to_SNSC * epc->leaflitr_flab) + nf->m_leafn_storage_to_SNSC + nf->m_leafn_transfer_to_SNSC +
 	                     	 (nf->m_fruitn_to_SNSC * epc->fruitlitr_flab) + nf->m_fruitn_storage_to_SNSC + nf->m_fruitn_transfer_to_SNSC +
 							 (nf->m_softstemn_to_SNSC * epc->softstemlitr_flab) + nf->m_softstemn_storage_to_SNSC + nf->m_softstemn_transfer_to_SNSC +
 							  nf->m_retransn_to_SNSC;
-	ns->litr2n_STDB  += (nf->m_leafn_to_SNSC * epc->leaflitr_fucel +
+	ns->STDB_litr2n  += (nf->m_leafn_to_SNSC * epc->leaflitr_fucel +
 		                      nf->m_fruitn_to_SNSC * epc->fruitlitr_fucel + nf->m_softstemn_to_SNSC * epc->softstemlitr_fucel);
-	ns->litr3n_STDB  += (nf->m_leafn_to_SNSC * epc->leaflitr_fscel +
+	ns->STDB_litr3n  += (nf->m_leafn_to_SNSC * epc->leaflitr_fscel +
 		                      nf->m_fruitn_to_SNSC * epc->fruitlitr_fscel + nf->m_softstemn_to_SNSC * epc->softstemlitr_fscel);
-	ns->litr4n_STDB  += (nf->m_leafn_to_SNSC* epc->leaflitr_flig +
+	ns->STDB_litr4n  += (nf->m_leafn_to_SNSC* epc->leaflitr_flig +
 		                      nf->m_fruitn_to_SNSC* epc->fruitlitr_flig   + nf->m_softstemn_to_SNSC* epc->softstemlitr_flig);
 
 	/* mortality fluxes into litter pools */
-	nf->SNSC_to_litr1n = ns->litr1n_STDB * SNSC_coeff + 
+	nf->SNSC_to_litr1n = ns->STDB_litr1n * SNSC_coeff + 
 						 nf->m_frootn_to_SNSC * epc->frootlitr_flab + nf->m_frootn_storage_to_SNSC + nf->m_frootn_transfer_to_SNSC;
-	nf->SNSC_to_litr2n = ns->litr2n_STDB * SNSC_coeff +
+	nf->SNSC_to_litr2n = ns->STDB_litr2n * SNSC_coeff +
 						 nf->m_frootn_to_SNSC * epc->frootlitr_fucel;
-	nf->SNSC_to_litr3n = ns->litr3n_STDB * SNSC_coeff +
+	nf->SNSC_to_litr3n = ns->STDB_litr3n * SNSC_coeff +
 						 nf->m_frootn_to_SNSC * epc->frootlitr_fscel;
-	nf->SNSC_to_litr4n = ns->litr4n_STDB * SNSC_coeff +
+	nf->SNSC_to_litr4n = ns->STDB_litr4n * SNSC_coeff +
 						 nf->m_frootn_to_SNSC * epc->frootlitr_flig;
 
 	/* update litter state variables */ 
@@ -288,35 +288,35 @@ int senescence(const epconst_struct* epc, const grazing_struct* GRZ,
 
 
 	/* standing dead biomass to litter */
-	litr1n_STDB_to_SNSC = ns->litr1n_STDB * SNSC_coeff;
-	litr2n_STDB_to_SNSC = ns->litr2n_STDB * SNSC_coeff;
-	litr3n_STDB_to_SNSC = ns->litr3n_STDB * SNSC_coeff;
-	litr4n_STDB_to_SNSC = ns->litr4n_STDB * SNSC_coeff;
+STDB_litr1n_to_SNSC = ns->STDB_litr1n * SNSC_coeff;
+	STDB_litr2n_to_SNSC = ns->STDB_litr2n * SNSC_coeff;
+	STDB_litr3n_to_SNSC = ns->STDB_litr3n * SNSC_coeff;
+	STDB_litr4n_to_SNSC = ns->STDB_litr4n * SNSC_coeff;
 
-	ns->litr1n_STDB -= litr1n_STDB_to_SNSC;
-	ns->litr2n_STDB -= litr2n_STDB_to_SNSC;
-	ns->litr3n_STDB -= litr3n_STDB_to_SNSC;
-	ns->litr4n_STDB -= litr4n_STDB_to_SNSC;
+	ns->STDB_litr1n -= STDB_litr1n_to_SNSC;
+	ns->STDB_litr2n -= STDB_litr2n_to_SNSC;
+	ns->STDB_litr3n -= STDB_litr3n_to_SNSC;
+	ns->STDB_litr4n -= STDB_litr4n_to_SNSC;
 	
-	ns->STDBn           = ns->litr1n_STDB + ns->litr2n_STDB + ns->litr3n_STDB + ns->litr4n_STDB;
-	nf->m_STDBn_to_SNSC = litr1n_STDB_to_SNSC + litr2n_STDB_to_SNSC + litr3n_STDB_to_SNSC + litr4n_STDB_to_SNSC;
+	ns->STDBn           = ns->STDB_litr1n + ns->STDB_litr2n + ns->STDB_litr3n + ns->STDB_litr4n;
+	nf->m_STDBn_to_SNSC = STDB_litr1n_to_SNSC + STDB_litr2n_to_SNSC + STDB_litr3n_to_SNSC + STDB_litr4n_to_SNSC;
 
 	/************************************************************/
 	/* decreasing of temporary pool */
 
 
-	if (cs->litr1c_STDB < CRIT_PREC && cs->litr1c_STDB != 0) 
+	if (cs->STDB_litr1c < CRIT_PREC && cs->STDB_litr1c != 0) 
 	{
-		cs->SNSCsrc += cs->litr1c_STDB + cs->litr2c_STDB + cs->litr3c_STDB + cs->litr4c_STDB;
-		cs->litr1c_STDB = 0;
-		cs->litr2c_STDB = 0;
-		cs->litr3c_STDB = 0;
-		cs->litr4c_STDB = 0;
-		ns->SNSCsrc += ns->litr1n_STDB + ns->litr2n_STDB + ns->litr3n_STDB + ns->litr4n_STDB;
-		ns->litr1n_STDB = 0;
-		ns->litr2n_STDB = 0;
-		ns->litr3n_STDB = 0;
-		ns->litr4n_STDB = 0;
+		cs->SNSCsrc += cs->STDB_litr1c + cs->STDB_litr2c + cs->STDB_litr3c + cs->STDB_litr4c;
+		cs->STDB_litr1c = 0;
+		cs->STDB_litr2c = 0;
+		cs->STDB_litr3c = 0;
+		cs->STDB_litr4c = 0;
+		ns->SNSCsrc += ns->STDB_litr1n + ns->STDB_litr2n + ns->STDB_litr3n + ns->STDB_litr4n;
+		ns->STDB_litr1n = 0;
+		ns->STDB_litr2n = 0;
+		ns->STDB_litr3n = 0;
+		ns->STDB_litr4n = 0;
 	}
 	
 	return (!ok);

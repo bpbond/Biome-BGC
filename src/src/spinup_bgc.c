@@ -9,7 +9,7 @@ Includes in-line output handling routines that write to daily and annual
 output files. 
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -91,10 +91,10 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	double **output_map = 0;
 	
 	/* local storage for daily and annual output variables */
-	float *dayarr = 0;
-	float *monavgarr = 0;
-	float *annavgarr = 0;
-	float *annarr = 0;
+	double *dayarr = 0;
+	double *monavgarr = 0;
+	double *annavgarr = 0;
+	double *annarr = 0;
 
 	/* miscelaneous variables for program control in main */
 	int simyr = 0;
@@ -107,6 +107,10 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
     int i, nmetdays;
 	double tair_annavg;
 	int dayout;
+
+	double CbalanceERR = 0;
+	double NbalanceERR = 0;
+	double WbalanceERR = 0;
 	
 	
 	/* variables used for monthly average output */
@@ -262,7 +266,7 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	/* allocate memory for local output arrays */
 	if (ok && dayout) 
 	{
-		dayarr = (float*) malloc(ctrl.ndayout * sizeof(float));
+		dayarr = (double*) malloc(ctrl.ndayout * sizeof(double));
 		if (!dayarr)
 		{
 			printf("Error allocating for local daily output array in bgc()\n");
@@ -271,7 +275,7 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	}
 	if (ok && ctrl.domonavg) 
 	{
-		monavgarr = (float*) malloc(ctrl.ndayout * sizeof(float));
+		monavgarr = (double*) malloc(ctrl.ndayout * sizeof(double));
 		if (!monavgarr)
 		{
 			printf("Error allocating for monthly average output array in bgc()\n");
@@ -280,7 +284,7 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	}
 	if (ok && ctrl.doannavg) 
 	{
-		annavgarr = (float*) malloc(ctrl.ndayout * sizeof(float));
+		annavgarr = (double*) malloc(ctrl.ndayout * sizeof(double));
 		if (!annavgarr)
 		{
 			printf("Error allocating for annual average output array in bgc()\n");
@@ -289,7 +293,7 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	}
 	if (ok && ctrl.doannual)
 	{
-		annarr = (float*) malloc(ctrl.nannout * sizeof(float));
+		annarr = (double*) malloc(ctrl.nannout * sizeof(double));
 		if (!annarr)
 		{
 			printf("Error allocating for local annual output array in bgc()\n");
@@ -581,7 +585,7 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 				nf = zero_nf;
 
 	               /* soil hydrological parameters: psi and vwc  */
- 			if (ok && multilayer_hydrolparams(&sitec, &ws, &epv, &metv))
+ 			if (ok && multilayer_hydrolparams(&sitec, &ws, &epv))
 			{
 				printf("Error in multilayer_hydrolparams() from bgc()\n");
 				ok=0;
@@ -1112,12 +1116,14 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 			if (ctrl.onscreen && (ctrl.spinyears < 100 || (ctrl.spinyears > 300 && ctrl.spinyears < 310) || (ctrl.spinyears > 500 && ctrl.spinyears < 510) || 
 				(ctrl.spinyears > 700 && ctrl.spinyears < 710) || (ctrl.spinyears > 900 && ctrl.spinyears < 910) ))
 			{
-				fprintf(bgcout->control_file.ptr, "%i %i %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f\n",
+			fprintf(bgcout->control_file.ptr, "%i %i %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f %14.8f\n",
 						ctrl.spinyears, yday, metv.tsoil[0], metv.tsoil[1], metv.GDD, epv.vwc[0], epv.vwc[1], epv.m_soilstress,
-						cs.STDBc, cs.CTDBc,(ns.sminn[0]+ns.sminn[1]+ns.sminn[2]+ns.sminn[3]+ns.sminn[4]+ns.sminn[5]+ns.sminn[6]), 
+						cs.STDBc, cs.CTDBc,ns.sminn[0], 
 				        summary.soilc, cs.litr_aboveground, cs.litr_belowground, epv.proj_lai, 
 						summary.abgc, summary.cum_npp, summary.daily_gpp,summary.daily_tr, wf.evapotransp);
 			}
+
+	
 	
 
 
@@ -1130,14 +1136,14 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 					/* fill the daily output array */
 					for (outv=0 ; outv<ctrl.ndayout ; outv++)
 					{
-						dayarr[outv] = (float) *(output_map[ctrl.daycodes[outv]]);
+						dayarr[outv] = (double) *(output_map[ctrl.daycodes[outv]]);
 					}
 				}
 				/* only write daily outputs if requested */
 				if (ok && ctrl.dodaily)
 				{
 					/* write the daily output array to daily output file */
-					if (fwrite(dayarr, sizeof(float), ctrl.ndayout, bgcout->dayout.ptr)
+					if (fwrite(dayarr, sizeof(double), ctrl.ndayout, bgcout->dayout.ptr)
 						!= (size_t)ctrl.ndayout)
 					{
 						printf("Error writing to %s: simyear = %d, simday = %d\n",
@@ -1166,11 +1172,11 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 						/* finish the averages */
 						for (outv=0 ; outv<ctrl.ndayout ; outv++)
 						{
-							monavgarr[outv] /= (float)mondays[curmonth];
+							monavgarr[outv] /= (double)mondays[curmonth];
 						}
 
 						/* write to file */
-						if (fwrite(monavgarr, sizeof(float), ctrl.ndayout, bgcout->monavgout.ptr)
+						if (fwrite(monavgarr, sizeof(double), ctrl.ndayout, bgcout->monavgout.ptr)
 							!= (size_t)ctrl.ndayout)
 						{
 							printf("Error writing to %s: simyear = %d, simday = %d\n",
@@ -1213,7 +1219,7 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 						}
 
 						/* write to file */
-						if (fwrite(annavgarr, sizeof(float), ctrl.ndayout, bgcout->annavgout.ptr)
+						if (fwrite(annavgarr, sizeof(double), ctrl.ndayout, bgcout->annavgout.ptr)
 							!= (size_t)ctrl.ndayout)
 						{
 							printf("Error writing to %s: simyear = %d, simday = %d\n",
@@ -1261,10 +1267,10 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 				/* fill the annual output array */
 				for (outv=0 ; outv<ctrl.nannout ; outv++)
 				{
-					annarr[outv] = (float) *output_map[ctrl.anncodes[outv]];
+					annarr[outv] = (double) *output_map[ctrl.anncodes[outv]];
 				}
 				/* write the annual output array to annual output file */
-				if (fwrite(annarr, sizeof(float), ctrl.nannout, bgcout->annout.ptr)
+				if (fwrite(annarr, sizeof(double), ctrl.nannout, bgcout->annout.ptr)
 					!= (size_t)ctrl.nannout)
 				{
 					printf("Error writing to %s: simyear = %d, simday = %d\n",
@@ -1360,10 +1366,15 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 
 	/********************************************************************************************************* */
 	/* Hidy 2015 - writing log file */
-	fprintf(bgcout->log_file.ptr, "Some important annual outputs\n");
-	fprintf(bgcout->log_file.ptr, "Mean annual GPP (gC/m2/year):                           %12.1f\n",summary.cum_gpp/ctrl.spinyears*1000);
-	fprintf(bgcout->log_file.ptr, "Mean annual NEE (gC/m2/year):                           %12.1f\n",summary.cum_nee/ctrl.spinyears*1000);
-	fprintf(bgcout->log_file.ptr, "Maximum projected LAI (m2/m2):                          %12.2f\n",epv.ytd_maxplai);
+
+	if (cs.balanceERR != 0) CbalanceERR = log10(cs.balanceERR);
+	if (ns.balanceERR != 0) NbalanceERR = log10(ns.balanceERR);
+	if (ws.balanceERR != 0) WbalanceERR = log10(ws.balanceERR);
+
+	fprintf(bgcout->log_file.ptr, "Some important annual outputs  from last simulation year\n");
+	fprintf(bgcout->log_file.ptr, "Mean annual GPP sum (gC/m2/year):                            %12.1f\n",summary.cum_gpp/ctrl.spinyears*1000);
+	fprintf(bgcout->log_file.ptr, "Mean annual NEE sum (gC/m2/year):                            %12.1f\n",summary.cum_nee/ctrl.spinyears*1000);
+	fprintf(bgcout->log_file.ptr, "Maximum projected LAI in last simulation year (m2/m2):  %12.2f\n",epv.ytd_maxplai);
 	fprintf(bgcout->log_file.ptr, "Recalcitrant SOM carbon content (kgC/m2):               %12.1f\n",cs.soil4c);
 	fprintf(bgcout->log_file.ptr, "Total soil carbon content (kgC/m2):                     %12.1f\n",summary.soilc);
 	fprintf(bgcout->log_file.ptr, "Total soil mineralized nitrogen content (gN/m2):        %12.2f\n",summary.sminn*1000);
@@ -1371,9 +1382,13 @@ int spinup_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	fprintf(bgcout->log_file.ptr, " \n");
  	fprintf(bgcout->log_file.ptr, "Mean annual N-plus (spinup_daily_allocation) (gN/year): %12.2f\n",summary.cum_nplus/ctrl.spinyears*1000);
     fprintf(bgcout->log_file.ptr, " \n");
-
+	fprintf(bgcout->log_file.ptr, "10-base logarithm of the maximum carbon balance diff.:  %12.1f\n",CbalanceERR);
+	fprintf(bgcout->log_file.ptr, "10-base logarithm of the maximum nitrogen balance diff.:%12.1f\n",NbalanceERR);
+	fprintf(bgcout->log_file.ptr, "10-base logarithm of the maximum water balance diff.:   %12.1f\n",WbalanceERR);
+	fprintf(bgcout->log_file.ptr, " \n");
 	fprintf(bgcout->log_file.ptr,"spinyears = %d \n",spinyears);
 	fprintf(bgcout->log_file.ptr, " \n");
+
 	
 	/********************************************************************************************************* */
 

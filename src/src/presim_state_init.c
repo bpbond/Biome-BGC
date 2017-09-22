@@ -4,7 +4,7 @@ Initialize water, carbon, and nitrogen state variables to 0.0 before
 each simulation.
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -55,7 +55,7 @@ int presim_state_init(wstate_struct* ws, cstate_struct* cs, nstate_struct* ns, c
 	ws->canopyw_PLGsnk=0;
 	ws->canopyw_GRZsnk=0;
 	ws->IRGsrc=0;
-	ws->balance = 0;
+	ws->balanceERR = 0;
 
 	cinit->max_leafc = 0.0;
 	cinit->max_stemc = 0.0;
@@ -88,11 +88,16 @@ int presim_state_init(wstate_struct* ws, cstate_struct* cs, nstate_struct* ns, c
 	cs->litr_belowground = 0.0;
 	cs->litr_aboveground = 0.0;
 	/* Hidy 2013 - senescence */
-	cs->litr1c_STDB = 0.0;
-	cs->litr2c_STDB = 0.0;
-	cs->litr3c_STDB = 0.0;
-	cs->litr4c_STDB = 0.0;
+	cs->STDB_litr1c = 0.0;
+	cs->STDB_litr2c = 0.0;
+	cs->STDB_litr3c = 0.0;
+	cs->STDB_litr4c = 0.0;
 	cs->STDBc = 0.0;
+	cs->CTDB_litr1c = 0.0;
+	cs->CTDB_litr2c = 0.0;
+	cs->CTDB_litr3c = 0.0;
+	cs->CTDB_litr4c = 0.0;
+	cs->CTDB_cwdc  = 0.0;
 	cs->CTDBc = 0.0;
 	cs->soil1c = 0.0;
 	cs->soil2c = 0.0;
@@ -125,19 +130,10 @@ int presim_state_init(wstate_struct* ws, cstate_struct* cs, nstate_struct* ns, c
 	cs->THNsnk = 0.0; 
 	cs->THNsrc = 0.0;
 	cs->THN_transportC  = 0.0;
-	cs->litr1c_strg_THN = 0.0;
-	cs->litr2c_strg_THN = 0.0;
-	cs->litr3c_strg_THN = 0.0;
-	cs->litr4c_strg_THN = 0.0;
-	cs->cwdc_strg_THN   = 0.0;
 	/* mowing - Hidy 2008.*/
 	cs->MOWsnk = 0.0; 
 	cs->MOWsrc = 0.0;
 	cs->MOW_transportC = 0.0;
-	cs->litr1c_strg_MOW = 0.0;
-	cs->litr2c_strg_MOW = 0.0;
-	cs->litr3c_strg_MOW = 0.0;
-	cs->litr4c_strg_MOW = 0.0;
 	/* grazing - Hidy 2008. */
 	cs->GRZsnk = 0.0;  
 	cs->GRZsrc = 0.0;
@@ -145,10 +141,6 @@ int presim_state_init(wstate_struct* ws, cstate_struct* cs, nstate_struct* ns, c
 	cs->HRVsnk = 0.0;  
 	cs->HRVsrc = 0.0;
 	cs->HRV_transportC = 0.0;
-	cs->litr1c_strg_HRV = 0.0;
-	cs->litr2c_strg_HRV = 0.0;
-	cs->litr3c_strg_HRV = 0.0;
-	cs->litr4c_strg_HRV = 0.0;
 	/* ploughing - Hidy 2012. */
 	cs->PLGsnk = 0.0;	
 	cs->PLGsrc = 0.0;
@@ -170,7 +162,7 @@ int presim_state_init(wstate_struct* ws, cstate_struct* cs, nstate_struct* ns, c
 	cs->softstemc_transfer = 0.0;
 	cs->softstem_gr_snk = 0.0;
 	cs->softstem_mr_snk = 0.0;
-	cs->balance = 0;
+	cs->balanceERR = 0;
 	
 	ns->leafn = 0.0;
 	ns->leafn_storage = 0.0;
@@ -196,11 +188,17 @@ int presim_state_init(wstate_struct* ws, cstate_struct* cs, nstate_struct* ns, c
 	ns->litr3n = 0.0;
 	ns->litr4n = 0.0;
 	/* Hidy 2013 - senescence */
-	ns->litr1n_STDB = 0.0;
-	ns->litr2n_STDB = 0.0;
-	ns->litr3n_STDB = 0.0;
-	ns->litr4n_STDB = 0.0;
+	ns->STDB_litr1n = 0.0;
+	ns->STDB_litr2n = 0.0;
+	ns->STDB_litr3n = 0.0;
+	ns->STDB_litr4n = 0.0;
 	ns->STDBn = 0.0;
+	ns->CTDB_litr1n = 0.0;
+	ns->CTDB_litr2n = 0.0;
+	ns->CTDB_litr3n = 0.0;
+	ns->CTDB_litr4n = 0.0;
+	ns->CTDB_cwdn = 0.0;
+	cs->CTDBc = 0.0;
 	ns->soil1n = 0.0;
 	ns->soil2n = 0.0;
 	ns->soil3n = 0.0;
@@ -228,19 +226,10 @@ int presim_state_init(wstate_struct* ws, cstate_struct* cs, nstate_struct* ns, c
 	ns->THNsnk = 0.0;  
 	ns->THNsrc = 0.0;
 	ns->THN_transportN  = 0.0;
-	ns->litr1n_strg_THN = 0.0;
-	ns->litr2n_strg_THN = 0.0;
-	ns->litr3n_strg_THN = 0.0;
-	ns->litr4n_strg_THN = 0.0;
-	ns->cwdn_strg_THN   = 0.0;
 	/* mowing - Hidy 2008. */
 	ns->MOWsnk = 0.0;  
 	ns->MOWsrc = 0.0;
 	ns->MOW_transportN = 0.0;
-	ns->litr1n_strg_MOW = 0.0;
-	ns->litr2n_strg_MOW = 0.0;
-	ns->litr3n_strg_MOW = 0.0;
-	ns->litr4n_strg_MOW = 0.0;
 	 /* grazing - Hidy 2008. */
 	ns->GRZsnk = 0.0; 
 	ns->GRZsrc = 0.0;
@@ -248,10 +237,6 @@ int presim_state_init(wstate_struct* ws, cstate_struct* cs, nstate_struct* ns, c
 	ns->HRVsnk = 0.0;  
 	ns->HRVsrc = 0.0;
 	ns->HRV_transportN = 0.0;
-	ns->litr1n_strg_HRV = 0.0;
-	ns->litr2n_strg_HRV = 0.0;
-	ns->litr3n_strg_HRV = 0.0;
-	ns->litr4n_strg_HRV = 0.0;
 	/* ploughing - Hidy 2012. */
 	ns->PLGsnk = 0.0;	
 	ns->PLGsrc = 0.0;
@@ -270,7 +255,7 @@ int presim_state_init(wstate_struct* ws, cstate_struct* cs, nstate_struct* ns, c
 	ns->softstemn_storage = 0.0;
 	ns->softstemn_transfer = 0.0;
 	
-	ns->balance = 0;
+	ns->balanceERR = 0;
 	return(!ok);
 }
 	

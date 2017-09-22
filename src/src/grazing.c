@@ -6,7 +6,7 @@ method: Vuichard et al, 2007
 NOTE: LSU: livestock unit = unit used to compare or aggregate different species and it is equivalnet to the liveweight of an average cattle (1 adult cattle = 1 LSU)
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Copyright 2017, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
@@ -31,8 +31,8 @@ int grazing(const control_struct* ctrl, const epconst_struct* epc, grazing_struc
 	/* grazing parameters */
 	int ny;
 	double DMintake, stocking_rate,weight_LSU;			
-	double litr1c_STDB_to_GRZ, litr2c_STDB_to_GRZ, litr3c_STDB_to_GRZ, litr4c_STDB_to_GRZ;
-	double litr1n_STDB_to_GRZ, litr2n_STDB_to_GRZ, litr3n_STDB_to_GRZ, litr4n_STDB_to_GRZ;
+	double STDB_litr1c_to_GRZ, STDB_litr2c_to_GRZ, STDB_litr3c_to_GRZ, STDB_litr4c_to_GRZ;
+	double STDB_litr1n_to_GRZ, STDB_litr2n_to_GRZ, STDB_litr3n_to_GRZ, STDB_litr4n_to_GRZ;
 
 	/* local variables */
 	double EFman_N2O, Nexrate, EFman_CH4, EFfer_CH4;
@@ -160,12 +160,12 @@ int grazing(const control_struct* ctrl, const epconst_struct* epc, grazing_struc
 	cf->gresp_storage_to_GRZ  = cs->gresp_storage * GRZcoeff * storage_MGMmort;
 
 	/* standing dead biome */
-	litr1c_STDB_to_GRZ = cs->litr1c_STDB * GRZcoeff;
-	litr2c_STDB_to_GRZ = cs->litr2c_STDB * GRZcoeff;
-	litr3c_STDB_to_GRZ = cs->litr3c_STDB * GRZcoeff;
-	litr4c_STDB_to_GRZ = cs->litr4c_STDB * GRZcoeff;
+	STDB_litr1c_to_GRZ = cs->STDB_litr1c * GRZcoeff;
+	STDB_litr2c_to_GRZ = cs->STDB_litr2c * GRZcoeff;
+	STDB_litr3c_to_GRZ = cs->STDB_litr3c * GRZcoeff;
+	STDB_litr4c_to_GRZ = cs->STDB_litr4c * GRZcoeff;
 
-	cf->STDBc_to_GRZ = litr1c_STDB_to_GRZ + litr2c_STDB_to_GRZ + litr3c_STDB_to_GRZ + litr4c_STDB_to_GRZ;
+	cf->STDBc_to_GRZ = STDB_litr1c_to_GRZ + STDB_litr2c_to_GRZ + STDB_litr3c_to_GRZ + STDB_litr4c_to_GRZ;
 
 
 	/* CARBON */
@@ -184,12 +184,12 @@ int grazing(const control_struct* ctrl, const epconst_struct* epc, grazing_struc
 	nf->softstemn_storage_to_GRZ  = ns->softstemn_storage * GRZcoeff * storage_MGMmort;
 	
 	/* standing dead biome */
-	litr1n_STDB_to_GRZ = ns->litr1n_STDB * GRZcoeff;
-	litr2n_STDB_to_GRZ = ns->litr2n_STDB * GRZcoeff;
-	litr3n_STDB_to_GRZ = ns->litr3n_STDB * GRZcoeff;
-	litr4n_STDB_to_GRZ = ns->litr4n_STDB * GRZcoeff;
+	STDB_litr1n_to_GRZ = ns->STDB_litr1n * GRZcoeff;
+	STDB_litr2n_to_GRZ = ns->STDB_litr2n * GRZcoeff;
+	STDB_litr3n_to_GRZ = ns->STDB_litr3n * GRZcoeff;
+	STDB_litr4n_to_GRZ = ns->STDB_litr4n * GRZcoeff;
 
-	nf->STDBn_to_GRZ = litr1n_STDB_to_GRZ + litr2n_STDB_to_GRZ + litr3n_STDB_to_GRZ + litr4n_STDB_to_GRZ;
+	nf->STDBn_to_GRZ = STDB_litr1n_to_GRZ + STDB_litr2n_to_GRZ + STDB_litr3n_to_GRZ + STDB_litr4n_to_GRZ;
    
 	/* restranslocated N pool is decreasing also */
 	nf->retransn_to_GRZ        = ns->retransn * GRZcoeff * storage_MGMmort;
@@ -250,14 +250,14 @@ int grazing(const control_struct* ctrl, const epconst_struct* epc, grazing_struc
 	cs->GRZsnk += cf->gresp_transfer_to_GRZ;
 
 	/* dead standing biomass */
-	cs->GRZsnk += litr1c_STDB_to_GRZ;
-	cs->litr1c_STDB -= litr1c_STDB_to_GRZ;
-	cs->GRZsnk += litr2c_STDB_to_GRZ;
-	cs->litr2c_STDB -= litr2c_STDB_to_GRZ;
-	cs->GRZsnk += litr3c_STDB_to_GRZ;
-	cs->litr3c_STDB -= litr3c_STDB_to_GRZ;
-	cs->GRZsnk += litr4c_STDB_to_GRZ;
-	cs->litr4c_STDB -=litr4c_STDB_to_GRZ;
+	cs->GRZsnk += STDB_litr1c_to_GRZ;
+	cs->STDB_litr1c -= STDB_litr1c_to_GRZ;
+	cs->GRZsnk += STDB_litr2c_to_GRZ;
+	cs->STDB_litr2c -= STDB_litr2c_to_GRZ;
+	cs->GRZsnk += STDB_litr3c_to_GRZ;
+	cs->STDB_litr3c -= STDB_litr3c_to_GRZ;
+	cs->GRZsnk += STDB_litr4c_to_GRZ;
+	cs->STDB_litr4c -=STDB_litr4c_to_GRZ;
 
 	cs->SNSCsrc += cf->STDBc_to_GRZ;
 	cs->STDBc -= cf->STDBc_to_GRZ;
@@ -300,14 +300,14 @@ int grazing(const control_struct* ctrl, const epconst_struct* epc, grazing_struc
 	ns->softstemn_storage -= nf->softstemn_storage_to_GRZ;
 
 /* dead standing biomass */
-	ns->GRZsnk += litr1n_STDB_to_GRZ;
-	ns->litr1n_STDB -= litr1n_STDB_to_GRZ;
-	ns->GRZsnk += litr2n_STDB_to_GRZ;
-	ns->litr2n_STDB -= litr2n_STDB_to_GRZ;
-	ns->GRZsnk += litr3n_STDB_to_GRZ;
-	ns->litr3n_STDB -= litr3n_STDB_to_GRZ;
-	ns->GRZsnk += litr4n_STDB_to_GRZ;
-	ns->litr4n_STDB -=litr4n_STDB_to_GRZ;
+	ns->GRZsnk += STDB_litr1n_to_GRZ;
+	ns->STDB_litr1n -= STDB_litr1n_to_GRZ;
+	ns->GRZsnk += STDB_litr2n_to_GRZ;
+	ns->STDB_litr2n -= STDB_litr2n_to_GRZ;
+	ns->GRZsnk += STDB_litr3n_to_GRZ;
+	ns->STDB_litr3n -= STDB_litr3n_to_GRZ;
+	ns->GRZsnk += STDB_litr4n_to_GRZ;
+	ns->STDB_litr4n -=STDB_litr4n_to_GRZ;
 
 	ns->SNSCsrc += nf->STDBn_to_GRZ;
 	ns->STDBn -= nf->STDBn_to_GRZ;

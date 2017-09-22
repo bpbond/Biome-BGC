@@ -3,7 +3,7 @@ bgc_func.h
 header file for function prototypes
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -116,7 +116,7 @@ int multilayer_sminn(const epconst_struct* epc, const siteconst_struct* sitec, c
 					 nstate_struct* ns, nflux_struct* nf, wstate_struct* ws, wflux_struct* wf);
 
 /* calculate the hydrological parameters in the multilayer soil */
-int multilayer_hydrolparams(const siteconst_struct* sitec,  wstate_struct* ws, epvar_struct* epv, metvar_struct* metv);
+int multilayer_hydrolparams(const siteconst_struct* sitec,  wstate_struct* ws, epvar_struct* epv);
 
 /* calculate the hydrological processes in the multilayer soil */
 int multilayer_hydrolprocess(const control_struct* ctrl, const siteconst_struct* sitec, const epconst_struct* epc,

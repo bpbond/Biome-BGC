@@ -4,7 +4,7 @@ defines an array of pointers to doubles that map to all the intermediate
 variables in bgc
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -358,6 +358,7 @@ psn_struct* psn_sun, psn_struct* psn_shade, summary_struct* summary)
 		output_map[327] = &ns->BNDRYsrc;	
 		output_map[328] = &ns->ndiffused_snk;
 		output_map[329] = &ns->STDBn;
+		output_map[330] = &ns->CTDBn;
 		/* nitrogen flux variables */
 		output_map[340] = &nf->m_leafn_to_litr1n;
 		output_map[341] = &nf->m_leafn_to_litr2n;
@@ -483,6 +484,7 @@ psn_struct* psn_sun, psn_struct* psn_shade, summary_struct* summary)
 		output_map[462] = &nf->N2O_flux_GRZ;
 		output_map[463] = &nf->N2O_flux_FRZ;
         output_map[464] = &nf->nplus;
+
 		/* phenological variables */
 		output_map[480] = &phen->remdays_curgrowth;
 		output_map[481] = &phen->remdays_transfer;
@@ -590,6 +592,7 @@ psn_struct* psn_sun, psn_struct* psn_shade, summary_struct* summary)
 		output_map[608] = &psn_shade->Aj;
 		output_map[609] = &psn_shade->A;
 		
+		output_map[611] = &summary->daily_N2O;
 		output_map[612] = &summary->abgc;
 		output_map[613] = &summary->cum_npp_ann;
 		output_map[614] = &ns->sum_ndemand;

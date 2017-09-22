@@ -3,7 +3,7 @@ mowing.c
 do mowing  - decrease the plant material (leafc, leafn, canopy water)
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Copyright 2017, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
@@ -28,14 +28,14 @@ int mowing(const control_struct* ctrl, const epconst_struct* epc, mowing_struct*
 	/* mowing parameters */
 	double LAI_limit;
 	double remained_prop;						/* remained proportion of plabnt material is calculated from transport coefficient */
-	double MOW_to_litr1c_strg, MOW_to_litr2c_strg, MOW_to_litr3c_strg, MOW_to_litr4c_strg, MOW_to_transpC;
-	double MOW_to_litr1n_strg, MOW_to_litr2n_strg, MOW_to_litr3n_strg, MOW_to_litr4n_strg, MOW_to_transpN;
+	double MOW_to_CTDB_litr1c, MOW_to_CTDB_litr2c, MOW_to_CTDB_litr3c, MOW_to_CTDB_litr4c, MOW_to_transpC;
+	double MOW_to_CTDB_litr1n, MOW_to_CTDB_litr2n, MOW_to_CTDB_litr3n, MOW_to_CTDB_litr4n, MOW_to_transpN;
 	double diffC, diffN;
 	/* local parameters */
 	double befgrass_LAI;						/* value of LAI before mowing */
 	double MOWcoeff;							/* coefficient determining the decrease of plant material caused by mowing */
-	double litr1c_STDB_to_MOW, litr2c_STDB_to_MOW, litr3c_STDB_to_MOW, litr4c_STDB_to_MOW;
-	double litr1n_STDB_to_MOW, litr2n_STDB_to_MOW, litr3n_STDB_to_MOW, litr4n_STDB_to_MOW;
+	double STDB_litr1c_to_MOW, STDB_litr2c_to_MOW, STDB_litr3c_to_MOW, STDB_litr4c_to_MOW;
+	double STDB_litr1n_to_MOW, STDB_litr2n_to_MOW, STDB_litr3n_to_MOW, STDB_litr4n_to_MOW;
 
 	int ok=1;
 	int ny;
@@ -123,12 +123,12 @@ int mowing(const control_struct* ctrl, const epconst_struct* epc, mowing_struct*
 	cf->gresp_storage_to_MOW  = cs->gresp_storage * MOWcoeff * storage_MGMmort;
 
 	/* standing dead biome */
-	litr1c_STDB_to_MOW = cs->litr1c_STDB * MOWcoeff;
-	litr2c_STDB_to_MOW = cs->litr2c_STDB * MOWcoeff;
-	litr3c_STDB_to_MOW = cs->litr3c_STDB * MOWcoeff;
-	litr4c_STDB_to_MOW = cs->litr4c_STDB * MOWcoeff;
+	STDB_litr1c_to_MOW = cs->STDB_litr1c * MOWcoeff;
+	STDB_litr2c_to_MOW = cs->STDB_litr2c * MOWcoeff;
+	STDB_litr3c_to_MOW = cs->STDB_litr3c * MOWcoeff;
+	STDB_litr4c_to_MOW = cs->STDB_litr4c * MOWcoeff;
 
-	cf->STDBc_to_MOW = litr1c_STDB_to_MOW + litr2c_STDB_to_MOW + litr3c_STDB_to_MOW + litr4c_STDB_to_MOW;
+	cf->STDBc_to_MOW = STDB_litr1c_to_MOW + STDB_litr2c_to_MOW + STDB_litr3c_to_MOW + STDB_litr4c_to_MOW;
 
 	nf->leafn_to_MOW          = ns->leafn * MOWcoeff;
 	nf->leafn_transfer_to_MOW = ns->leafn_transfer * MOWcoeff * storage_MGMmort;
@@ -146,86 +146,86 @@ int mowing(const control_struct* ctrl, const epconst_struct* epc, mowing_struct*
 
 
 	/* standing dead biome */
-	litr1n_STDB_to_MOW = ns->litr1n_STDB * MOWcoeff;
-	litr2n_STDB_to_MOW = ns->litr2n_STDB * MOWcoeff;
-	litr3n_STDB_to_MOW = ns->litr3n_STDB * MOWcoeff;
-	litr4n_STDB_to_MOW = ns->litr4n_STDB * MOWcoeff;
+	STDB_litr1n_to_MOW = ns->STDB_litr1n * MOWcoeff;
+	STDB_litr2n_to_MOW = ns->STDB_litr2n * MOWcoeff;
+	STDB_litr3n_to_MOW = ns->STDB_litr3n * MOWcoeff;
+	STDB_litr4n_to_MOW = ns->STDB_litr4n * MOWcoeff;
 
-	nf->STDBn_to_MOW = litr1n_STDB_to_MOW + litr2n_STDB_to_MOW + litr3n_STDB_to_MOW + litr4n_STDB_to_MOW;
+	nf->STDBn_to_MOW = STDB_litr1n_to_MOW + STDB_litr2n_to_MOW + STDB_litr3n_to_MOW + STDB_litr4n_to_MOW;
    
 	/**********************************************************************************************/
 	/* 2. part of the plant material is transported (MOW_to_transpC and MOW_to_transpN; transp_coeff = 1-remained_prop),
-	      the rest remains at the site (MOW_to_litrc_strg, MOW_to_litrn_strg)*/
+	      the rest remains at the site (MOW_to_litrc, MOW_to_litrn)*/
 
 	MOW_to_transpC = (cf->leafc_to_MOW + cf->fruitc_to_MOW + cf->softstemc_to_MOW + cf->STDBc_to_MOW)  * (1-remained_prop);
 
 	MOW_to_transpN = (nf->leafn_to_MOW + nf->fruitn_to_MOW + nf->softstemn_to_MOW + nf->STDBn_to_MOW) 	* (1-remained_prop);
 	
-	MOW_to_litr1c_strg = (cf->leafc_to_MOW * epc->leaflitr_flab + cf->fruitc_to_MOW* epc->fruitlitr_flab  + 
-						  cf->softstemc_to_MOW* epc->softstemlitr_flab + litr1c_STDB_to_MOW) * remained_prop +
+	MOW_to_CTDB_litr1c = (cf->leafc_to_MOW * epc->leaflitr_flab + cf->fruitc_to_MOW* epc->fruitlitr_flab  + 
+						  cf->softstemc_to_MOW* epc->softstemlitr_flab + STDB_litr1c_to_MOW) * remained_prop +
 						 (cf->leafc_transfer_to_MOW  + cf->leafc_storage_to_MOW + cf->fruitc_transfer_to_MOW + cf->fruitc_storage_to_MOW + 
 						  cf->softstemc_transfer_to_MOW + cf->softstemc_storage_to_MOW + 
 						  cf->gresp_storage_to_MOW  + cf->gresp_transfer_to_MOW);
 
-	MOW_to_litr2c_strg = (cf->leafc_to_MOW * epc->leaflitr_fucel  + cf->fruitc_to_MOW * epc->fruitlitr_fucel
+	MOW_to_CTDB_litr2c = (cf->leafc_to_MOW * epc->leaflitr_fucel  + cf->fruitc_to_MOW * epc->fruitlitr_fucel
 							+ cf->softstemc_to_MOW * epc->softstemlitr_fucel
-						    + litr2c_STDB_to_MOW) * remained_prop;
+						    + STDB_litr2c_to_MOW) * remained_prop;
 
-	MOW_to_litr3c_strg = (cf->leafc_to_MOW * epc->leaflitr_fscel  + cf->fruitc_to_MOW * epc->fruitlitr_fscel
+	MOW_to_CTDB_litr3c = (cf->leafc_to_MOW * epc->leaflitr_fscel  + cf->fruitc_to_MOW * epc->fruitlitr_fscel
 		                    + cf->softstemc_to_MOW * epc->softstemlitr_fscel
-							+ litr3c_STDB_to_MOW) * remained_prop;
+							+ STDB_litr3c_to_MOW) * remained_prop;
 
-	MOW_to_litr4c_strg = (cf->leafc_to_MOW * epc->leaflitr_flig   + cf->fruitc_to_MOW * epc->fruitlitr_flig
+	MOW_to_CTDB_litr4c = (cf->leafc_to_MOW * epc->leaflitr_flig   + cf->fruitc_to_MOW * epc->fruitlitr_flig
 							+ cf->softstemc_to_MOW * epc->softstemlitr_flig
-							+ litr4c_STDB_to_MOW) * remained_prop;
+							+ STDB_litr4c_to_MOW) * remained_prop;
 
-	MOW_to_litr1n_strg =  (nf->leafn_to_MOW * epc->leaflitr_flab  + nf->fruitn_to_MOW* epc->fruitlitr_flab + 
-		                   nf->softstemn_to_MOW* epc->softstemlitr_flab + litr1n_STDB_to_MOW) * remained_prop + 
+	MOW_to_CTDB_litr1n =  (nf->leafn_to_MOW * epc->leaflitr_flab  + nf->fruitn_to_MOW* epc->fruitlitr_flab + 
+		                   nf->softstemn_to_MOW* epc->softstemlitr_flab + STDB_litr1n_to_MOW) * remained_prop + 
 						  (nf->leafn_transfer_to_MOW  + nf->leafn_storage_to_MOW + nf->fruitn_transfer_to_MOW + nf->fruitn_storage_to_MOW +
 						   nf->softstemn_transfer_to_MOW + nf->softstemn_storage_to_MOW + nf->retransn_to_MOW);
 
-	MOW_to_litr2n_strg =  (nf->leafn_to_MOW * epc->leaflitr_fucel + nf->fruitn_to_MOW * epc->fruitlitr_fucel
+	MOW_to_CTDB_litr2n =  (nf->leafn_to_MOW * epc->leaflitr_fucel + nf->fruitn_to_MOW * epc->fruitlitr_fucel
 		                    + nf->softstemn_to_MOW * epc->softstemlitr_fucel
-							+ litr2n_STDB_to_MOW) * remained_prop;
+							+ STDB_litr2n_to_MOW) * remained_prop;
 
-	MOW_to_litr3n_strg =  (nf->leafn_to_MOW * epc->leaflitr_fscel + nf->fruitn_to_MOW * epc->fruitlitr_fscel
+	MOW_to_CTDB_litr3n =  (nf->leafn_to_MOW * epc->leaflitr_fscel + nf->fruitn_to_MOW * epc->fruitlitr_fscel
 							+ nf->softstemn_to_MOW * epc->softstemlitr_fscel
-							+ litr3n_STDB_to_MOW) * remained_prop;
+							+ STDB_litr3n_to_MOW) * remained_prop;
 
-	MOW_to_litr4n_strg =  (nf->leafn_to_MOW * epc->leaflitr_flig  + nf->fruitn_to_MOW * epc->fruitlitr_flig
+	MOW_to_CTDB_litr4n =  (nf->leafn_to_MOW * epc->leaflitr_flig  + nf->fruitn_to_MOW * epc->fruitlitr_flig
 							+ nf->softstemn_to_MOW * epc->softstemlitr_flig
-							+ litr4n_STDB_to_MOW) * remained_prop;
+							+ STDB_litr4n_to_MOW) * remained_prop;
    
 
-	cs->litr1c_strg_MOW += MOW_to_litr1c_strg;
-	cs->litr2c_strg_MOW += MOW_to_litr2c_strg;
-	cs->litr3c_strg_MOW += MOW_to_litr3c_strg;
-	cs->litr4c_strg_MOW += MOW_to_litr4c_strg;
+	cs->CTDB_litr1c += MOW_to_CTDB_litr1c;
+	cs->CTDB_litr2c += MOW_to_CTDB_litr2c;
+	cs->CTDB_litr3c += MOW_to_CTDB_litr3c;
+	cs->CTDB_litr4c += MOW_to_CTDB_litr4c;
 
 	cs->MOW_transportC  += MOW_to_transpC;
 
 
-	ns->litr1n_strg_MOW +=  MOW_to_litr1n_strg;
-	ns->litr2n_strg_MOW +=  MOW_to_litr2n_strg;
-	ns->litr3n_strg_MOW +=  MOW_to_litr3n_strg;
-	ns->litr4n_strg_MOW +=  MOW_to_litr4n_strg;
+	ns->CTDB_litr1n +=  MOW_to_CTDB_litr1n;
+	ns->CTDB_litr2n +=  MOW_to_CTDB_litr2n;
+	ns->CTDB_litr3n +=  MOW_to_CTDB_litr3n;
+	ns->CTDB_litr4n +=  MOW_to_CTDB_litr4n;
 
 	
 
 	ns->MOW_transportN  += MOW_to_transpN;
 
 	/**********************************************************************************************/
-	/* 3.the remained part of the plant material gradually goes into the litter pool (litrc_strg_MOW, litrn_strg_MOW) */
+	/* 3.the remained part of the plant material gradually goes into the litter pool (litrc, litrn) */
  
-	cf->MOW_to_litr1c = cs->litr1c_strg_MOW * MOW_to_litter_coeff;
-	cf->MOW_to_litr2c = cs->litr2c_strg_MOW * MOW_to_litter_coeff;
-	cf->MOW_to_litr3c = cs->litr3c_strg_MOW * MOW_to_litter_coeff;
-	cf->MOW_to_litr4c = cs->litr4c_strg_MOW * MOW_to_litter_coeff;
+	cf->MOW_to_litr1c = cs->CTDB_litr1c * MOW_to_litter_coeff;
+	cf->MOW_to_litr2c = cs->CTDB_litr2c * MOW_to_litter_coeff;
+	cf->MOW_to_litr3c = cs->CTDB_litr3c * MOW_to_litter_coeff;
+	cf->MOW_to_litr4c = cs->CTDB_litr4c * MOW_to_litter_coeff;
 
-	nf->MOW_to_litr1n = ns->litr1n_strg_MOW * MOW_to_litter_coeff;
-	nf->MOW_to_litr2n = ns->litr2n_strg_MOW * MOW_to_litter_coeff;
-	nf->MOW_to_litr3n = ns->litr3n_strg_MOW * MOW_to_litter_coeff;
-	nf->MOW_to_litr4n = ns->litr4n_strg_MOW * MOW_to_litter_coeff;
+	nf->MOW_to_litr1n = ns->CTDB_litr1n * MOW_to_litter_coeff;
+	nf->MOW_to_litr2n = ns->CTDB_litr2n * MOW_to_litter_coeff;
+	nf->MOW_to_litr3n = ns->CTDB_litr3n * MOW_to_litter_coeff;
+	nf->MOW_to_litr4n = ns->CTDB_litr4n * MOW_to_litter_coeff;
 	
 
 	/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -247,14 +247,14 @@ int mowing(const control_struct* ctrl, const epconst_struct* epc, mowing_struct*
 	cs->gresp_storage -= cf->gresp_storage_to_MOW;
 
 	/* dead standing biomass */
-	cs->MOWsnk += litr1c_STDB_to_MOW;
-	cs->litr1c_STDB -= litr1c_STDB_to_MOW;
-	cs->MOWsnk += litr2c_STDB_to_MOW;
-	cs->litr2c_STDB -= litr2c_STDB_to_MOW;
-	cs->MOWsnk += litr3c_STDB_to_MOW;
-	cs->litr3c_STDB -= litr3c_STDB_to_MOW;
-	cs->MOWsnk += litr4c_STDB_to_MOW;
-	cs->litr4c_STDB -=litr4c_STDB_to_MOW;
+	cs->MOWsnk += STDB_litr1c_to_MOW;
+	cs->STDB_litr1c -= STDB_litr1c_to_MOW;
+	cs->MOWsnk += STDB_litr2c_to_MOW;
+	cs->STDB_litr2c -= STDB_litr2c_to_MOW;
+	cs->MOWsnk += STDB_litr3c_to_MOW;
+	cs->STDB_litr3c -= STDB_litr3c_to_MOW;
+	cs->MOWsnk += STDB_litr4c_to_MOW;
+	cs->STDB_litr4c -=STDB_litr4c_to_MOW;
 
 	cs->SNSCsrc += cf->STDBc_to_MOW;
 	cs->STDBc -= cf->STDBc_to_MOW;
@@ -282,10 +282,10 @@ int mowing(const control_struct* ctrl, const epconst_struct* epc, mowing_struct*
 	cs->litr4c += cf->MOW_to_litr4c;
 	
     /* decreasing litter storage state variables*/
-	cs->litr1c_strg_MOW -= cf->MOW_to_litr1c;
-	cs->litr2c_strg_MOW -= cf->MOW_to_litr2c;
-	cs->litr3c_strg_MOW -= cf->MOW_to_litr3c;
-	cs->litr4c_strg_MOW -= cf->MOW_to_litr4c;
+	cs->CTDB_litr1c -= cf->MOW_to_litr1c;
+	cs->CTDB_litr2c -= cf->MOW_to_litr2c;
+	cs->CTDB_litr3c -= cf->MOW_to_litr3c;
+	cs->CTDB_litr4c -= cf->MOW_to_litr4c;
 
 	/* litter plus because of mowing and returning of dead plant material */
 	cs->MOWsrc += cf->MOW_to_litr1c + cf->MOW_to_litr2c + cf->MOW_to_litr3c + cf->MOW_to_litr4c;
@@ -302,14 +302,14 @@ int mowing(const control_struct* ctrl, const epconst_struct* epc, mowing_struct*
 	ns->leafn_storage -= nf->leafn_storage_to_MOW;
 
 	/* dead standing biomass */
-	ns->MOWsnk += litr1n_STDB_to_MOW;
-	ns->litr1n_STDB -= litr1n_STDB_to_MOW;
-	ns->MOWsnk += litr2n_STDB_to_MOW;
-	ns->litr2n_STDB -= litr2n_STDB_to_MOW;
-	ns->MOWsnk += litr3n_STDB_to_MOW;
-	ns->litr3n_STDB -= litr3n_STDB_to_MOW;
-	ns->MOWsnk += litr4n_STDB_to_MOW;
-	ns->litr4n_STDB -=litr4n_STDB_to_MOW;
+	ns->MOWsnk += STDB_litr1n_to_MOW;
+	ns->STDB_litr1n -= STDB_litr1n_to_MOW;
+	ns->MOWsnk += STDB_litr2n_to_MOW;
+	ns->STDB_litr2n -= STDB_litr2n_to_MOW;
+	ns->MOWsnk += STDB_litr3n_to_MOW;
+	ns->STDB_litr3n -= STDB_litr3n_to_MOW;
+	ns->MOWsnk += STDB_litr4n_to_MOW;
+	ns->STDB_litr4n -=STDB_litr4n_to_MOW;
 
 	ns->SNSCsrc += nf->STDBn_to_MOW;
 	ns->STDBn -= nf->STDBn_to_MOW;
@@ -340,10 +340,10 @@ int mowing(const control_struct* ctrl, const epconst_struct* epc, mowing_struct*
 
 
 	/* decreasing litter storage state variables*/
-	ns->litr1n_strg_MOW -= nf->MOW_to_litr1n;
-	ns->litr2n_strg_MOW -= nf->MOW_to_litr2n;
-	ns->litr3n_strg_MOW -= nf->MOW_to_litr3n;
-	ns->litr4n_strg_MOW -= nf->MOW_to_litr4n;
+	ns->CTDB_litr1n -= nf->MOW_to_litr1n;
+	ns->CTDB_litr2n -= nf->MOW_to_litr2n;
+	ns->CTDB_litr3n -= nf->MOW_to_litr3n;
+	ns->CTDB_litr4n -= nf->MOW_to_litr4n;
 
 	ns->MOWsrc += nf->MOW_to_litr1n + nf->MOW_to_litr2n + nf->MOW_to_litr3n + nf->MOW_to_litr4n;
 
@@ -355,28 +355,28 @@ int mowing(const control_struct* ctrl, const epconst_struct* epc, mowing_struct*
 	/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                                                     TEMPORARY POOLS
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-	/* temporary MOWed plant material pools: if litr1c_strg_MOW is less than a crit. value, the temporary pool becomes empty */
+	/* temporary MOWed plant material pools: if litr1c_MOW is less than a crit. value, the temporary pool becomes empty */
 
-	if (cs->litr1c_strg_MOW < CRIT_PREC && cs->litr1c_strg_MOW != 0) 
+	if (cs->CTDB_litr1c < CRIT_PREC && cs->CTDB_litr1c != 0) 
 	{
-		cs->MOWsrc += (cs->litr1c_strg_MOW + cs->litr2c_strg_MOW + cs->litr3c_strg_MOW + cs->litr4c_strg_MOW);
-		cs->litr1c_strg_MOW = 0;
-		cs->litr2c_strg_MOW = 0;
-		cs->litr3c_strg_MOW = 0;
-		cs->litr4c_strg_MOW = 0;
-		ns->MOWsrc += (ns->litr1n_strg_MOW + ns->litr2n_strg_MOW + ns->litr3n_strg_MOW + ns->litr4n_strg_MOW);
-		ns->litr1n_strg_MOW = 0;
-		ns->litr2n_strg_MOW = 0;
-		ns->litr3n_strg_MOW = 0;
-		ns->litr4n_strg_MOW = 0;
+		cs->MOWsrc += (cs->CTDB_litr1c + cs->CTDB_litr2c + cs->CTDB_litr3c + cs->CTDB_litr4c);
+		cs->CTDB_litr1c = 0;
+		cs->CTDB_litr2c = 0;
+		cs->CTDB_litr3c = 0;
+		cs->CTDB_litr4c = 0;
+		ns->MOWsrc += (ns->CTDB_litr1n + ns->CTDB_litr2n + ns->CTDB_litr3n + ns->CTDB_litr4n);
+		ns->CTDB_litr1n = 0;
+		ns->CTDB_litr2n = 0;
+		ns->CTDB_litr3n = 0;
+		ns->CTDB_litr4n = 0;
 	}
 		
 	/* CONTROL */
 	diffC = (cs->MOWsnk-cs->MOWsrc) - cs->MOW_transportC - 
-		    (cs->litr1c_strg_MOW+cs->litr2c_strg_MOW+cs->litr3c_strg_MOW+cs->litr4c_strg_MOW);
+		    (cs->CTDB_litr1c+cs->CTDB_litr2c+cs->CTDB_litr3c+cs->CTDB_litr4c);
 
 	diffN = (ns->MOWsnk-ns->MOWsrc) - ns->MOW_transportN - 
-		    (ns->litr1n_strg_MOW+ns->litr2n_strg_MOW+ns->litr3n_strg_MOW+ns->litr4n_strg_MOW);
+		    (ns->CTDB_litr1n+ns->CTDB_litr2n+ns->CTDB_litr3n+ns->CTDB_litr4n);
 
 	if (fabs(diffC) > 1e-3 || fabs(diffN) > 1e-3)
 	{

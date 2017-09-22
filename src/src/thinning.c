@@ -3,7 +3,7 @@ thinning.c
 do thinning  - decrease the plant material (leafc, leafn, canopy water, frootc, frootn, stemc, stemn, crootc, crootn)
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Copyright 2017, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
@@ -29,10 +29,11 @@ int thinning(const control_struct* ctrl, const epconst_struct* epc, thinning_str
 	double remained_prop_nwoody, remained_prop_woody;	
 	
 	double THNcoeff;					/* coefficient determining decrease of plant material caused by thinning  */		
-	double THN_to_litr1c_strg, THN_to_litr2c_strg, THN_to_litr3c_strg, THN_to_litr4c_strg, THN_to_cwdc_strg, THN_to_transpC;
-	double THN_to_litr1n_strg, THN_to_litr2n_strg, THN_to_litr3n_strg, THN_to_litr4n_strg, THN_to_cwdn_strg, THN_to_transpN;
-	double litr1c_STDB_to_THN, litr2c_STDB_to_THN, litr3c_STDB_to_THN, litr4c_STDB_to_THN;
-	double litr1n_STDB_to_THN, litr2n_STDB_to_THN, litr3n_STDB_to_THN, litr4n_STDB_to_THN;
+	double THN_to_CTDB_litr1c, THN_to_CTDB_litr2c, THN_to_CTDB_litr3c, THN_to_CTDB_litr4c, THN_to_CTDB_cwdc;
+	double THN_to_CTDB_litr1n, THN_to_CTDB_litr2n, THN_to_CTDB_litr3n, THN_to_CTDB_litr4n, THN_to_CTDB_cwdn;
+	double STDB_litr1c_to_THN, STDB_litr2c_to_THN, STDB_litr3c_to_THN, STDB_litr4c_to_THN;
+	double STDB_litr1n_to_THN, STDB_litr2n_to_THN, STDB_litr3n_to_THN, STDB_litr4n_to_THN;
+	double THN_to_transpC, THN_to_transpN;
 	double diffC = 0;
 	double diffN = 0;
 	int ok=1;
@@ -150,19 +151,19 @@ int thinning(const control_struct* ctrl, const epconst_struct* epc, thinning_str
 	wf->canopyw_to_THN = ws->canopyw * THNcoeff;
 
 	/* standing dead biome */
-	litr1c_STDB_to_THN = cs->litr1c_STDB * THNcoeff;
-	litr2c_STDB_to_THN = cs->litr2c_STDB * THNcoeff;
-	litr3c_STDB_to_THN = cs->litr3c_STDB * THNcoeff;
-	litr4c_STDB_to_THN = cs->litr4c_STDB * THNcoeff;
+	STDB_litr1c_to_THN = cs->STDB_litr1c * THNcoeff;
+	STDB_litr2c_to_THN = cs->STDB_litr2c * THNcoeff;
+	STDB_litr3c_to_THN = cs->STDB_litr3c * THNcoeff;
+	STDB_litr4c_to_THN = cs->STDB_litr4c * THNcoeff;
 
-	cf->STDBc_to_THN = litr1c_STDB_to_THN + litr2c_STDB_to_THN + litr3c_STDB_to_THN + litr4c_STDB_to_THN;
+	cf->STDBc_to_THN = STDB_litr1c_to_THN + STDB_litr2c_to_THN + STDB_litr3c_to_THN + STDB_litr4c_to_THN;
 
-	litr1n_STDB_to_THN = ns->litr1n_STDB * THNcoeff;
-	litr2n_STDB_to_THN = ns->litr2n_STDB * THNcoeff;
-	litr3n_STDB_to_THN = ns->litr3n_STDB * THNcoeff;
-	litr4n_STDB_to_THN = ns->litr4n_STDB * THNcoeff;
+	STDB_litr1n_to_THN = ns->STDB_litr1n * THNcoeff;
+	STDB_litr2n_to_THN = ns->STDB_litr2n * THNcoeff;
+	STDB_litr3n_to_THN = ns->STDB_litr3n * THNcoeff;
+	STDB_litr4n_to_THN = ns->STDB_litr4n * THNcoeff;
 
-	nf->STDBn_to_THN = litr1n_STDB_to_THN + litr2n_STDB_to_THN + litr3n_STDB_to_THN + litr4n_STDB_to_THN;
+	nf->STDBn_to_THN = STDB_litr1n_to_THN + STDB_litr2n_to_THN + STDB_litr3n_to_THN + STDB_litr4n_to_THN;
    
 
 	/**********************************************************************************************/
@@ -177,10 +178,10 @@ int thinning(const control_struct* ctrl, const epconst_struct* epc, thinning_str
 					 (nf->livestemn_to_THN + nf->deadstemn_to_THN + nf->STDBn_to_THN)  * (1-remained_prop_woody);
 	
 	/**********************************************************************************************/
-	/* 3. the rest remains at the site (THN_to_litrc_strg, THN_to_litrn_strg, THN_to_cwdn_strg, THN_to_cwdn) */
+	/* 3. the rest remains at the site (THN_to_litrc, THN_to_litrn, THN_to_cwdn, THN_to_cwdn) */
 	
 	/* litter:  */
-	THN_to_litr1c_strg = (cf->leafc_to_THN * epc->leaflitr_flab   + cf->fruitc_to_THN * epc->fruitlitr_flab + cf->STDBc_to_THN)  * (remained_prop_nwoody) +
+	THN_to_CTDB_litr1c = (cf->leafc_to_THN * epc->leaflitr_flab   + cf->fruitc_to_THN * epc->fruitlitr_flab + cf->STDBc_to_THN)  * (remained_prop_nwoody) +
 						  cf->frootc_to_THN * epc->frootlitr_flab + cf->frootc_transfer_to_THN  + cf->frootc_storage_to_THN +
 						  cf->leafc_transfer_to_THN  + cf->leafc_storage_to_THN +
 						  cf->fruitc_transfer_to_THN + cf->fruitc_storage_to_THN + 
@@ -192,22 +193,22 @@ int thinning(const control_struct* ctrl, const epconst_struct* epc, thinning_str
        
 
 
-	THN_to_litr2c_strg = (cf->leafc_to_THN * epc->leaflitr_fucel  + cf->fruitc_to_THN * epc->fruitlitr_fucel) * remained_prop_nwoody +
+	THN_to_CTDB_litr2c = (cf->leafc_to_THN * epc->leaflitr_fucel  + cf->fruitc_to_THN * epc->fruitlitr_fucel) * remained_prop_nwoody +
 		                  (cf->frootc_to_THN * epc->frootlitr_fucel);
 	
-	THN_to_litr3c_strg = (cf->leafc_to_THN * epc->leaflitr_fscel  + cf->fruitc_to_THN * epc->fruitlitr_fscel) * remained_prop_nwoody +
+	THN_to_CTDB_litr3c = (cf->leafc_to_THN * epc->leaflitr_fscel  + cf->fruitc_to_THN * epc->fruitlitr_fscel) * remained_prop_nwoody +
 						  (cf->frootc_to_THN * epc->frootlitr_fscel);
 	
-	THN_to_litr4c_strg = (cf->leafc_to_THN * epc->leaflitr_flig   + cf->fruitc_to_THN * epc->fruitlitr_flig)  * remained_prop_nwoody +
+	THN_to_CTDB_litr4c = (cf->leafc_to_THN * epc->leaflitr_flig   + cf->fruitc_to_THN * epc->fruitlitr_flig)  * remained_prop_nwoody +
 		                  (cf->frootc_to_THN * epc->frootlitr_flig);
 	
-	/* cwd_strg: temporary cwd storage pool which contains the cut-down part of coarse root and stem*/
-	THN_to_cwdc_strg   = (cf->livecrootc_to_THN + cf->deadcrootc_to_THN) +
+	/* cwd: temporary cwd storage pool which contains the cut-down part of coarse root and stem*/
+	THN_to_CTDB_cwdc   = (cf->livecrootc_to_THN + cf->deadcrootc_to_THN) +
 		                  (cf->livestemc_to_THN + cf->deadstemc_to_THN) * remained_prop_woody;
 
 
 	/* litter:  */
-	THN_to_litr1n_strg = (nf->leafn_to_THN * epc->leaflitr_flab  + nf->fruitn_to_THN * epc->fruitlitr_flab + nf->STDBn_to_THN) * remained_prop_nwoody +                                                            
+	THN_to_CTDB_litr1n = (nf->leafn_to_THN * epc->leaflitr_flab  + nf->fruitn_to_THN * epc->fruitlitr_flab + nf->STDBn_to_THN) * remained_prop_nwoody +                                                            
 		                  nf->frootn_to_THN * epc->frootlitr_flab+ nf->frootn_transfer_to_THN  + nf->frootn_storage_to_THN +	
 						  nf->leafn_transfer_to_THN  + nf->leafn_storage_to_THN +
 						  nf->fruitn_transfer_to_THN + nf->fruitn_storage_to_THN + 
@@ -217,48 +218,48 @@ int thinning(const control_struct* ctrl, const epconst_struct* epc, thinning_str
 						  nf->livecrootn_transfer_to_THN + nf->livecrootn_storage_to_THN + 
 						  nf->deadcrootn_transfer_to_THN + nf->deadcrootn_storage_to_THN;
 
-	THN_to_litr2n_strg =  (nf->leafn_to_THN * epc->leaflitr_fucel + nf->fruitn_to_THN * epc->fruitlitr_fucel) * remained_prop_nwoody +
+	THN_to_CTDB_litr2n =  (nf->leafn_to_THN * epc->leaflitr_fucel + nf->fruitn_to_THN * epc->fruitlitr_fucel) * remained_prop_nwoody +
 						   nf->frootn_to_THN * epc->frootlitr_fucel;
-	THN_to_litr3n_strg =  (nf->leafn_to_THN * epc->leaflitr_fscel + nf->fruitn_to_THN * epc->fruitlitr_fscel) * remained_prop_nwoody +
+	THN_to_CTDB_litr3n =  (nf->leafn_to_THN * epc->leaflitr_fscel + nf->fruitn_to_THN * epc->fruitlitr_fscel) * remained_prop_nwoody +
 		                   nf->frootn_to_THN * epc->frootlitr_fscel;
-	THN_to_litr4n_strg =  (nf->leafn_to_THN * epc->leaflitr_flig  + nf->fruitn_to_THN * epc->fruitlitr_flig)  * remained_prop_nwoody +
+	THN_to_CTDB_litr4n =  (nf->leafn_to_THN * epc->leaflitr_flig  + nf->fruitn_to_THN * epc->fruitlitr_flig)  * remained_prop_nwoody +
 		                   nf->frootn_to_THN * epc->frootlitr_flig;
-    /* cwd_strg: temporary cwd storage pool which contains the cut-down part of coarse root and stem */
-	THN_to_cwdn_strg   =  (nf->livecrootn_to_THN + nf->deadcrootn_to_THN) + 
+    /* cwd: temporary cwd storage pool which contains the cut-down part of coarse root and stem */
+	THN_to_CTDB_cwdn   =  (nf->livecrootn_to_THN + nf->deadcrootn_to_THN) + 
 		                  (nf->livestemn_to_THN + nf->deadstemn_to_THN) * remained_prop_woody;
 
 
-	cs->litr1c_strg_THN += THN_to_litr1c_strg;
-	cs->litr2c_strg_THN += THN_to_litr2c_strg;
-	cs->litr3c_strg_THN += THN_to_litr3c_strg;
-	cs->litr4c_strg_THN += THN_to_litr4c_strg;
-	cs->cwdc_strg_THN   += THN_to_cwdc_strg;
+	cs->CTDB_litr1c += THN_to_CTDB_litr1c;
+	cs->CTDB_litr2c += THN_to_CTDB_litr2c;
+	cs->CTDB_litr3c += THN_to_CTDB_litr3c;
+	cs->CTDB_litr4c += THN_to_CTDB_litr4c;
+	cs->CTDB_cwdc   += THN_to_CTDB_cwdc;
 
 	cs->THN_transportC  += THN_to_transpC;
 
 
-	ns->litr1n_strg_THN += THN_to_litr1n_strg;
-	ns->litr2n_strg_THN += THN_to_litr2n_strg;
-	ns->litr3n_strg_THN += THN_to_litr3n_strg;
-	ns->litr4n_strg_THN += THN_to_litr4n_strg;
-	ns->cwdn_strg_THN   += THN_to_cwdn_strg;
+	ns->CTDB_litr1n += THN_to_CTDB_litr1n;
+	ns->CTDB_litr2n += THN_to_CTDB_litr2n;
+	ns->CTDB_litr3n += THN_to_CTDB_litr3n;
+	ns->CTDB_litr4n += THN_to_CTDB_litr4n;
+	ns->CTDB_cwdn   += THN_to_CTDB_cwdn;
 
 	ns->THN_transportN  += THN_to_transpN;
 
 	/**********************************************************************************************/
-	/* 3.the remained part of the plant material gradually goes into the litter pool (litrc_strg_THN, litrn_strg_THN) */
+	/* 3.the remained part of the plant material gradually goes into the litter pool (litrc, litrn) */
  
-	cf->THN_to_litr1c = cs->litr1c_strg_THN * THN_to_litter_coeff_nw;
-	cf->THN_to_litr2c = cs->litr2c_strg_THN * THN_to_litter_coeff_nw;
-	cf->THN_to_litr3c = cs->litr3c_strg_THN * THN_to_litter_coeff_nw;
-	cf->THN_to_litr4c = cs->litr4c_strg_THN * THN_to_litter_coeff_nw;
-	cf->THN_to_cwdc   = cs->cwdc_strg_THN   * THN_to_litter_coeff_w;
+	cf->THN_to_litr1c = cs->CTDB_litr1c * THN_to_litter_coeff_nw;
+	cf->THN_to_litr2c = cs->CTDB_litr2c * THN_to_litter_coeff_nw;
+	cf->THN_to_litr3c = cs->CTDB_litr3c * THN_to_litter_coeff_nw;
+	cf->THN_to_litr4c = cs->CTDB_litr4c * THN_to_litter_coeff_nw;
+	cf->THN_to_cwdc   = cs->CTDB_cwdc   * THN_to_litter_coeff_w;
 
-	nf->THN_to_litr1n = ns->litr1n_strg_THN * THN_to_litter_coeff_nw;
-	nf->THN_to_litr2n = ns->litr2n_strg_THN * THN_to_litter_coeff_nw;
-	nf->THN_to_litr3n = ns->litr3n_strg_THN * THN_to_litter_coeff_nw;
-	nf->THN_to_litr4n = ns->litr4n_strg_THN * THN_to_litter_coeff_nw;
-	nf->THN_to_cwdn   = ns->cwdn_strg_THN   * THN_to_litter_coeff_w;
+	nf->THN_to_litr1n = ns->CTDB_litr1n * THN_to_litter_coeff_nw;
+	nf->THN_to_litr2n = ns->CTDB_litr2n * THN_to_litter_coeff_nw;
+	nf->THN_to_litr3n = ns->CTDB_litr3n * THN_to_litter_coeff_nw;
+	nf->THN_to_litr4n = ns->CTDB_litr4n * THN_to_litter_coeff_nw;
+	nf->THN_to_cwdn   = ns->CTDB_cwdn   * THN_to_litter_coeff_w;
 
 		
 	/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -328,14 +329,14 @@ int thinning(const control_struct* ctrl, const epconst_struct* epc, thinning_str
 	cs->deadstemc_storage   -= cf->deadstemc_storage_to_THN;
 
 	/* dead standing biomass */
-	cs->THNsnk += litr1c_STDB_to_THN;
-	cs->litr1c_STDB -= litr1c_STDB_to_THN;
-	cs->THNsnk += litr2c_STDB_to_THN;
-	cs->litr2c_STDB -= litr2c_STDB_to_THN;
-	cs->THNsnk += litr3c_STDB_to_THN;
-	cs->litr3c_STDB -= litr3c_STDB_to_THN;
-	cs->THNsnk += litr4c_STDB_to_THN;
-	cs->litr4c_STDB -=litr4c_STDB_to_THN;
+	cs->THNsnk += STDB_litr1c_to_THN;
+	cs->STDB_litr1c -= STDB_litr1c_to_THN;
+	cs->THNsnk += STDB_litr2c_to_THN;
+	cs->STDB_litr2c -= STDB_litr2c_to_THN;
+	cs->THNsnk += STDB_litr3c_to_THN;
+	cs->STDB_litr3c -= STDB_litr3c_to_THN;
+	cs->THNsnk += STDB_litr4c_to_THN;
+	cs->STDB_litr4c -=STDB_litr4c_to_THN;
 
 	cs->SNSCsrc += cf->STDBc_to_THN;
 	cs->STDBc -= cf->STDBc_to_THN;
@@ -349,11 +350,11 @@ int thinning(const control_struct* ctrl, const epconst_struct* epc, thinning_str
 
 
 	/* decreasing litter storage state variables*/
-	cs->litr1c_strg_THN -= cf->THN_to_litr1c;
-	cs->litr2c_strg_THN -= cf->THN_to_litr2c;
-	cs->litr3c_strg_THN -= cf->THN_to_litr3c;
-	cs->litr4c_strg_THN -= cf->THN_to_litr4c;
-	cs->cwdc_strg_THN   -= cf->THN_to_cwdc;
+	cs->CTDB_litr1c -= cf->THN_to_litr1c;
+	cs->CTDB_litr2c -= cf->THN_to_litr2c;
+	cs->CTDB_litr3c -= cf->THN_to_litr3c;
+	cs->CTDB_litr4c -= cf->THN_to_litr4c;
+	cs->CTDB_cwdc   -= cf->THN_to_cwdc;
 
 	cs->THNsrc += cf->THN_to_litr1c + cf->THN_to_litr2c + cf->THN_to_litr3c + cf->THN_to_litr4c + cf->THN_to_cwdc;
 
@@ -419,14 +420,14 @@ int thinning(const control_struct* ctrl, const epconst_struct* epc, thinning_str
 	ns->retransn -= nf->retransn_to_THN;
 
 	/* dead standing biomass */
-	ns->THNsnk += litr1n_STDB_to_THN;
-	ns->litr1n_STDB -= litr1n_STDB_to_THN;
-	ns->THNsnk += litr2n_STDB_to_THN;
-	ns->litr2n_STDB -= litr2n_STDB_to_THN;
-	ns->THNsnk += litr3n_STDB_to_THN;
-	ns->litr3n_STDB -= litr3n_STDB_to_THN;
-	ns->THNsnk += litr4n_STDB_to_THN;
-	ns->litr4n_STDB -=litr4n_STDB_to_THN;
+	ns->THNsnk += STDB_litr1n_to_THN;
+	ns->STDB_litr1n -= STDB_litr1n_to_THN;
+	ns->THNsnk += STDB_litr2n_to_THN;
+	ns->STDB_litr2n -= STDB_litr2n_to_THN;
+	ns->THNsnk += STDB_litr3n_to_THN;
+	ns->STDB_litr3n -= STDB_litr3n_to_THN;
+	ns->THNsnk += STDB_litr4n_to_THN;
+	ns->STDB_litr4n -=STDB_litr4n_to_THN;
 
 	ns->SNSCsrc += nf->STDBn_to_THN;
 	ns->STDBn -= nf->STDBn_to_THN;
@@ -439,11 +440,11 @@ int thinning(const control_struct* ctrl, const epconst_struct* epc, thinning_str
 	ns->cwdn   += nf->THN_to_cwdn;
 
 	/* decreasing litter storage state variables*/
-	ns->litr1n_strg_THN -= nf->THN_to_litr1n;
-	ns->litr2n_strg_THN -= nf->THN_to_litr2n;
-	ns->litr3n_strg_THN -= nf->THN_to_litr3n;
-	ns->litr4n_strg_THN -= nf->THN_to_litr4n;
-	ns->cwdn_strg_THN   -= nf->THN_to_cwdn;
+	ns->CTDB_litr1n -= nf->THN_to_litr1n;
+	ns->CTDB_litr2n -= nf->THN_to_litr2n;
+	ns->CTDB_litr3n -= nf->THN_to_litr3n;
+	ns->CTDB_litr4n -= nf->THN_to_litr4n;
+	ns->CTDB_cwdn   -= nf->THN_to_cwdn;
 	
 	ns->THNsrc += nf->THN_to_litr1n + nf->THN_to_litr2n + nf->THN_to_litr3n + nf->THN_to_litr4n + nf->THN_to_cwdn;
 
@@ -454,37 +455,37 @@ int thinning(const control_struct* ctrl, const epconst_struct* epc, thinning_str
 		/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                                                     TEMPORARY POOLS
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-	/* temporary THNed plant material pools: if litr1c_strg_THN is less than a crit. value, the temporary pool becomes empty */
+	/* temporary THNed plant material pools: if CTDBc_litr1c is less than a crit. value, the temporary pool becomes empty */
 
-	if (cs->litr1c_strg_THN < CRIT_PREC && cs->litr1c_strg_THN != 0) 
+	if (cs->CTDB_litr1c < CRIT_PREC && cs->CTDB_litr1c != 0) 
 	{
-		cs->THNsrc += (cs->litr1c_strg_THN + cs->litr2c_strg_THN + cs->litr3c_strg_THN + cs->litr4c_strg_THN);
-		cs->litr1c_strg_THN = 0;
-		cs->litr2c_strg_THN = 0;
-		cs->litr3c_strg_THN = 0;
-		cs->litr4c_strg_THN = 0;
-		ns->THNsrc += (ns->litr1n_strg_THN + ns->litr2n_strg_THN + ns->litr3n_strg_THN + ns->litr4n_strg_THN);
-		ns->litr1n_strg_THN = 0;
-		ns->litr2n_strg_THN = 0;
-		ns->litr3n_strg_THN = 0;
-		ns->litr4n_strg_THN = 0;
+		cs->THNsrc += (cs->CTDB_litr1c + cs->CTDB_litr2c + cs->CTDB_litr3c + cs->CTDB_litr4c);
+		cs->CTDB_litr1c = 0;
+		cs->CTDB_litr2c = 0;
+		cs->CTDB_litr3c = 0;
+		cs->CTDB_litr4c = 0;
+		ns->THNsrc += (ns->CTDB_litr1n + ns->CTDB_litr2n + ns->CTDB_litr3n + ns->CTDB_litr4n);
+		ns->CTDB_litr1n = 0;
+		ns->CTDB_litr2n = 0;
+		ns->CTDB_litr3n = 0;
+		ns->CTDB_litr4n = 0;
 	}
 
-	if (cs->cwdc_strg_THN < CRIT_PREC && cs->cwdc_strg_THN != 0) 
+	if (cs->CTDB_cwdc < CRIT_PREC && cs->CTDB_cwdc != 0) 
 	{
-		cs->THNsrc += cs->cwdc_strg_THN;
-		ns->THNsrc += ns->cwdn_strg_THN;
+		cs->THNsrc += cs->CTDB_cwdc;
+		ns->THNsrc += ns->CTDB_cwdn;
 	
-		cs->cwdc_strg_THN   = 0;
-		ns->cwdn_strg_THN   = 0;
+		cs->CTDB_cwdc   = 0;
+		ns->CTDB_cwdn   = 0;
 	}
 
 	/* CONTROL */
 	diffC = (cs->THNsnk - cs->THNsrc) - cs->THN_transportC -  
-		    (cs->litr1c_strg_THN + cs->litr2c_strg_THN + cs->litr3c_strg_THN + cs->litr4c_strg_THN) - cs->cwdc_strg_THN;
+		    (cs->CTDB_litr1c + cs->CTDB_litr2c + cs->CTDB_litr3c + cs->CTDB_litr4c) - cs->CTDB_cwdc;
 
 	diffN = (ns->THNsnk - ns->THNsrc) - ns->THN_transportN -  
-		    (ns->litr1n_strg_THN + ns->litr2n_strg_THN + ns->litr3n_strg_THN + ns->litr4n_strg_THN) - ns->cwdn_strg_THN;
+		    (ns->CTDB_litr1n + ns->CTDB_litr2n + ns->CTDB_litr3n + ns->CTDB_litr4n) - ns->CTDB_cwdn;
 
 	if (fabs(diffC) > 10-8 || fabs(diffN) > 10-8)
 	{

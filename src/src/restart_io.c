@@ -4,7 +4,7 @@ functions called to copy restart info between restart structure and
 active structures
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group (NTSG)
 School of Forestry, University of Montana
@@ -77,25 +77,17 @@ int restart_input(const control_struct* ctrl, const epconst_struct* epc, wstate_
 	cs->cpool                             = restart->cpool;
 
 	/* Hidy 2015 - standing dead biomass, cut-down dead biomass and litter pools */
-	cs->litr1c_STDB				  = restart->litr1c_STDB;
-	cs->litr2c_STDB				  = restart->litr2c_STDB;
-	cs->litr3c_STDB				  = restart->litr3c_STDB;
-	cs->litr4c_STDB				  = restart->litr4c_STDB;
-	cs->litr1c_strg_HRV           = restart->litr1c_strg_HRV;
-	cs->litr2c_strg_HRV           = restart->litr2c_strg_HRV;
-	cs->litr3c_strg_HRV           = restart->litr3c_strg_HRV;
-	cs->litr4c_strg_HRV           = restart->litr4c_strg_HRV;
-	cs->litr1c_strg_MOW           = restart->litr1c_strg_MOW;
-	cs->litr2c_strg_MOW           = restart->litr2c_strg_MOW;
-	cs->litr3c_strg_MOW           = restart->litr3c_strg_MOW;
-	cs->litr4c_strg_MOW           = restart->litr4c_strg_MOW;
-	cs->litr1c_strg_THN           = restart->litr1c_strg_THN;
-	cs->litr2c_strg_THN           = restart->litr2c_strg_THN;
-	cs->litr3c_strg_THN           = restart->litr3c_strg_THN;
-	cs->litr4c_strg_THN           = restart->litr4c_strg_THN;
+	cs->STDB_litr1c 			  = restart->STDB_litr1c;
+	cs->STDB_litr2c				  = restart->STDB_litr2c;
+	cs->STDB_litr3c				  = restart->STDB_litr3c;
+	cs->STDB_litr4c				  = restart->STDB_litr4c;
+	cs->CTDB_litr1c               = restart->CTDB_litr1c;
+	cs->CTDB_litr2c               = restart->CTDB_litr2c;
+	cs->CTDB_litr3c               = restart->CTDB_litr3c;
+	cs->CTDB_litr4c               = restart->CTDB_litr4c;
+	cs->CTDB_cwdc                 = restart->CTDB_cwdc;
 	cs->litr_aboveground          = restart->litr_aboveground;
 	cs->litr_belowground          = restart->litr_belowground;
-	cs->CTDBc                     = restart->CTDBc;
 
 	
 	/* spinup - normal C and N pool adjustment in order to avoud negative N pools in case of land use change (changing EOC) */
@@ -203,22 +195,15 @@ int restart_input(const control_struct* ctrl, const epconst_struct* epc, wstate_
 	ns->soil4n                            = restart->soil4n;
 
 	/* Hidy 2015 - standing dead biomass, cut-down dead biomass and litter pools */
-	ns->litr1n_STDB				  = restart->litr1n_STDB;
-	ns->litr2n_STDB				  = restart->litr2n_STDB;
-	ns->litr3n_STDB				  = restart->litr3n_STDB;
-	ns->litr4n_STDB				  = restart->litr4n_STDB;
-	ns->litr1n_strg_HRV           = restart->litr1n_strg_HRV;
-	ns->litr2n_strg_HRV           = restart->litr2n_strg_HRV;
-	ns->litr3n_strg_HRV           = restart->litr3n_strg_HRV;
-	ns->litr4n_strg_HRV           = restart->litr4n_strg_HRV;
-	ns->litr1n_strg_MOW           = restart->litr1n_strg_MOW;
-	ns->litr2n_strg_MOW           = restart->litr2n_strg_MOW;
-	ns->litr3n_strg_MOW           = restart->litr3n_strg_MOW;
-	ns->litr4n_strg_MOW           = restart->litr4n_strg_MOW;
-	ns->litr1n_strg_THN           = restart->litr1n_strg_THN;
-	ns->litr2n_strg_THN           = restart->litr2n_strg_THN;
-	ns->litr3n_strg_THN           = restart->litr3n_strg_THN;
-	ns->litr4n_strg_THN           = restart->litr4n_strg_THN;
+	ns->STDB_litr1n				  = restart->STDB_litr1n;
+	ns->STDB_litr2n				  = restart->STDB_litr2n;
+	ns->STDB_litr3n				  = restart->STDB_litr3n;
+	ns->STDB_litr4n 			  = restart->STDB_litr4n;
+	ns->CTDB_litr1n				  = restart->CTDB_litr1n;
+	ns->CTDB_litr2n				  = restart->CTDB_litr2n;
+	ns->CTDB_litr3n				  = restart->CTDB_litr3n;
+	ns->CTDB_litr4n				  = restart->CTDB_litr4n;
+	ns->CTDB_cwdn				  = restart->CTDB_cwdn;
 	/*-----------------------------*/
 	/* Hidy 2011 - multilayer soil */
 	
@@ -309,22 +294,15 @@ int restart_output(wstate_struct* ws,cstate_struct* cs, nstate_struct* ns, epvar
 	restart->litr4c 						  = cs->litr4c;
 
 	/* Hidy 2015 - standing dead biomass, cut-down dead biomass and litter pools */
-	restart->litr1c_STDB		= cs->litr1c_STDB;
-	restart->litr2c_STDB		= cs->litr2c_STDB;
-	restart->litr3c_STDB		= cs->litr3c_STDB;
-	restart->litr4c_STDB		= cs->litr4c_STDB;
-	restart->litr1c_strg_HRV	= cs->litr1c_strg_HRV;
-	restart->litr2c_strg_HRV	= cs->litr2c_strg_HRV;
-	restart->litr3c_strg_HRV	= cs->litr3c_strg_HRV;
-	restart->litr4c_strg_HRV	= cs->litr4c_strg_HRV;
-	restart->litr1c_strg_MOW	= cs->litr1c_strg_MOW;
-	restart->litr2c_strg_MOW	= cs->litr2c_strg_MOW;
-	restart->litr3c_strg_MOW	= cs->litr3c_strg_MOW;
-	restart->litr4c_strg_MOW	= cs->litr4c_strg_MOW;
-	restart->litr1c_strg_THN	= cs->litr1c_strg_THN;
-	restart->litr2c_strg_THN	= cs->litr2c_strg_THN;
-	restart->litr3c_strg_THN	= cs->litr3c_strg_THN;
-	restart->litr4c_strg_THN	= cs->litr4c_strg_THN;
+	restart->STDB_litr1c		= cs->STDB_litr1c;
+	restart->STDB_litr2c		= cs->STDB_litr2c;
+	restart->STDB_litr3c		= cs->STDB_litr3c;
+	restart->STDB_litr4c		= cs->STDB_litr4c;
+	restart->CTDB_litr1c	    = cs->CTDB_litr1c;
+	restart->CTDB_litr2c	    = cs->CTDB_litr2c;
+	restart->CTDB_litr3c	    = cs->CTDB_litr3c;
+	restart->CTDB_litr4c	    = cs->CTDB_litr4c;
+	restart->CTDB_cwdc	        = cs->CTDB_cwdc;
 	restart->litr_aboveground	= cs->litr_aboveground;
 	restart->litr_belowground	= cs->litr_belowground;
 
@@ -368,22 +346,15 @@ int restart_output(wstate_struct* ws,cstate_struct* cs, nstate_struct* ns, epvar
 	restart->litr4n 						  = ns->litr4n;
 	
 	/* Hidy 2015 - standing dead biomass, cut-down dead biomass and litter pools */
-	restart->litr1n_STDB		= ns->litr1n_STDB;
-	restart->litr2n_STDB		= ns->litr2n_STDB;
-	restart->litr3n_STDB		= ns->litr3n_STDB;
-	restart->litr4n_STDB		= ns->litr4n_STDB;
-	restart->litr1n_strg_HRV	= ns->litr1n_strg_HRV;
-	restart->litr2n_strg_HRV	= ns->litr2n_strg_HRV;
-	restart->litr3n_strg_HRV	= ns->litr3n_strg_HRV;
-	restart->litr4n_strg_HRV	= ns->litr4n_strg_HRV;
-	restart->litr1n_strg_MOW	= ns->litr1n_strg_MOW;
-	restart->litr2n_strg_MOW	= ns->litr2n_strg_MOW;
-	restart->litr3n_strg_MOW	= ns->litr3n_strg_MOW;
-	restart->litr4n_strg_MOW	= ns->litr4n_strg_MOW;
-	restart->litr1n_strg_THN	= ns->litr1n_strg_THN;
-	restart->litr2n_strg_THN	= ns->litr2n_strg_THN;
-	restart->litr3n_strg_THN	= ns->litr3n_strg_THN;
-	restart->litr4n_strg_THN	= ns->litr4n_strg_THN;
+	restart->STDB_litr1n		= ns->STDB_litr1n;
+	restart->STDB_litr2n		= ns->STDB_litr2n;
+	restart->STDB_litr3n		= ns->STDB_litr3n;
+	restart->STDB_litr4n		= ns->STDB_litr4n;
+	restart->CTDB_litr1n	    = ns->CTDB_litr1n;
+	restart->CTDB_litr2n	    = ns->CTDB_litr2n;
+	restart->CTDB_litr3n	    = ns->CTDB_litr3n;
+	restart->CTDB_litr4n	    = ns->CTDB_litr4n;
+	restart->CTDB_cwdn	        = ns->CTDB_cwdn;
 
 	restart->soil1n 						  = ns->soil1n;
 	restart->soil2n 						  = ns->soil2n;

@@ -3,7 +3,7 @@ check_balance.c
 daily test of mass balance (water, carbon, and nitrogen state variables)
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -56,12 +56,11 @@ int check_water_balance(wstate_struct* ws, int first_balance)
 	/* calculate current balance */
 	balance = in - out - store;
 	 
-	if (!first_balance)
+	/* calculate actual maximum balance error */
+	if (!first_balance && (fabs(old_balance - balance) > ws->balanceERR))
 	{
-		if (fabs(old_balance - balance) > CRIT_PREC)
-		{
-			if (fabs(old_balance - balance) > ws->balance) ws->balance = fabs(old_balance - balance);
-		}
+		ws->balanceERR = fabs(old_balance - balance);
+
 	}
 	old_balance = balance;
 	
@@ -73,6 +72,9 @@ int check_carbon_balance(cstate_struct* cs, int first_balance)
 	int ok=1;
 	static double old_balance;
 	double in, out, store, balance;
+
+	cs->STDBc = cs->STDB_litr1c + cs->STDB_litr2c + cs->STDB_litr3c + cs->STDB_litr4c;
+	cs->CTDBc = cs->CTDB_litr1c + cs->CTDB_litr2c + cs->CTDB_litr3c + cs->CTDB_litr4c + cs->CTDB_cwdc;
 	
 	/* Hidy 2010 - control avoiding negative pools */
 	if (cs->leafc < 0.0 ||  cs->leafc_storage < 0.0 || cs->leafc_transfer < 0.0 || 
@@ -85,15 +87,17 @@ int check_carbon_balance(cstate_struct* cs, int first_balance)
 	cs->deadcrootc < 0.0 || cs->deadcrootc_storage < 0.0 || cs->deadcrootc_transfer < 0.0 || 
 	cs->gresp_storage < 0.0 || cs->gresp_transfer < 0.0 || cs->cwdc < 0.0 || 
 	cs->litr1c < 0.0 || cs->litr2c < 0.0 || cs->litr3c < 0.0 || cs->litr4c < 0.0 || 
-	cs->soil1c < 0.0 || cs->soil2c < 0.0 || cs->soil3c < 0.0 || cs-> soil4c < 0.0 || cs->litr_aboveground < 0.0)
+	cs->soil1c < 0.0 || cs->soil2c < 0.0 || cs->soil3c < 0.0 || cs-> soil4c < 0.0 || cs->litr_aboveground < 0.0 ||
+	cs->STDB_litr1c < 0     || cs->STDB_litr2c < 0     || cs->STDB_litr3c < 0     || cs->STDB_litr4c < 0     || 
+	cs->CTDB_litr1c < 0 || cs->CTDB_litr2c < 0 || cs->CTDB_litr3c < 0 || cs->CTDB_litr4c < 0 || cs->CTDB_cwdc < 0)
 	{	
 		printf("ERROR: negative carbon stock\n");
 		ok=0;
 	}
 
 
-	/* DAILY CHECK ON CARBON BALANCE */
-	
+	/* DAILY CHECK ON CARBON BALANCE *
+
 	/* sum of sources */
 	in = cs->psnsun_src + cs->psnshade_src + 
 		/* senescence - Hidy 2012 */
@@ -102,46 +106,38 @@ int check_carbon_balance(cstate_struct* cs, int first_balance)
 		cs->PLTsrc + cs->THNsrc +  cs->MOWsrc + cs->GRZsrc + cs->HRVsrc + cs->PLGsrc + cs->FRZsrc;
 	
 	/* sum of sinks */
-	out = cs->leaf_mr_snk + cs->leaf_gr_snk + cs->froot_mr_snk + 
-		cs->froot_gr_snk + cs->livestem_mr_snk + cs->livestem_gr_snk + 
-		cs->deadstem_gr_snk + cs->livecroot_mr_snk + cs->livecroot_gr_snk + 
-		cs->deadcroot_gr_snk + cs->litr1_hr_snk + cs->litr2_hr_snk + 
-		cs->litr4_hr_snk + cs->soil1_hr_snk + cs->soil2_hr_snk + 
-		cs->soil3_hr_snk + cs->soil4_hr_snk + cs->fire_snk + 
+	out = cs->leaf_mr_snk + cs->leaf_gr_snk + cs->froot_mr_snk + cs->froot_gr_snk + 
+        cs->fruit_mr_snk + cs->fruit_gr_snk + cs->softstem_mr_snk +cs->softstem_gr_snk + 
+		cs->livestem_mr_snk + cs->livestem_gr_snk + 
+		cs->deadstem_gr_snk + cs->livecroot_mr_snk + cs->livecroot_gr_snk + cs->deadcroot_gr_snk + 
+		cs->litr1_hr_snk + cs->litr2_hr_snk + cs->litr4_hr_snk + 
+		cs->soil1_hr_snk + cs->soil2_hr_snk + cs->soil3_hr_snk + cs->soil4_hr_snk + 
+		cs->fire_snk + 
 		/* management and senescence - Hidy 2012. */
-		cs->SNSCsnk + cs->THNsnk + cs->MOWsnk + cs->GRZsnk + cs->HRVsnk + cs->PLGsnk + 
-		/* fruit simulation - Hidy 2013. */
-		cs->fruit_gr_snk + cs->fruit_mr_snk +
-		/* softstem simulation - Hidy 2013. */
-		cs->softstem_gr_snk + cs->softstem_mr_snk; 
+		cs->SNSCsnk + cs->THNsnk + cs->MOWsnk + cs->GRZsnk + cs->HRVsnk + cs->PLGsnk; 
 		     
 		
 	/* sum of current storage */
 	store = cs->leafc + cs->leafc_storage + cs->leafc_transfer +
 		cs->frootc + cs->frootc_storage + cs->frootc_transfer + 
+		cs->fruitc + cs->fruitc_storage + cs->fruitc_transfer +
+		cs->softstemc + cs->softstemc_storage + cs->softstemc_transfer + 
 		cs->livestemc + cs->livestemc_storage + cs->livestemc_transfer + 
 		cs->deadstemc + cs->deadstemc_storage + cs->deadstemc_transfer +
 		cs->livecrootc + cs->livecrootc_storage + cs->livecrootc_transfer + 
 		cs->deadcrootc + cs->deadcrootc_storage + cs->deadcrootc_transfer + 
 		cs->gresp_storage + cs->gresp_transfer + cs->cwdc + cs->litr1c +
 		cs->litr2c + cs->litr3c + cs->litr4c + cs->soil1c + cs->soil2c +
-		cs->soil3c + cs->soil4c + cs->cpool +
-		/* fruit simulation */
-		cs->fruitc + cs->fruitc_storage + cs->fruitc_transfer +
-		/* softstem simulation */
-		cs->softstemc + cs->softstemc_storage + cs->softstemc_transfer;   
+		cs->soil3c + cs->soil4c + cs->cpool;   
 	
 	/* calculate current balance */
 	balance = in - out - store;
 	 
-	if (!first_balance)
+/* calculate actual maximum balance error */
+	if (!first_balance && (fabs(old_balance - balance) > cs->balanceERR))
 	{
-		if (fabs(old_balance - balance) > 0)
-		{
-	 		if (fabs(old_balance - balance) > cs->balance) cs->balance = fabs(old_balance - balance);
+	 	cs->balanceERR = fabs(old_balance - balance);
 
-
-		}
 	}
 	old_balance = balance;
 
@@ -154,6 +150,9 @@ int check_nitrogen_balance(nstate_struct* ns, int first_balance)
 	int ok=1;
 	double in,out,store,balance;
 	static double old_balance = 0.0;
+
+	ns->STDBn = ns->STDB_litr1n + ns->STDB_litr2n + ns->STDB_litr3n + ns->STDB_litr4n;
+	ns->CTDBn = ns->CTDB_litr1n + ns->CTDB_litr2n + ns->CTDB_litr3n + ns->CTDB_litr4n + ns->CTDB_cwdn;
 	
 	/* Hidy 2010 -	CONTROL AVOIDING NITROGEN POOLS */
 	if (ns->leafn < 0.0 || ns->leafn < 0.0 ||  ns->leafn_storage < 0.0 || ns->leafn_transfer < 0.0 || 
@@ -168,7 +167,9 @@ int check_nitrogen_balance(nstate_struct* ns, int first_balance)
 		ns->sminn[0] < 0.0 || ns->sminn[1] < 0.0 || ns->sminn[2] < 0.0 || ns->sminn[3] < 0.0 || 
 		ns->sminn[4] < 0.0 || ns->sminn[5] < 0.0 || ns->sminn[6] < 0.0 || 
 		ns->litr1n < 0.0  || ns->litr2n < 0.0  || ns->litr3n < 0.0  || ns->litr4n < 0.0 || 
-		ns->soil1n < 0.0  || ns->soil2n < 0.0  || ns->soil3n < 0.0  || ns->soil4n < 0.0)
+		ns->soil1n < 0.0  || ns->soil2n < 0.0  || ns->soil3n < 0.0  || ns->soil4n < 0.0	||
+		ns->STDB_litr1n < 0     || ns->STDB_litr2n < 0     || ns->STDB_litr3n < 0     || ns->STDB_litr4n < 0     || 
+		ns->CTDB_litr1n < 0 || ns->CTDB_litr2n < 0 || ns->CTDB_litr3n < 0 || ns->CTDB_litr4n < 0 || ns->CTDB_cwdn < 0)
 	{	
 		printf("ERROR: negative nitrogen stock\n");
 		ok=0;
@@ -198,6 +199,8 @@ int check_nitrogen_balance(nstate_struct* ns, int first_balance)
 	/* sum of current storage */
 	store = ns->leafn + ns->leafn_storage + ns->leafn_transfer +
 		ns->frootn + ns->frootn_storage + ns->frootn_transfer + 
+		ns->fruitn + ns->fruitn_storage + ns->fruitn_transfer +
+		ns->softstemn + ns->softstemn_storage + ns->softstemn_transfer +
 		ns->livestemn + ns->livestemn_storage + ns->livestemn_transfer + 
 		ns->deadstemn + ns->deadstemn_storage + ns->deadstemn_transfer + 
 		ns->livecrootn + ns->livecrootn_storage + ns->livecrootn_transfer + 
@@ -205,22 +208,16 @@ int check_nitrogen_balance(nstate_struct* ns, int first_balance)
 		ns->cwdn + ns->litr1n + ns->litr2n + ns->litr3n + ns->litr4n +
 		ns->soil1n + ns->soil2n + ns->soil3n + ns->soil4n +
 		ns->sminn[0] + ns->sminn[1] + ns->sminn[2] + ns->sminn[3] + ns->sminn[4] + ns->sminn[5] + ns->sminn[6] +
-		ns->npool + ns->retransn +
-		/* fruit simulation */
-		ns->fruitn + ns->fruitn_storage + ns->fruitn_transfer +
-		/* softstem simulation */
-		ns->softstemn + ns->softstemn_storage + ns->softstemn_transfer;
+		ns->npool + ns->retransn;
 	
 	/* calculate current balance */
 	balance = in - out - store;
 	 
-	if (!first_balance)
+	/* calculate actual maximum balance error */
+	if (!first_balance && (fabs(old_balance - balance) > ns->balanceERR))
 	{
-	
-		if (fabs(old_balance - balance) > 0)
-		{
-			if (fabs(old_balance - balance) > ns->balance) ns->balance = fabs(old_balance - balance);
-		}
+		ns->balanceERR = fabs(old_balance - balance);
+
 	}
 	old_balance = balance;
 

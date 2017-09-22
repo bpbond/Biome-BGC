@@ -4,7 +4,7 @@ calcultion of soil water potential, hydr. conductivity and hydr. diffusivity as 
 constants related to texture
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.6
+Biome-BGCMuSo v4.1
 Copyright 2017, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
@@ -20,7 +20,7 @@ See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentatio
 #include "bgc_func.h"
 #include "bgc_constants.h"
 
-int multilayer_hydrolparams(const siteconst_struct* sitec,  wstate_struct* ws, epvar_struct* epv, metvar_struct* metv)
+int multilayer_hydrolparams(const siteconst_struct* sitec,  wstate_struct* ws, epvar_struct* epv)
 {
 	/* given a list of site constants and the soil water mass (kg/m2),
 	this function returns the soil water potential (MPa)
@@ -59,8 +59,8 @@ int multilayer_hydrolparams(const siteconst_struct* sitec,  wstate_struct* ws, e
 
 	int ok=1;
 	int layer;
-	double vwc_avg, psi_avg, tsoil_avg;
-	vwc_avg=psi_avg=tsoil_avg=0;
+	double vwc_avg, psi_avg;
+	vwc_avg=psi_avg=0;
 
 	/* ***************************************************************************************************** */
 	/* calculating vwc psi and hydr. cond. to every layer */
@@ -86,7 +86,6 @@ int multilayer_hydrolparams(const siteconst_struct* sitec,  wstate_struct* ws, e
 
 		if (layer < N_SOILLAYERS-1)
 		{
-			tsoil_avg += metv->tsoil[layer] * (sitec->soillayer_thickness[layer] / sitec->soillayer_depth[N_SOILLAYERS-2]);
 			vwc_avg	  += epv->vwc[layer]    * (sitec->soillayer_thickness[layer] / sitec->soillayer_depth[N_SOILLAYERS-2]);
 			psi_avg	  += epv->psi[layer]    * (sitec->soillayer_thickness[layer] / sitec->soillayer_depth[N_SOILLAYERS-2]);
 		}
@@ -115,7 +114,6 @@ int multilayer_hydrolparams(const siteconst_struct* sitec,  wstate_struct* ws, e
 
   	epv->vwc_avg	= vwc_avg;
 	epv->psi_avg	= psi_avg;
-	metv->tsoil_avg = tsoil_avg;
 
 
 	return(!ok);

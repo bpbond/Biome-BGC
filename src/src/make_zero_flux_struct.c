@@ -4,7 +4,7 @@ create structures initialized with zero for forcing fluxes to zero
 between simulation days
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Original code: Copyright 2000, Peter E. Thornton
 Numerical Terradynamic Simulation Group, The University of Montana, USA
 Modified code: Copyright 2017, D. Hidy [dori.hidy@gmail.com]
@@ -293,7 +293,7 @@ int make_zero_flux_struct(wflux_struct* wf, cflux_struct* cf, nflux_struct* nf)
 	cf->CH4_flux_MANURE = 0.0;
 	cf->CH4_flux_FERMENT = 0.0;
        
-      /* Hidy 2010 -  senescence */
+    /* Hidy 2010 -  senescence */
 	cf->SNSC_to_litr1c = 0.0;
 	cf->SNSC_to_litr2c = 0.0;
 	cf->SNSC_to_litr3c = 0.0;
@@ -384,6 +384,9 @@ int make_zero_flux_struct(wflux_struct* wf, cflux_struct* cf, nflux_struct* nf)
 	cf->cpool_to_softstemc_storage = 0.0;
 	cf->transfer_softstem_gr = 0.0;
 	cf->softstemc_transfer_to_softstemc = 0.0;
+	/* standing and dead biomass (Hidy 2017) */
+	cf->m_STDBc_to_fire = 0.0;
+	cf->m_CTDBc_to_fire = 0.0;
 	         	
 	/* daily nitrogen fluxes */
 	nf->m_leafn_to_litr1n = 0.0;
@@ -668,6 +671,10 @@ int make_zero_flux_struct(wflux_struct* wf, cflux_struct* cf, nflux_struct* nf)
 	nf->m_softstemn_to_fire = 0.0;
 	nf->m_softstemn_to_litr1n = 0.0;
 	nf->m_softstemn_to_SNSC = 0.0;
+
+	/* standing and dead biomass (Hidy 2017) */
+	nf->m_STDBn_to_fire = 0.0;
+	nf->m_CTDBn_to_fire = 0.0;
 
 
 	return (!ok);

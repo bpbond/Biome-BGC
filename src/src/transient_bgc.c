@@ -10,7 +10,7 @@ This run has no output and it is optional
 (spinup_ini: CO2_CONTROL block varCO2 flag=1)
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGCMuSo v4.0.7
+Biome-BGCMuSo v4.1
 Copyright 2017, D. Hidy [dori.hidy@gmail.com]
 Hungarian Academy of Sciences, Hungary
 See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
@@ -121,10 +121,10 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	double **output_map = 0;
 	
 	/* local storage for daily and annual output variables */
-	float *dayarr = 0;
-	float *monavgarr = 0;
-	float *annavgarr = 0;
-	float *annarr = 0;
+	double *dayarr = 0;
+	double *monavgarr = 0;
+	double *annavgarr = 0;
+	double *annarr = 0;
 
 	
 
@@ -142,7 +142,10 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	double nmetdays;
 	int i;
 
-	
+		
+	double CbalanceERR = 0;
+	double NbalanceERR = 0;
+	double WbalanceERR = 0;
 
 	/* copy the input structures into local structures */
 	ws = bgcin->ws; 
@@ -194,7 +197,7 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	/* allocate memory for local output arrays */
 	if (ok && dayout) 
 	{
-		dayarr = (float*) malloc(ctrl.ndayout * sizeof(float));
+		dayarr = (double*) malloc(ctrl.ndayout * sizeof(double));
 		if (!dayarr)
 		{
 			printf("Error allocating for local daily output array in bgc()\n");
@@ -203,7 +206,7 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	}
 	if (ok && ctrl.domonavg) 
 	{
-		monavgarr = (float*) malloc(ctrl.ndayout * sizeof(float));
+		monavgarr = (double*) malloc(ctrl.ndayout * sizeof(double));
 		if (!monavgarr)
 		{
 			printf("Error allocating for monthly average output array in bgc()\n");
@@ -212,7 +215,7 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	}
 	if (ok && ctrl.doannavg) 
 	{
-		annavgarr = (float*) malloc(ctrl.ndayout * sizeof(float));
+		annavgarr = (double*) malloc(ctrl.ndayout * sizeof(double));
 		if (!annavgarr)
 		{
 			printf("Error allocating for annual average output array in bgc()\n");
@@ -221,7 +224,7 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	}
 	if (ok && ctrl.doannual)
 	{
-		annarr = (float*) malloc(ctrl.nannout * sizeof(float));
+		annarr = (double*) malloc(ctrl.nannout * sizeof(double));
 		if (!annarr)
 		{
 			printf("Error allocating for local annual output array in bgc()\n");
@@ -499,7 +502,7 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 
 
 			/* soil hydrological parameters: psi and vwc  */
- 			if (ok && multilayer_hydrolparams(&sitec, &ws, &epv, &metv))
+ 			if (ok && multilayer_hydrolparams(&sitec, &ws, &epv))
 			{
 				printf("Error in multilayer_hydrolparams() from bgc()\n");
 				ok=0;
@@ -971,13 +974,9 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 				ok=0;
 			}	
 
-			cs.CTDBc =  cs.litr1c_strg_HRV + cs.litr1c_strg_MOW + cs.litr1c_strg_THN + 
-			cs.litr2c_strg_HRV + cs.litr2c_strg_MOW + cs.litr2c_strg_THN + 
-			cs.litr3c_strg_HRV + cs.litr3c_strg_MOW + cs.litr3c_strg_THN + 
-			cs.litr4c_strg_HRV + cs.litr4c_strg_MOW + cs.litr4c_strg_THN;
-			
-		
+			cs.CTDBc =  cs.CTDB_litr1c + cs.CTDB_litr2c + cs.CTDB_litr3c + cs.CTDB_litr4c + cs.CTDB_cwdc;
 
+			ns.CTDBn =  ns.CTDB_litr1n + ns.CTDB_litr2n + ns.CTDB_litr3n + ns.CTDB_litr4n + ns.CTDB_cwdn;
 			/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 	
@@ -1131,14 +1130,22 @@ int transient_bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 	
 
 	/* write log file */
+	if (cs.balanceERR != 0) CbalanceERR = log10(cs.balanceERR);
+	if (ns.balanceERR != 0) NbalanceERR = log10(ns.balanceERR);
+	if (ws.balanceERR != 0) WbalanceERR = log10(ws.balanceERR);
+
 	fprintf(bgcout->log_file.ptr, "Some important annual outputs\n");
-	fprintf(bgcout->log_file.ptr, "Mean annual GPP (gC/m2/year):                           %12.1f\n",summary.cum_gpp/ctrl.simyears*1000);
-	fprintf(bgcout->log_file.ptr, "Mean annual NEE (gC/m2/year):                           %12.1f\n",summary.cum_nee/ctrl.simyears*1000);
-	fprintf(bgcout->log_file.ptr, "Maximum projected LAI (m2/m2):                          %12.2f\n",epv.ytd_maxplai);
+	fprintf(bgcout->log_file.ptr, "Mean annual GPP sum (gC/m2/year):                       %12.1f\n",summary.cum_gpp/ctrl.simyears*1000);
+	fprintf(bgcout->log_file.ptr, "Mean annual NEE sum (gC/m2/year):                       %12.1f\n",summary.cum_nee/ctrl.simyears*1000);
+	fprintf(bgcout->log_file.ptr, "Maximum projected LAI in last simulation year (m2/m2):  %12.2f\n",epv.ytd_maxplai);
 	fprintf(bgcout->log_file.ptr, "Recalcitrant SOM carbon content (kgC/m2):               %12.1f\n",cs.soil4c);
 	fprintf(bgcout->log_file.ptr, "Total soil carbon content (kgC/m2):                     %12.1f\n",summary.soilc);
 	fprintf(bgcout->log_file.ptr, "Total soil mineralized nitrogen content (gN/m2):        %12.2f\n",summary.sminn*1000);
 	fprintf(bgcout->log_file.ptr, "Mean annual SWC in rootzone (m3/m3):                    %12.2f\n",summary.vwc_annavg/(ctrl.simyears*NDAY_OF_YEAR));
+	fprintf(bgcout->log_file.ptr, " \n");
+	fprintf(bgcout->log_file.ptr, "10-base logarithm of the maximum carbon balance diff.:  %12.1f\n",CbalanceERR);
+	fprintf(bgcout->log_file.ptr, "10-base logarithm of the maximum nitrogen balance diff.:%12.1f\n",NbalanceERR);
+	fprintf(bgcout->log_file.ptr, "10-base logarithm of the maximum water balance diff.:   %12.1f\n",WbalanceERR);
 	fprintf(bgcout->log_file.ptr, " \n");	
 	/********************************************************************************************************* */
 
