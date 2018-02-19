@@ -1,4 +1,6 @@
-Biome-BGCMuSo v4.1 biogeochemical model
+![Logo]http://nimbus.elte.hu/agromo/images/infoblokk_sm.jpg)
+
+# Biome-BGCMuSo v4.1 biogeochemical model
 
 Biome-BGCMuSo is a biogeochemical model that simulates the storage and flux of water, carbon, and nitrogen between the ecosystem and the atmosphere, and within the components of the terrestrial ecosystem. Biome-BGCMuSo was developed from the widely used Biome-BGC model that was created by the Numerical Terradynamic Simulation Group (NTSG), University of Montana. 
 
@@ -20,8 +22,8 @@ http://nimbus.elte.hu/bbgc/usingbbgc.html
 
 
 Please contact us if you have any questions related to the model.
-DÛra HIDY: dori.hidy@gmail.com
-Zolt·n BARCZA: zoltan.barcza@ttk.elte.hu
+D√≥ra HIDY: dori.hidy@gmail.com
+Zolt√°n BARCZA: zoltan.barcza@ttk.elte.hu
 
 
 
