@@ -1,24 +1,16 @@
-#ifndef BGC_CONSTANTS_H
-#define BGC_CONSTANTS_H
 /*
 bgc_constants.h
 Holds macro definitions for constants used in bgc()
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGC version 4.2 (final release)
-See copyright.txt for Copyright information
-
-Revisions from version 4.1.1:
-Moved the heterotrophic respiration fractions and base decomposition rates 
-out of the science subroutines and into the constants file so that it is
-easier to make sure modifications are propagated correctly.
+Biome-BGCMuSo v5.0.
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2018, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 /* atmospheric constants */
 /* from the definition of the standard atmosphere, as established
@@ -40,75 +32,61 @@ Iribane, J.V., and W.L. Godson, 1981. Atmospheric Thermodynamics. 2nd
 #define EPS      0.6219          /* (MW/MA) unitless ratio of molec weights */
 
 /* ecosystem constants */
-#define RAD2PAR     0.45     /* (DIM) ratio PAR / SWtotal  */
+#define RAD2PAR     0.45     /* (ratio) ratio PAR / SWtotal  */
 #define EPAR        4.55     /* (umol/J) PAR photon energy ratio */  
 #define SOIL1_CN    12.0     /* C:N for fast microbial recycling pool */
 #define SOIL2_CN    12.0     /* C:N for slow microbial recycling pool */
 #define SOIL3_CN    10.0     /* C:N for recalcitrant SOM pool (humus) */
 #define SOIL4_CN    10.0     /* C:N for recalcitrant SOM pool (humus) */
-#define GRPERC      0.3      /* (DIM) growth resp per unit of C grown */
-#define GRPNOW      1.0      /* (DIM) proportion of storage growth resp at fixation */
+#define GRPNOW      1.0      /* (prop) proportion of storage growth resp at fixation */
 #define PPFD50      75.0     /* (umol/m2/s) PPFD for 1/2 stomatal closure */
-#define DENITRIF_PROPORTION  0.01  /* fraction of mineralization to volatile */
-#define MOBILEN_PROPORTION   0.1   /* fraction mineral N avail for leaching */
-
-/* use this block of constants to include the dynamics for slowest soil pool (s4) */
-/* respiration fractions for fluxes between compartments (unitless) */ 
-#define	RFL1S1		0.39	/* transfer from litter 1 to soil 1 */
-#define	RFL2S2		0.55	/* transfer from litter 2 to soil 2 */
-#define	RFL4S3		0.29	/* transfer from litter 4 to soil 3 */
-#define	RFS1S2		0.28	/* transfer from soil 1 to soil 2 */
-#define	RFS2S3		0.46    /* transfer from soil 2 to soil 3 */
-#define	RFS3S4		0.55	/* transfer from soil 3 to soil 4 */
-/* base decomposition rate constants (1/day) */ 
-#define KL1_BASE	0.7		/* labile litter pool */
-#define KL2_BASE	0.07	/* cellulose litter pool */
-#define KL4_BASE	0.014	/* lignin litter pool */
-#define KS1_BASE	0.07	/* fast microbial recycling pool */
-#define KS2_BASE	0.014	/* medium microbial recycling pool */
-#define KS3_BASE	0.0014	/* slow microbial recycling pool */
-#define KS4_BASE	0.0001	/* recalcitrant SOM (humus) pool */
-#define KFRAG_BASE	0.001	/* physical fragmentation of coarse woody debris */
-
-/* use this block of constants to exclude the dynamics for slowest soil pool (s4) */
-/* respiration fractions for fluxes between compartments (unitless) */ 
-/*#define	RFL1S1	0.39*/	/* transfer from litter 1 to soil 1 */
-/*#define	RFL2S2	0.55*/	/* transfer from litter 2 to soil 2 */
-/*#define	RFL4S3	0.29*/	/* transfer from litter 4 to soil 3 */
-/*#define	RFS1S2	0.28*/	/* transfer from soil 1 to soil 2 */
-/*#define	RFS2S3	0.46*/  /* transfer from soil 2 to soil 3 */
-/*#define	RFS3S4	1.00*/	/* transfer from soil 3 to soil 4 */
-/* base decomposition rate constants (1/day) */ 
-/*#define KL1_BASE	0.7	*/	/* labile litter pool */
-/*#define KL2_BASE	0.07*/	/* cellulose litter pool */
-/*#define KL4_BASE	0.014*/	/* lignin litter pool */
-/*#define KS1_BASE	0.07*/	/* fast microbial recycling pool */
-/*#define KS2_BASE	0.014*/	/* medium microbial recycling pool */
-/*#define KS3_BASE	0.0005*/	/* slow microbial recycling pool */
-/*#define KS4_BASE	0.0000*/	/* recalcitrant SOM (humus) pool */
+#define Q10_VALUE	2.0      /* q10 value for respiration calculation */
 
 /* precision control */
 /* This constant determines the lower limit of state variables before they
 are set to 0.0 to control rounding and overflow errors */
-#define CRIT_PREC 1e-20
+#define CRIT_PREC 1e-12
+#define CRIT_PREC_RIG 1e-20
 
 /* spinup control */
-/* maximum allowable trend in slow soil carbon at steady-state (kgC/m2/yr) */
-#define SPINUP_TOLERANCE 0.0005
-#define MODE_INI 0
-#define MODE_SPINUP 1
-#define MODE_MODEL 2
-#define MODE_SPINNGO 3
+/* maximum allowable trend in slow soil carbon at steady-state (kgC/m2/yr) 0.005 */
+#define SPINUP_TOLERANCE 0.008 
 
 /* output control constants */
-#define NMAP 700
+#define NMAP 3200
 
-/* For modifying summary output as per pan-arctic bgc */
-#define SANE 1
-#define INSANE 0
+/* contants for multilayer soil model calculation */
+#define HC_water			4200000.	/* (J/m3/K) heat capacity of water */
+#define HC_soil				1260000.	/* (J/m3/K) heat capacity of soil */
+#define HC_air				1004.		/* (J/m3/K) heat capacity of air */
+#define water_density		1000		/* (kg/m3)  mean value of water density */
+#define pF_hygroscopw		6.2			/* (dimless)  pF value at hygroscopic water point (dry air) */
+#define pF_wiltingpoint		4.2			/* (dimless)  pF value at wilting point */
+#define pF_fieldcapacity	2.5			/* (dimless)  pF value at field capacity */
+#define TP					2.65		/* (g/cm3) total porosity */
 
-#ifdef __cplusplus
-}
-#endif
+/* contants for snow estimation in GSI calculation */
+#define sn_abs				0.6			/* absorptivity of snow */
+#define lh_fus				335.0		/* (kJ/kg) latent heat of fusion */
+#define lh_sub				2845.0		/* (kJ/kg) latent heal of sublimation */
+#define tcoef				0.65		/* (kg/m2/deg C/d) temp. snowmelt coef */
 
-#endif
+#define NDAYS_OF_YEAR	    365	
+#define NSEC_IN_DAY		    86400					/* (s/day)  calculation of daily value from second values */
+#define NHOUR_IN_DAY		24.						/* (hour/day)  calculation of daily value from hourly values */
+#define DATA_GAP			-9999
+
+/* number of parameter arrays regarding to management sections */
+#define n_FRZparam			13
+#define n_GRZparam			15
+#define n_HRVparam			3
+#define n_IRGparam			3
+#define n_MOWparam			3
+#define n_PLTparam			6
+#define n_PLGparam			3
+#define n_THNparam			5
+
+/* constant for net radiation calculation */
+#define PI                  3.14159265358979323846
+#define STEFAN_BOLTZMANN	0.000000004901
+#define C_to_K				273.16

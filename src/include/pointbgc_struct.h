@@ -1,19 +1,16 @@
-#ifndef POINTBGC_STRUCT_H
-#define POINTBGC_STRUCT_H
 /* 
 pointbgc_struct.h
-for use with pointbgc front-end to BIOME-BGC library
+for use with pointbgc front-end to BBGC MuSo v4 library
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGC version 4.2 (final release)
-See copyright.txt for Copyright information
+Biome-BGCMuSo v5.0.
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2018, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 /* point simulation control parameters */
 typedef struct
@@ -21,6 +18,7 @@ typedef struct
     char header[100];      /* header string, written to all output files */
 	char systime[100];     /* system time at start of simulation */ 
 	file metf;             /* met data file (ASCII) *//* simulation restart control variables */
+	int  nday_lastsimyear; /* (int) number of simdays in last simyear (truncated year: < 365) */
 } point_struct;
 
 typedef struct
@@ -44,29 +42,41 @@ typedef struct
 
 typedef struct
 {
-	int onscreen;          /* flag for on-screen progress indicator */
-	char outprefix[100];   /* output filename prefix */
-	int dodaily; 	       /* flag for daily output */
-	int domonavg;          /* flag for monthly average output */
-	int doannavg;          /* flag for annual average output */
-	int doannual;		   /* flag for annual output */
-	int ndayout;           /* number of custom daily outputs */
-	int nannout;           /* number of custom annual outputs */
-	int* daycodes;         /* array of indices for daily outputs */
-	int* anncodes;         /* array of indices for annual outputs */
-    file dayout;           /* daily output file */
-	file monavgout;        /* monthly average output file */
-	file annavgout;        /* annual average output file */
-    file annout;           /* annual output file */
-	file anntext;          /* simple annual text output */
-	file dayoutascii;	/* ASCII daily output file */
-	file monoutascii;	/* ASCII monthly output file */
-	file annoutascii;	/* ASCII annual output file */
-	unsigned char bgc_ascii;	
+	int onscreen;				/* flag for on-screen progress indicator */
+	char outprefix[100];		/* output filename prefix */
+	int dodaily; 				/* flag for daily output */
+	int domonavg;				/* flag for monthly average output */
+	int doannavg;				/* flag for annual average output */
+	int doannual;				/* flag for annual output */
+	int ndayout;				/* number of custom daily outputs */
+	int nannout;				/* number of custom annual outputs */
+	int* daycodes;				/* array of indices for daily outputs */
+	char** daynames;			/* array of names for daily outputs */
+	int* anncodes;				/* array of indices for annual outputs */
+	char** annnames;			/* array of names for daily outputs */
+    file dayout;				/* daily output file */
+	file monavgout;				/* monthly average output file */
+	file annavgout;				/* annual average output file */
+    file annout;				/* annual output file */
+	file log_file;				/* main information about model run */
 } output_struct;
 
-#ifdef __cplusplus
-}
-#endif
 
-#endif
+/* GSI arrays */
+typedef struct
+{
+	int GSI_flag;					/* flag for using GSI or not */
+	double snowcover_limit;			/* critical amount of snow (above: no vegetation period) */
+	double heatsum_limit1;			/* lower limit of heatsum to calculate heatsum index */
+    double heatsum_limit2;			/* upper limit of heatsum to calculate heatsum index */
+	double tmin_limit1;				/* lower limit of tmin to calculate tmin index */
+	double tmin_limit2;				/* upper limit of tmin to calculate tmin index  */
+	double vpd_limit1;				/* lower limit of tmin to calculate vpd index  */
+	double vpd_limit2;				/* upper limit of tmin to calculate vpd index  */
+	double dayl_limit1;				/* lower limit of dayl to calculate vpd index  */
+	double dayl_limit2;				/* upper limit of dayl to calculate vpd index  */
+	int n_moving_avg;				/* moving average (calculated from indicatiors to avoid the effects of single extreme events)*/
+	double GSI_limit_SGS;			/* when GSI index fisrt time greater that limit -> start of the growing season */
+	double GSI_limit_EGS;			/* when GSI index fisrt time less that limit -> end of the growing season */
+} GSI_struct;
+
