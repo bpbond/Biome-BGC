@@ -113,7 +113,8 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout, int mode)
 	/* mode == MODE_MODEL only */
 	/* simple annual variables for text output */
 	double annmaxplai,annet,annoutflow,annnpp,annnbp, annprcp,anntavg;
-
+	annmaxplai = 0.0;
+	
 	if (mode != MODE_SPINUP && mode != MODE_MODEL)
 	{
 		bgc_printf(BV_ERROR, "Error: Unknown MODE given when calling bgc()\n");
