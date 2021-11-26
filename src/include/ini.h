@@ -1,40 +1,28 @@
-#ifndef INI_H
-#define INI_H
-
 /*
 ini.h
 header file for file I/O handling and initialization file reading
-for use with BIOME-BGC library
+for use with BBGC MuSo v4 library
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGC version 4.2 (final release)
-See copyright.txt for Copyright information
+Biome-BGCMuSo v6.2.
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2020, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-#define FLT_COND_TOL 1e-10  /* This constant is used in if conditions    *
-                             * where floating point values are compared  */
-
+#include "bgc_constants.h"
 
 /* structure definition for filename handling */
 typedef struct
 {
-	char name[128];
+	char name[FILENAMESIZE];
 	FILE *ptr;
 } file;
 
 /* function prototypes */
-int file_open (file *target, char mode);
+int file_open (file *target, char mode, int errormessage);
 int scan_value (file ini, void *var, char mode);
-int scan_open (file ini,file *target,char mode);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+int scan_array (file ini, void *var, char mode, int nl, int errormessage);
+int scan_open (file ini,file *target,char mode, int errormessage);

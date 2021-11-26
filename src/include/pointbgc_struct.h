@@ -1,19 +1,17 @@
-#ifndef POINTBGC_STRUCT_H
-#define POINTBGC_STRUCT_H
 /* 
 pointbgc_struct.h
-for use with pointbgc front-end to BIOME-BGC library
+for use with pointbgc front-end to BBGC MuSo v4 library
 
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-Biome-BGC version 4.2 (final release)
-See copyright.txt for Copyright information
+Biome-BGCMuSo v6.2.
+Original code: Copyright 2000, Peter E. Thornton
+Numerical Terradynamic Simulation Group, The University of Montana, USA
+Modified code: Copyright 2020, D. Hidy [dori.hidy@gmail.com]
+Hungarian Academy of Sciences, Hungary
+See the website of Biome-BGCMuSo at http://nimbus.elte.hu/bbgc/ for documentation, model executable and example input files.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#define N_MGMDAYS 7		/*  number of type of management events in a single year */
 
 /* point simulation control parameters */
 typedef struct
@@ -21,13 +19,13 @@ typedef struct
     char header[100];      /* header string, written to all output files */
 	char systime[100];     /* system time at start of simulation */ 
 	file metf;             /* met data file (ASCII) *//* simulation restart control variables */
+	int  nday_lastsimyear; /* (int) number of simdays in last simyear (truncated year: < 365) */
 } point_struct;
 
 typedef struct
 {
 	int read_restart;      /* flag to read restart file */
 	int write_restart;     /* flag to write restart file */
-	int keep_metyr;        /* (flag) 1=retain restart metyr, 0=reset metyr */
 	file in_restart;       /* input restart file */
 	file out_restart;      /* output restart file */
 } restart_ctrl_struct;
@@ -44,29 +42,29 @@ typedef struct
 
 typedef struct
 {
-	int onscreen;          /* flag for on-screen progress indicator */
-	char outprefix[100];   /* output filename prefix */
-	int dodaily; 	       /* flag for daily output */
-	int domonavg;          /* flag for monthly average output */
-	int doannavg;          /* flag for annual average output */
-	int doannual;		   /* flag for annual output */
-	int ndayout;           /* number of custom daily outputs */
-	int nannout;           /* number of custom annual outputs */
-	int* daycodes;         /* array of indices for daily outputs */
-	int* anncodes;         /* array of indices for annual outputs */
-    file dayout;           /* daily output file */
-	file monavgout;        /* monthly average output file */
-	file annavgout;        /* annual average output file */
-    file annout;           /* annual output file */
-	file anntext;          /* simple annual text output */
-	file dayoutascii;	/* ASCII daily output file */
-	file monoutascii;	/* ASCII monthly output file */
-	file annoutascii;	/* ASCII annual output file */
-	unsigned char bgc_ascii;	
+	int onscreen;				/* flag for on-screen progress indicator */
+	char outprefix[100];		/* output filename prefix */
+	int dodaily; 				/* flag for daily output */
+	int domonavg;				/* flag for monthly average output */
+	int doannavg;				/* flag for annual average output */
+	int doannual;				/* flag for annual output */
+	int ndayout;				/* number of custom daily outputs */
+	int nannout;				/* number of custom annual outputs */
+	int* daycodes;				/* array of indices for daily outputs */
+	char** daynames;			/* array of names for daily outputs */
+	int* anncodes;				/* array of indices for annual outputs */
+	char** annnames;			/* array of names for daily outputs */
+    file dayout;				/* daily output file */
+	file monavgout;				/* monthly average output file */
+	file annavgout;				/* annual average output file */
+    file annout;				/* annual output file */
+	file dayoutT;				/* transient daily output file */
+	file monavgoutT;			/* transient monthly average output file */
+	file annavgoutT;			/* transient annual average output file */
+    file annoutT;				/* transient annual output file */
+	file log_file;				/* main information about model run */
+	file econout_file;			/* economical information  */
 } output_struct;
 
-#ifdef __cplusplus
-}
-#endif
 
-#endif
+
