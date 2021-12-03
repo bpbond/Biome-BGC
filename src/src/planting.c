@@ -92,8 +92,49 @@ int planting(control_struct* ctrl, const siteconst_struct* sitec, const planting
 
 			epv->germ_depth = PLT->germ_depth_array[md]; 
 
-			cs->fruitC_HRV          = 0;
+			cs->fruitC_HRV        = 0;
 			cs->vegC_HRV          = 0;
+
+			/* resetting of storage variables */
+			if (cs->leafc_storage > 0)
+			{
+				cs->STDBc_nsc                   += cs->leafc_storage;
+				cs->SNSCsnk_C                   += cs->leafc_storage;
+				ns->STDBn_nsc                   += ns->leafn_storage;
+				ns->SNSCsnk_N                   += ns->leafn_storage;
+				cs->leafc_storage = 0;
+				ns->leafn_storage = 0;
+			}
+
+			if (cs->frootc_storage > 0)
+			{
+				cs->STDBc_nsc                   += cs->frootc_storage;
+				cs->SNSCsnk_C                   += cs->frootc_storage;
+				ns->STDBn_nsc                   += ns->frootn_storage;
+				ns->SNSCsnk_N                   += ns->frootn_storage;
+				cs->frootc_storage = 0;
+				ns->frootn_storage = 0;
+			}
+
+			if (cs->softstemc_storage > 0)
+			{
+				cs->STDBc_nsc                   += cs->softstemc_storage;
+				cs->SNSCsnk_C                   += cs->softstemc_storage;
+				ns->STDBn_nsc                   += ns->softstemn_storage;
+				ns->SNSCsnk_N                   += ns->softstemn_storage;
+				cs->softstemc_storage = 0;
+				ns->softstemn_storage = 0;
+			}
+
+			if (cs->fruitc_storage > 0)
+			{
+				cs->STDBc_nsc                   += cs->fruitc_storage;
+				cs->SNSCsnk_C                   += cs->fruitc_storage;
+				ns->STDBn_nsc                   += ns->fruitn_storage;
+				ns->SNSCsnk_N                   += ns->fruitn_storage;
+				cs->fruitc_storage = 0;
+				ns->fruitn_storage = 0;
+			}
 
 			/* 2.2 germination depth and layer */
 			while (!flag_layerIMP)

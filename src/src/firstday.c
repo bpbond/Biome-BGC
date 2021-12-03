@@ -210,7 +210,8 @@ int firstday(const control_struct* ctrl, const soilprop_struct* sprop, const epc
 	for (pp = 0; pp < N_PHENPHASES; pp++) 
 	{
 		cs->leafcSUM_phenphase[pp] = 0;
-		epv->phenphase_date[pp]=-1;
+		epv->phenphase_date[pp]    =-1;
+		epv->rootdepth_phen[pp]    = 0;
 	}
 
 

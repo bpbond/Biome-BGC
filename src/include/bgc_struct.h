@@ -1562,6 +1562,7 @@ typedef struct
 	double MRdeficit_w;								/* (flag) of maint.resp.calculation deficit for nw-biomass */
 	double albedo_LAI;                              /* (dimless) LAI dependent albedo */
 	double phenphase_date[N_PHENPHASES];			/* (DOY) date of phenphase's start */
+	double rootdepth_phen[N_PHENPHASES];			/* (m) depth of the rootzone at the end of the given phenphase */
 	double flower_date;								/* (DOY) date of flowering phenphase's start */
 	double winterEnd_date;							/* (DOY) date of end of wintering */
 	double wpm_act;                                 /* (prop) whole plant mortality value on actual day */

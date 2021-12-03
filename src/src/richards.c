@@ -42,13 +42,13 @@ int richards(siteconst_struct* sitec, soilprop_struct* sprop, const epconst_stru
 	int layer, n_second, n_sec, discretlevel;
 
 	double CRIT_PRECwater;
-	double VWCdiff_max, VWCdiff, diff;
+	double VWCdiff_max, VWCdiff, diff, diff1, diff2;
 	double localvalue,  exponent_discretlevel;
 	double soilw0, VWC0, VWC1, soilw_sat0;
 	double Ksat0, Ksat1, Kact;
 
 	double pondw_act, infilt_limit,outflux;
-	double pondw_to_runoff,soilw_to_pondw, infilt_to_soilw, infilt_to_pondw, pondw_evap, soilw_evap, pondw_to_soilw;
+	double soilw_to_pondw, infilt_to_soilw, infilt_to_pondw, pondw_evap, soilw_evap, pondw_to_soilw;
 
 	double dz0, dz1;
 	double transp[N_SOILLAYERS],diffus[N_SOILLAYERS], percol[N_SOILLAYERS];
@@ -57,7 +57,7 @@ int richards(siteconst_struct* sitec, soilprop_struct* sprop, const epconst_stru
 	CRIT_PRECwater=1e-8;
 	
 	INFILT=EVAP=INFILT_ctrl=EVAP_act=EVAP_ctrl=TRANSP_ctrl=0;
-	outflux=pondw_to_runoff=pondw_to_soilw=soilw_to_pondw=infilt_to_soilw=infilt_to_pondw=pondw_evap=soilw_evap=pondw_act=0;
+	outflux=pondw_to_soilw=soilw_to_pondw=infilt_to_soilw=infilt_to_pondw=pondw_evap=soilw_evap=pondw_act=0;
 	for (layer=0 ; layer < N_SOILLAYERS; layer++)
 	{
 		transp[layer]=0;
@@ -224,6 +224,7 @@ int richards(siteconst_struct* sitec, soilprop_struct* sprop, const epconst_stru
 			else
 				ws->soilw[layer] = ws->soilw[layer] - transp[layer] + percol[layer-1] + diffus[layer-1] - percol[layer] - diffus[layer];
 
+			
 
 			diff             = sprop->VWChw[layer] * sitec->soillayer_thickness[layer] * water_density - ws->soilw[layer];
 		
@@ -235,17 +236,24 @@ int richards(siteconst_struct* sitec, soilprop_struct* sprop, const epconst_stru
 				{
 					if (soilw_evap+transp[layer] > diff)
 					{
-						soilw_evap       -= soilw_evap*(diff/(soilw_evap+transp[layer]));
-						transp[layer]    -= transp[layer]*(diff/(soilw_evap+transp[layer]));
-						ws->soilw[layer] = sprop->VWChw[layer] * sitec->soillayer_thickness[layer] * water_density;
+						diff1             = soilw_evap   *(diff/(soilw_evap+transp[layer]));
+						diff2             = transp[layer]*(diff/(soilw_evap+transp[layer]));
+						soilw_evap       -= diff1;
+						transp[layer]    -= diff2;
+						ws->soilw[layer]  = sprop->VWChw[layer] * sitec->soillayer_thickness[layer] * water_density;
+						diff             -= (diff1+diff2);
+						if (diff > CRIT_PRECwater) ws->runoff_snk += diff;
 					}
 					else
 					{
-						if (diff - (soilw_evap+transp[layer]) < CRIT_PREC)
+						diff            -= (soilw_evap +transp[layer]);
+						soilw_evap       = 0;
+						transp[layer]    = 0;
+						if (percol[layer] > diff)
 						{
-							soilw_evap       = 0;
-							transp[layer]    = 0;
+							percol[layer]   -= diff;
 							ws->soilw[layer] = sprop->VWChw[layer] * sitec->soillayer_thickness[layer] * water_density;
+							diff             = 0;
 						}
 						else
 						{
@@ -258,17 +266,20 @@ int richards(siteconst_struct* sitec, soilprop_struct* sprop, const epconst_stru
 				/* except of top soil layer: limitation of transpiration */
 				else
 				{
-					if (transp[layer]  > diff)
+					if (transp[layer] > diff)
 					{
 						transp[layer]    -= diff;
-						ws->soilw[layer] = sprop->VWChw[layer] * sitec->soillayer_thickness[layer] * water_density;
+						ws->soilw[layer]  = sprop->VWChw[layer] * sitec->soillayer_thickness[layer] * water_density;
+						diff              = 0;
 					}
 					else
 					{
-						if (diff - transp[layer] < CRIT_PREC)
+						diff  -= transp[layer];
+						if (percol[layer] > diff)
 						{
-							transp[layer]    = 0;
+							percol[layer]   -= diff;
 							ws->soilw[layer] = sprop->VWChw[layer] * sitec->soillayer_thickness[layer] * water_density;
+							diff             = 0;
 						}
 						else
 						{
@@ -316,35 +327,48 @@ int richards(siteconst_struct* sitec, soilprop_struct* sprop, const epconst_stru
 			
 		if (diff >	0)
 		{
-			soilw_to_pondw += diff;
+			soilw_to_pondw = diff;
 			ws->soilw[0] = sprop->VWCsat[0] * sitec->soillayer_thickness[0] * water_density;
 			epv->VWC[0] = ws->soilw[0] / (water_density * sitec->soillayer_thickness[0]);
 		}
+		else
+			soilw_to_pondw = 0;
+
+		
 		pondw_act          += infilt_to_pondw + soilw_to_pondw - pondw_to_soilw - pondw_evap;
 		
 		if (pondw_act < 0)
 		{
 			diff            = -1*pondw_act;
-			pondw_evap     -= diff * pondw_evap    /(pondw_evap+pondw_to_soilw);
-			pondw_to_soilw -= diff * pondw_to_soilw/(pondw_evap+pondw_to_soilw);
+			diff1           = diff * pondw_evap    /(pondw_evap+pondw_to_soilw);
+			diff2           = diff * pondw_to_soilw/(pondw_evap+pondw_to_soilw);
+			pondw_evap     -= diff1;
+			pondw_to_soilw -= diff2;
+			ws->soilw[0]   -= diff2;
+			epv->VWC[0]     = ws->soilw[0] / (water_density * sitec->soillayer_thickness[0]);
+			if (epv->VWC[0] > sprop->VWCsat[0])
+			{
+				printf("\n");
+				printf("ERROR: in pondw water calculation (richards.c)\n");
+			}
 			pondw_act       = 0;
+			diff           -= (diff1+diff2);
+			if (diff > CRIT_PRECwater) ws->runoff_snk += diff;
 		}
-		if (pondw_act > sprop->pondmax)
-		{
-			pondw_to_runoff = pondw_act - sprop->pondmax;
-			pondw_act = sprop->pondmax;
-		}
+		
 
 		/* 2.2 pondw and FLUX VARIABLES */
 			
 		wf->infilt_to_pondw += infilt_to_pondw;
 		wf->infilt_to_soilw += infilt_to_soilw;
+
+		
 		wf->soilw_to_pondw  += soilw_to_pondw;
 		wf->soilw_evap      += soilw_evap;
 		wf->pondw_to_soilw  += pondw_to_soilw;
 		wf->pondw_evap      += pondw_evap;
 		wf->pondw_to_soilw  += pondw_to_soilw;
-		wf->pondw_to_runoff += pondw_to_runoff;
+	
 
 		INFILT          -= (infilt_to_soilw + infilt_to_pondw);
 		INFILT_ctrl     += (infilt_to_soilw + infilt_to_pondw);
@@ -406,13 +430,7 @@ int richards(siteconst_struct* sitec, soilprop_struct* sprop, const epconst_stru
 				INFILT_ctrl         += infilt_to_soilw;
 			}
 			
-			/* if pond water is greatedr than a maximum height -> runoff */
-			if (pondw_act > sprop->pondmax)
-			{
-				pondw_to_runoff      = pondw_act - sprop->pondmax;
-				wf->pondw_to_runoff += pondw_to_runoff;
-				pondw_act            = sprop->pondmax;
-			}
+		
 
 			/* precision control */
 			if (pondw_act > 0 && pondw_act < CRIT_PRECwater)
@@ -422,11 +440,19 @@ int richards(siteconst_struct* sitec, soilprop_struct* sprop, const epconst_stru
 			}
 		}
 
+	
 		ws->timestepRichards=ws->timestepRichards+1;	
 	
 	}
 	
 	
+	/* if pond water is greatedr than a maximum height -> runoff */
+	if (pondw_act > sprop->pondmax)
+	{
+		wf->pondw_to_runoff  = pondw_act - sprop->pondmax;
+		pondw_act            = sprop->pondmax;
+	}
+
 	ws->pondw = pondw_act;
 
 	/* --------------------------------------------------------------------------------------------------------*/	
@@ -447,14 +473,14 @@ int richards(siteconst_struct* sitec, soilprop_struct* sprop, const epconst_stru
 		else
 		{
 			printf("\n");
-			printf("WARNING: balance in evaporation calculation\n");
+			printf("ERROR: actual evaporation is greater than potential evaporation (richards.c)\n");
 		}
 	}
 
 	if (fabs(wf->soilw_evap + wf->pondw_evap - EVAP_ctrl) > CRIT_PRECwater)
 	{
 	//	printf("\n");
-		printf("WARNING: balance problem in evaporation calculation\n");
+		printf("WARNING: balance problem in evaporation calculation (richards.c)\n");
 	}
 
 	/* ----------------------------------------*/
@@ -482,7 +508,7 @@ int richards(siteconst_struct* sitec, soilprop_struct* sprop, const epconst_stru
 		else
 		{
 			printf("\n");
-			printf("ERROR: in transpiration calculation\n");
+			printf("ERROR: in transpiration calculation (richards.c)\n");
 			errorCode=1;
 		}
 	}
@@ -490,7 +516,7 @@ int richards(siteconst_struct* sitec, soilprop_struct* sprop, const epconst_stru
 	if (fabs(wf->soilw_transp_SUM - TRANSP_ctrl) > CRIT_PRECwater)
 	{
 		//printf("\n");
-		printf("WARNING: balance problem in transpiration calculation\n");
+		printf("WARNING: balance problem in transpiration calculation (richards.c)\n");
 	}
 
 	wf->infiltPOT = (wf->prcp_to_soilw + wf->snoww_to_soilw + wf->canopyw_to_soilw + wf->IRG_to_prcp + wf->pondw_to_soilw - wf->prcp_to_runoff - wf->prcp_to_pondw);
@@ -501,7 +527,7 @@ int richards(siteconst_struct* sitec, soilprop_struct* sprop, const epconst_stru
 	if (fabs(INFILT_sum - INFILT_ctrl) > CRIT_PRECwater)
 	{
 		//printf("\n");
-		printf("WARNING: balance problem in infiltration calculation\n");
+		printf("WARNING: balance problem in infiltration calculation (richards.c)\n");
 	}
 
 

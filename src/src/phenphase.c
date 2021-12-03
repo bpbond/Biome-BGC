@@ -113,7 +113,7 @@ int phenphase(file logfile, const control_struct* ctrl, const epconst_struct* ep
 	}
 
 	/* 2.3 first day of phenological phases and flowering phenophase (0: in 1th of January) */
-	//if (ctrl->month == 1 && ctrl->day == 1)
+
 	if (epv->n_actphen == 0)
 	{
 		for (pp=0; pp<N_PHENPHASES; pp++) 
@@ -127,6 +127,7 @@ int phenphase(file logfile, const control_struct* ctrl, const epconst_struct* ep
 	if (epv->phenphase_date[pp-1] == 0) 
 	{
 		epv->phenphase_date[pp-1]=ctrl->yday;
+		epv->rootdepth_phen[pp-1]=epv->rootdepth;
 	}
 	
 	
@@ -215,6 +216,7 @@ int phenphase(file logfile, const control_struct* ctrl, const epconst_struct* ep
 					/* firstday and ndays of phenological phase */
 					pp = (int) epv->n_actphen- 1;
 					epv->phenphase_date[pp]=ctrl->yday;
+					epv->rootdepth_phen[pp]=epv->rootdepth;
 					
 					/* writing out phenphases limits into logfile */
 					if (ctrl->spinup == 0 && PLT->PLT_num) 
@@ -248,6 +250,7 @@ int phenphase(file logfile, const control_struct* ctrl, const epconst_struct* ep
 				/* first day of phenological phase */
 				pp = (int) epv->n_actphen- 1;
 				epv->phenphase_date[pp]=ctrl->yday;
+				epv->rootdepth_phen[pp]=epv->rootdepth;
 				
 				/* writing out phenphases limits into logfile */
 				if (ctrl->spinup == 0 && PLT->PLT_num) 

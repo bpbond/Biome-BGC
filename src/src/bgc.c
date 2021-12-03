@@ -955,7 +955,7 @@ int bgc(bgcin_struct* bgcin, bgcout_struct* bgcout)
 				errorCode=522;
 			}
 
-		
+			
 	    	/* multilayer soil hydrology: percolation calculation based on PRCP, RUNOFF, EVAP, TRANSP */
 			if (!errorCode && multilayer_hydrolprocess(&ctrl, &sitec, &sprop, &epc,  &epv, &ws, &wf, &gws))
 			{

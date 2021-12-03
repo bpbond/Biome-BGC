@@ -76,7 +76,7 @@ int multilayer_rootdepth(const epconst_struct* epc, const soilprop_struct* sprop
 
 	if (epc->woody) epv->rootdepth = maxRD;
 
-	if (epv->germ_layer)
+	if (epv->germ_layer && epv->rootdepth)
 		epv->rootlength = epv->rootdepth - sitec->soillayer_depth[epv->germ_layer-1];
 	else
 		epv->rootlength = epv->rootdepth;
