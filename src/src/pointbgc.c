@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 	{
         if(!strcmp(argv[1],"-v"))
 		{
-           	printf("Model version: Biome-BGCMuSo6.2-b25 (Biome-BGCMAg2.2-b25)\n");
+           	printf("Model version: Biome-BGCMuSo6.2alfa (Biome-BGCMAg2.2alfa)\n");
 			exit(0);
         }
     }

@@ -116,19 +116,12 @@ int phenphase(file logfile, const control_struct* ctrl, const epconst_struct* ep
 
 	if (epv->n_actphen == 0)
 	{
-		for (pp=0; pp<N_PHENPHASES; pp++) 
-		{
-			epv->phenphase_date[pp] = 0;
-		}
+		for (pp=0; pp<N_PHENPHASES; pp++) epv->phenphase_date[pp] = -1;
 		epv->flower_date = 0;
 		epv->winterEnd_date = 0;
 	}
+	
 	pp = (int) epv->n_actphen; 
-	if (epv->phenphase_date[pp-1] == 0) 
-	{
-		epv->phenphase_date[pp-1]=ctrl->yday;
-		epv->rootdepth_phen[pp-1]=epv->rootdepth;
-	}
 	
 	
 	if (pp == epc->n_flowHS_phenophase && ctrl->yday-epv->phenphase_date[pp-1] == 1) 
@@ -202,8 +195,12 @@ int phenphase(file logfile, const control_struct* ctrl, const epconst_struct* ep
 		
 		if (epv->n_actphen == 1)
 		{
-			/* first day of phenological phase */
-			if (epv->phenphase_date[pp] < 0) epv->phenphase_date[pp]=ctrl->yday;
+			/* first day of phenological phase nd depth of rooting zone from previous phenphase */
+			if (epv->phenphase_date[pp] < 0) 
+			{
+				epv->phenphase_date[pp]=ctrl->yday;
+				epv->rootdepth_phen[pp]=epv->rootdepth;
+			}
 
 			critVWC = sprop->VWCwp[epv->germ_layer] + epc->grmn_paramVWC *(sprop->VWCfc[epv->germ_layer] - sprop->VWCwp[epv->germ_layer]);
 			if (metv->GDD_wMOD > phen->GDD_limit && epv->VWC[epv->germ_layer] > critVWC && phen->yday_total > phen->onday)
@@ -325,6 +322,7 @@ int phenphase(file logfile, const control_struct* ctrl, const epconst_struct* ep
 		if (!lastday) phen->remdays_litfall = 0;
 		phen->predays_litfall = 0;
 		phen->remdays_curgrowth = 0;
+		for (pp=0; pp<N_PHENPHASES; pp++) epv->rootdepth_phen[pp] = -1;
 
 	}
 	
